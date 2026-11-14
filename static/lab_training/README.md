@@ -33,10 +33,13 @@ static/lab_training/
 ## Controles
 
 - `WASD` ou setas: mover pelo mapa top-down.
-- `E` ou espaço: inspecionar o objeto próximo.
-- `Esc`: fechar a inspeção.
-- Use os botões de sala para navegar rapidamente pelo mapa.
-- Os botões de animação reproduzem uma prévia; idle e run também alternam automaticamente conforme o movimento.
+- `E` ou espaço: interagir com o objeto próximo.
+- `1`–`4`: selecionar ferramenta científica.
+- `M`: abrir/fechar o mapa; `Tab`: abrir/fechar a mochila.
+- `Esc`: fechar painéis. No celular, use os controles sobre o mapa.
+- Os controles de pausa, reinício e tela cheia ficam no canto superior direito.
+
+O mapa ocupa a tela inteira; o canvas mantém a proporção da planta. O perfil do cadete (nome e personagem) fica salvo em `localStorage` na chave `opportunity.labTraining.profile`.
 
 ## API
 

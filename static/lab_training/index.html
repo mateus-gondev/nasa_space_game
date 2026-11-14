@@ -16,10 +16,6 @@
         <h1>Opportunity Research Facility</h1>
         <p class="subtitle">Mapa original da instalação · exploração top-down em pixel art</p>
       </div>
-      <div class="topbar-actions">
-        <button class="ui-button" id="pauseButton" type="button">Pausar</button>
-        <button class="ui-button" id="resetButton" type="button">Reiniciar</button>
-      </div>
     </header>
 
     <section class="toolbar" aria-label="Controles do mapa">
@@ -39,6 +35,12 @@
           <canvas id="gameCanvas" tabindex="0" aria-label="Mapa top-down da instalação Opportunity com um astronauta"></canvas>
           <div class="stage-vignette" aria-hidden="true"></div>
           <div class="stage-status" id="stageStatus">CARREGANDO ASTRONAUTA <span></span></div>
+          <div class="game-hud" aria-label="Controles da simulação">
+            <span class="cadet-badge" id="cadetBadge" hidden></span>
+            <button class="hud-button" id="pauseButton" type="button" aria-label="Pausar" title="Pausar">Ⅱ</button>
+            <button class="hud-button" id="resetButton" type="button" aria-label="Reiniciar" title="Reiniciar">↻</button>
+            <button class="hud-button" id="fullscreenButton" type="button" aria-label="Tela cheia" title="Tela cheia">⛶</button>
+          </div>
           <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
             <p class="eyebrow">OBJETIVO DO TREINAMENTO</p>
             <h2 id="tutorialTitle"></h2>
@@ -76,15 +78,15 @@
             </section>
           </div>
           <div class="paused-overlay" id="pausedOverlay" hidden>SIMULAÇÃO PAUSADA</div>
-        </div>
-        <div class="mobile-controls" aria-label="Controles de movimento">
-          <button type="button" data-key="ArrowUp" aria-label="Cima">▲</button>
-          <div class="mobile-controls-row">
-            <button type="button" data-key="ArrowLeft" aria-label="Esquerda">◀</button>
-            <button type="button" data-key="ArrowDown" aria-label="Baixo">▼</button>
-            <button type="button" data-key="ArrowRight" aria-label="Direita">▶</button>
+          <div class="mobile-controls" aria-label="Controles de movimento">
+            <button type="button" data-key="ArrowUp" aria-label="Cima">▲</button>
+            <div class="mobile-controls-row">
+              <button type="button" data-key="ArrowLeft" aria-label="Esquerda">◀</button>
+              <button type="button" data-key="ArrowDown" aria-label="Baixo">▼</button>
+              <button type="button" data-key="ArrowRight" aria-label="Direita">▶</button>
+            </div>
+            <button type="button" data-action="inspect">E · USAR</button>
           </div>
-          <button type="button" data-action="inspect">E · INSPECIONAR</button>
         </div>
       </div>
 
@@ -145,30 +147,24 @@
 
   <div class="story-overlay" id="introOverlay">
     <section class="story-card" id="welcomeScreen" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
-      <p class="eyebrow">HOUSTON, TEXAS · CENTRO ESPACIAL LYNDON B. JOHNSON</p>
-      <h2 id="welcomeTitle">Treinamento Júnior de Astronautas</h2>
-      <p class="story-copy">Parabéns, cadete <strong id="welcomeCadet">_________</strong>. Você foi selecionado para participar do Treinamento Júnior de Astronautas da NASA no Centro Espacial Lyndon B. Johnson. Antes de viajar de vez para Marte, você vai participar de uma simulação para aprender a controlar o que deve ser feito na nave e como sobreviver no ambiente marciano.</p>
+      <p class="eyebrow">OPPORTUNITY · TREINAMENTO EM MARTE</p>
+      <h2 id="welcomeTitle">Preparação da missão</h2>
+      <p class="story-copy">Informe seu nome e confirme o equipamento para começar.</p>
+      <p class="profile-character">PERSONAGEM · ASTRONAUTA</p>
       <form id="welcomeForm">
         <label for="cadetName">Identificação do cadete</label>
         <input id="cadetName" name="cadetName" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome" required>
-        <button class="story-button" type="submit">Continuar briefing</button>
+        <div class="suit-steps">
+          <button class="suit-step" id="wearSuit" type="button" aria-pressed="false">
+            <kbd>01</kbd><span>Traje e botas</span><span class="suit-step-state">PENDENTE</span>
+          </button>
+          <button class="suit-step" id="wearHelmet" type="button" aria-pressed="false" disabled>
+            <kbd>02</kbd><span>Capacete</span><span class="suit-step-state">PENDENTE</span>
+          </button>
+        </div>
+        <p class="suit-feedback" id="suitFeedback" role="status">Conclua as duas etapas.</p>
+        <button class="story-button" id="confirmSuit" type="submit" disabled>Iniciar missão</button>
       </form>
-    </section>
-    <section class="story-card suit-screen" id="suitScreen" role="dialog" aria-modal="true" aria-labelledby="suitTitle" hidden>
-      <p class="eyebrow">PREPARAÇÃO · EQUIPAMENTO PESSOAL</p>
-      <h2 id="suitTitle">Verificação do traje</h2>
-      <div class="suit-preview" role="img" aria-label="Astronauta vestindo traje espacial e capacete"></div>
-      <p class="story-copy"><strong id="suitCadet">Cadete</strong>, vista o traje pressurizado, ajuste as luvas e as botas e vede o capacete. Confirme o rádio e o sistema de suporte à vida antes de entrar na simulação de gravidade marciana.</p>
-      <div class="suit-steps">
-        <button class="suit-step" id="wearSuit" type="button" aria-pressed="false">
-          <kbd>01</kbd><span>Vestir traje, botas e luvas</span><span class="suit-step-state">PENDENTE</span>
-        </button>
-        <button class="suit-step" id="wearHelmet" type="button" aria-pressed="false" disabled>
-          <kbd>02</kbd><span>Colocar e vedar o capacete</span><span class="suit-step-state">PENDENTE</span>
-        </button>
-      </div>
-      <p class="suit-feedback" id="suitFeedback" role="status">Complete as duas etapas para iniciar a simulação.</p>
-      <button class="story-button" id="confirmSuit" type="button" disabled>Entrar na simulação</button>
     </section>
   </div>
 

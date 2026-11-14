@@ -80,5 +80,5 @@ window.MAP_DATA = (() => {
     { name: "Power", x: 23.5, y: 14.5 }
   ];
 
-  return { width: W, height: H, grid, floorMap, doors, roomLabels, lights, destinations };
+  return { width: W, height: H, grid, floorMap, doors, props, roomLabels, lights, destinations };
 })();
