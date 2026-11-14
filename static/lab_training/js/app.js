@@ -35,6 +35,8 @@
   const inspectCard = $("#inspectCard");
   const interactionHint = $("#interactionHint");
   const animationFeedback = $("#animationFeedback");
+  const mainMenuOverlay = $("#mainMenuOverlay");
+  const mainMenuHome = $("#mainMenuHome");
   const introOverlay = $("#introOverlay");
   const mapOverlay = $("#mapOverlay");
   const inventoryOverlay = $("#inventoryOverlay");
@@ -306,6 +308,7 @@
   function startTutorial() {
     if (!suitWorn || !helmetWorn) return;
     tutorialPhase = "gravity";
+    mainMenuOverlay.hidden = true;
     appShell.inert = false;
     introOverlay.hidden = true;
     engine.controls.enabled = true;
@@ -346,12 +349,34 @@
     canvas.focus();
   }
 
+  function showMenuPage(page) {
+    mainMenuHome.hidden = page !== "home";
+    document.querySelectorAll(".menu-subpage").forEach(section => {
+      section.hidden = section.id !== `${page}Page`;
+    });
+    const focusTarget = page === "home"
+      ? $("#playButton")
+      : document.querySelector(`#${page}Page .menu-back`);
+    focusTarget?.focus();
+  }
+
+  function selectAtmosphere(key) {
+    engine.setAtmosphere(key);
+    document.querySelectorAll("[data-atmosphere]").forEach(button => {
+      button.classList.toggle("selected", button.dataset.atmosphere === key);
+    });
+  }
+
   Object.entries(config.atmosphere.presets).forEach(([key, preset]) => {
     const button = document.createElement("button");
     button.type = "button"; button.className = "mood-button"; button.dataset.mood = key; button.textContent = preset.label;
-    button.addEventListener("click", () => engine.setAtmosphere(key));
+    button.addEventListener("click", () => selectAtmosphere(key));
     $("#moodControls").append(button);
   });
+  document.querySelectorAll("[data-atmosphere]").forEach(button => {
+    button.addEventListener("click", () => selectAtmosphere(button.dataset.atmosphere));
+  });
+  selectAtmosphere(config.atmosphere.default);
 
   map.destinations.forEach(destination => {
     const button = document.createElement("button");
@@ -424,9 +449,33 @@
     $("#confirmSuit").disabled = false;
     $("#confirmSuit").focus();
   });
+  $("#playButton").addEventListener("click", () => {
+    if (savedProfile) {
+      startTutorial();
+      return;
+    }
+    mainMenuOverlay.hidden = true;
+    introOverlay.hidden = false;
+    cadetInput.focus();
+  });
+  $("#settingsButton").addEventListener("click", () => showMenuPage("settings"));
+  $("#infoButton").addEventListener("click", () => showMenuPage("info"));
+  $("#creditsButton").addEventListener("click", () => showMenuPage("credits"));
+  document.querySelectorAll("[data-menu-home]").forEach(button => {
+    button.addEventListener("click", () => showMenuPage("home"));
+  });
+  $("#settingsFullscreenButton").addEventListener("click", () => toggleFullscreen());
+  document.addEventListener("keydown", event => {
+    if (mainMenuOverlay.hidden || event.key !== "Escape") return;
+    const activePage = document.querySelector(".menu-subpage:not([hidden])");
+    if (activePage) {
+      event.preventDefault();
+      showMenuPage("home");
+    }
+  });
   $("#pauseButton").addEventListener("click", () => engine.setPaused());
   $("#resetButton").addEventListener("click", resetTraining);
-  fullscreenButton.addEventListener("click", async () => {
+  async function toggleFullscreen() {
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
       else if (document.documentElement.requestFullscreen) await document.documentElement.requestFullscreen();
@@ -435,7 +484,8 @@
       console.error("Não foi possível alternar para tela cheia:", error);
       showFeedback("Tela cheia indisponível.");
     }
-  });
+  }
+  fullscreenButton.addEventListener("click", toggleFullscreen);
   document.addEventListener("fullscreenchange", () => {
     const isFullscreen = Boolean(document.fullscreenElement);
     fullscreenButton.setAttribute("aria-label", isFullscreen ? "Sair da tela cheia" : "Tela cheia");
@@ -520,13 +570,10 @@
     }
   });
 
-  if (savedProfile) {
-    cadetInput.value = cadetName;
-    startTutorial();
-  } else {
-    cadetInput.focus();
-  }
+  cadetInput.value = cadetName;
+  $("#menuCharacter").textContent = character === defaultCharacter ? "Astronauta" : character;
   updateInterface();
+  showMenuPage("home");
   engine.start().then(() => {
     $("#stageStatus").innerHTML = "SISTEMA ONLINE <span></span>";
     console.info("Opportunity Lab Engine pronta. APIs disponíveis em window.labTraining e window.opportunityMap.");

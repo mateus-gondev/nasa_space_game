@@ -18,7 +18,8 @@ O atalho `http://localhost:3000/game` redireciona para a mesma página. O servid
 static/lab_training/
 ├── index.html
 ├── README.md
-├── css/style.css
+├── assets/             # Logo e arte de fundo do menu inicial
+├── css/style.css       # Layout fullscreen, HUD e menu
 └── js/
     ├── config.js       # Início no Instrument Lab, velocidade e sprites
     ├── map-data.js     # Planta original, salas, portas e objetos Opportunity
@@ -29,6 +30,10 @@ static/lab_training/
     ├── engine.js       # Movimento top-down, colisão, interação e loop
     └── app.js          # Inicialização, UI e API pública
 ```
+
+## Menu inicial
+
+O menu com Play, Settings, Info e Créditos aparece antes de cada nova sessão. Settings altera a ambientação e permite alternar a tela cheia; Info resume os controles. Play inicia a missão com o perfil salvo ou abre o cadastro e a preparação do traje no primeiro acesso.
 
 ## Controles
 

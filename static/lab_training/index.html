@@ -145,7 +145,65 @@
     <footer class="footer"><span>OPPORTUNITY · MAP ENGINE</span><span>Explorar. Aprender. Viver.</span><span>v1.0.0</span></footer>
   </main>
 
-  <div class="story-overlay" id="introOverlay">
+  <div class="main-menu" id="mainMenuOverlay">
+    <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Menu principal">
+      <img class="menu-logo" src="assets/title.png" alt="Surviving in Mars">
+      <nav class="menu-frame" aria-label="Menu principal">
+        <span class="menu-corner menu-corner-tl" aria-hidden="true"></span>
+        <span class="menu-corner menu-corner-tr" aria-hidden="true"></span>
+        <span class="menu-corner menu-corner-bl" aria-hidden="true"></span>
+        <span class="menu-corner menu-corner-br" aria-hidden="true"></span>
+        <button class="menu-option selected" id="playButton" type="button">Play</button>
+        <button class="menu-option" id="settingsButton" type="button">Settings</button>
+        <button class="menu-option" id="infoButton" type="button">Info</button>
+      </nav>
+      <button class="credits-button" id="creditsButton" type="button">Créditos</button>
+    </section>
+
+    <section class="menu-subpage" id="settingsPage" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
+      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
+      <p class="menu-eyebrow">SURVIVING IN MARS</p>
+      <h2 id="settingsTitle">Settings</h2>
+      <div class="menu-setting">
+        <span>Ambiente</span>
+        <div class="menu-atmospheres">
+          <button type="button" data-atmosphere="clean">Operacional</button>
+          <button type="button" data-atmosphere="emergency">Emergência</button>
+          <button type="button" data-atmosphere="abandoned">Abandonada</button>
+          <button type="button" data-atmosphere="horror">Suspense</button>
+        </div>
+      </div>
+      <div class="menu-setting menu-profile-setting">
+        <span>Personagem</span>
+        <strong id="menuCharacter">Astronauta</strong>
+      </div>
+      <button class="menu-secondary-button" id="settingsFullscreenButton" type="button">Alternar tela cheia</button>
+    </section>
+
+    <section class="menu-subpage" id="infoPage" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
+      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
+      <p class="menu-eyebrow">OPPORTUNITY · MARTE</p>
+      <h2 id="infoTitle">Info</h2>
+      <p>Explore a instalação e treine os instrumentos antes da missão em Marte.</p>
+      <ul class="menu-info-list">
+        <li><kbd>W A S D</kbd> mover</li>
+        <li><kbd>E</kbd> interagir</li>
+        <li><kbd>1–4</kbd> ferramentas</li>
+        <li><kbd>M</kbd> mapa <kbd>Tab</kbd> mochila</li>
+      </ul>
+    </section>
+
+    <section class="menu-subpage" id="creditsPage" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" hidden>
+      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
+      <p class="menu-eyebrow">SURVIVING IN MARS</p>
+      <h2 id="creditsTitle">Créditos</h2>
+      <p>Sprites do astronauta: Space Runner Assets, Matt Walkden (CC0).</p>
+      <p>Mapa de treinamento inspirado na missão Opportunity.</p>
+      <p>Cenário e logo: imagens fornecidas pelo usuário.</p>
+    </section>
+  </div>
+
+  <div class="story-overlay" id="introOverlay" hidden>
     <section class="story-card" id="welcomeScreen" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
       <p class="eyebrow">OPPORTUNITY · TREINAMENTO EM MARTE</p>
       <h2 id="welcomeTitle">Preparação da missão</h2>
