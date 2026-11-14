@@ -38,8 +38,11 @@
   const mainMenuOverlay = $("#mainMenuOverlay");
   const mainMenuHome = $("#mainMenuHome");
   const introOverlay = $("#introOverlay");
+  const equipmentAnimationOverlay = $("#equipmentAnimationOverlay");
+  const equipmentAnimationFrame = $("#equipmentAnimationFrame");
   const mapOverlay = $("#mapOverlay");
   const inventoryOverlay = $("#inventoryOverlay");
+  const quickToolsPanel = $("#quickToolsPanel");
   const miniMap = $("#miniMap");
   const tutorialObjective = $("#tutorialObjective");
   const tutorialFeedback = $("#tutorialFeedback");
@@ -59,6 +62,7 @@
   let selectedTool = null;
   let suitWorn = Boolean(savedProfile);
   let helmetWorn = Boolean(savedProfile);
+  let activeEquipmentAnimation = null;
   const completedTests = new Set();
   const inventoryItems = [];
   let feedbackTimer = 0;
@@ -106,8 +110,8 @@
     $("#telemetryTarget").textContent = state.target;
     $("#telemetryAnimation").textContent = state.animation;
     $("#telemetryCadet").textContent = cadetName || "Astronauta";
-    $("#cadetBadge").textContent = cadetName ? `${cadetName} · Astronauta` : "";
-    $("#cadetBadge").hidden = !cadetName;
+    $("#hudCadetName").textContent = cadetName || "Astronauta";
+    $("#hudLocation").textContent = state.room;
     $("#pausedOverlay").hidden = !state.paused;
     const pauseButton = $("#pauseButton");
     pauseButton.textContent = state.paused ? "▶" : "Ⅱ";
@@ -186,9 +190,11 @@
   function selectTool(key) {
     if (!tools.some(tool => tool.key === key) || tutorialPhase === "intro" || tutorialPhase === "suit" || !mapOverlay.hidden || !inventoryOverlay.hidden) return;
     selectedTool = key;
+    quickToolsPanel.hidden = true;
+    $("#researchAction").setAttribute("aria-expanded", "false");
     engine.closeInspection();
     showFeedback(`${tools[key - 1].name} ativa`);
-    updateInterface();
+    setModalState();
   }
 
   function handleInteraction(prop) {
@@ -275,15 +281,30 @@
   }
 
   function setModalState() {
-    engine.controls.movementEnabled = mapOverlay.hidden && inventoryOverlay.hidden;
+    engine.controls.movementEnabled = mapOverlay.hidden && inventoryOverlay.hidden && quickToolsPanel.hidden;
     engine.controls.keys.clear();
     updateInterface();
+  }
+
+  function toggleQuickTools() {
+    const opening = quickToolsPanel.hidden;
+    quickToolsPanel.hidden = !opening;
+    if (opening) {
+      mapOverlay.hidden = true;
+      inventoryOverlay.hidden = true;
+    }
+    $("#researchAction").setAttribute("aria-expanded", String(opening));
+    if (opening) $("#toolControls button")?.focus();
+    else $("#researchAction").focus();
+    setModalState();
   }
 
   function toggleMap() {
     const opening = mapOverlay.hidden;
     mapOverlay.hidden = !opening;
     inventoryOverlay.hidden = true;
+    quickToolsPanel.hidden = true;
+    $("#researchAction").setAttribute("aria-expanded", "false");
     if (opening) { drawMinimap(); $("#closeMap").focus(); }
     else canvas.focus();
     setModalState();
@@ -293,6 +314,8 @@
     const opening = inventoryOverlay.hidden;
     inventoryOverlay.hidden = !opening;
     mapOverlay.hidden = true;
+    quickToolsPanel.hidden = true;
+    $("#researchAction").setAttribute("aria-expanded", "false");
     if (opening) { renderInventory(); $("#closeInventory").focus(); }
     else canvas.focus();
     setModalState();
@@ -301,6 +324,7 @@
   function handleEscape() {
     if (!mapOverlay.hidden) { mapOverlay.hidden = true; canvas.focus(); setModalState(); return true; }
     if (!inventoryOverlay.hidden) { inventoryOverlay.hidden = true; canvas.focus(); setModalState(); return true; }
+    if (!quickToolsPanel.hidden) { quickToolsPanel.hidden = true; $("#researchAction").setAttribute("aria-expanded", "false"); $("#researchAction").focus(); setModalState(); return true; }
     engine.closeInspection();
     return true;
   }
@@ -367,6 +391,42 @@
     });
   }
 
+  function finishEquipmentAnimation() {
+    if (equipmentAnimationOverlay.hidden) return;
+    equipmentAnimationOverlay.hidden = true;
+    equipmentAnimationFrame.src = "about:blank";
+    if (activeEquipmentAnimation === "suit") {
+      suitWorn = true;
+      $("#wearSuit").setAttribute("aria-pressed", "true");
+      $("#wearSuit").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
+      $("#wearHelmet").disabled = false;
+      $("#suitFeedback").textContent = "Agora coloque o capacete.";
+      $("#wearHelmet").focus();
+    } else if (activeEquipmentAnimation === "helmet") {
+      helmetWorn = true;
+      $("#wearHelmet").setAttribute("aria-pressed", "true");
+      $("#wearHelmet").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
+      $("#suitFeedback").textContent = "Equipamento pronto.";
+      $("#confirmSuit").disabled = false;
+      $("#confirmSuit").focus();
+    }
+    activeEquipmentAnimation = null;
+  }
+
+  function startEquipmentAnimation(equipment) {
+    activeEquipmentAnimation = equipment;
+    const isSuit = equipment === "suit";
+    const button = isSuit ? $("#wearSuit") : $("#wearHelmet");
+    button.disabled = true;
+    button.querySelector(".suit-step-state").textContent = "EM ANDAMENTO";
+    $("#suitFeedback").textContent = isSuit ? "Vestindo o traje..." : "Colocando o capacete...";
+    equipmentAnimationOverlay.hidden = false;
+    equipmentAnimationFrame.src = isSuit
+      ? "/assets/Animations/astronauta_vestindo_traje_8bit.html?embed=1"
+      : "/assets/Animations/Capacete%20%E2%80%93%20POV%208-bit.html?embed=1";
+    $("#skipEquipmentAnimation").focus();
+  }
+
   Object.entries(config.atmosphere.presets).forEach(([key, preset]) => {
     const button = document.createElement("button");
     button.type = "button"; button.className = "mood-button"; button.dataset.mood = key; button.textContent = preset.label;
@@ -431,24 +491,32 @@
     cadetInput.setCustomValidity("");
   });
   $("#wearSuit").addEventListener("click", () => {
-    suitWorn = true;
-    $("#wearSuit").disabled = true;
-    $("#wearSuit").setAttribute("aria-pressed", "true");
-    $("#wearSuit").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
-    $("#wearHelmet").disabled = false;
-    $("#suitFeedback").textContent = "Agora coloque o capacete.";
-    $("#wearHelmet").focus();
+    if (!suitWorn) startEquipmentAnimation("suit");
   });
   $("#wearHelmet").addEventListener("click", () => {
     if (!suitWorn) return;
-    helmetWorn = true;
-    $("#wearHelmet").disabled = true;
-    $("#wearHelmet").setAttribute("aria-pressed", "true");
-    $("#wearHelmet").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
-    $("#suitFeedback").textContent = "Equipamento pronto.";
-    $("#confirmSuit").disabled = false;
-    $("#confirmSuit").focus();
+    startEquipmentAnimation("helmet");
   });
+  $("#skipEquipmentAnimation").addEventListener("click", finishEquipmentAnimation);
+  window.addEventListener("message", event => {
+    if (event.source !== equipmentAnimationFrame.contentWindow || event.origin !== window.location.origin) return;
+    if (event.data === `${activeEquipmentAnimation}-animation-complete`) finishEquipmentAnimation();
+  });
+  document.addEventListener("keydown", event => {
+    if (!equipmentAnimationOverlay.hidden && event.key === "Escape") {
+      event.preventDefault();
+      finishEquipmentAnimation();
+    }
+  });
+  $("#researchAction").addEventListener("click", toggleQuickTools);
+  $("#closeQuickTools").addEventListener("click", () => {
+    quickToolsPanel.hidden = true;
+    $("#researchAction").setAttribute("aria-expanded", "false");
+    $("#researchAction").focus();
+    setModalState();
+  });
+  $("#mapAction").addEventListener("click", toggleMap);
+  $("#inventoryAction").addEventListener("click", toggleInventory);
   $("#playButton").addEventListener("click", () => {
     if (savedProfile) {
       startTutorial();
@@ -497,15 +565,16 @@
 
   canvas.addEventListener("click", event => {
     const rect = canvas.getBoundingClientRect();
-    const scale = Math.min(rect.width / map.width, rect.height / map.height);
-    const renderedWidth = map.width * scale;
-    const renderedHeight = map.height * scale;
+    const scale = Math.min(rect.width / canvas.width, rect.height / canvas.height);
+    const renderedWidth = canvas.width * scale;
+    const renderedHeight = canvas.height * scale;
     const offsetX = (rect.width - renderedWidth) / 2;
     const offsetY = (rect.height - renderedHeight) / 2;
-    const x = (event.clientX - rect.left - offsetX) / renderedWidth * map.width;
-    const y = (event.clientY - rect.top - offsetY) / renderedHeight * map.height;
-    if (x < 0 || x > map.width || y < 0 || y > map.height) return;
-    engine.inspectObjectAt(x, y);
+    const x = (event.clientX - rect.left - offsetX) / renderedWidth * canvas.width + engine.renderer.cam.x;
+    const y = (event.clientY - rect.top - offsetY) / renderedHeight * canvas.height + engine.renderer.cam.y;
+    if (x < engine.renderer.cam.x || x > engine.renderer.cam.x + canvas.width ||
+        y < engine.renderer.cam.y || y > engine.renderer.cam.y + canvas.height) return;
+    engine.inspectObjectAt(x / config.grid.tileSize, y / config.grid.tileSize);
   });
 
   $("#assetInput").addEventListener("change", event => {

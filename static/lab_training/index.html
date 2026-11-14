@@ -14,7 +14,7 @@
       <div>
         <p class="eyebrow">OPPORTUNITY / LAB TRAINING</p>
         <h1>Opportunity Research Facility</h1>
-        <p class="subtitle">Mapa original da instalação · exploração top-down em pixel art</p>
+        <p class="subtitle">Opportunity Map Engine v2 · exploração top-down em pixel art</p>
       </div>
     </header>
 
@@ -35,12 +35,72 @@
           <canvas id="gameCanvas" tabindex="0" aria-label="Mapa top-down da instalação Opportunity com um astronauta"></canvas>
           <div class="stage-vignette" aria-hidden="true"></div>
           <div class="stage-status" id="stageStatus">CARREGANDO ASTRONAUTA <span></span></div>
-          <div class="game-hud" aria-label="Controles da simulação">
-            <span class="cadet-badge" id="cadetBadge" hidden></span>
-            <button class="hud-button" id="pauseButton" type="button" aria-label="Pausar" title="Pausar">Ⅱ</button>
-            <button class="hud-button" id="resetButton" type="button" aria-label="Reiniciar" title="Reiniciar">↻</button>
-            <button class="hud-button" id="fullscreenButton" type="button" aria-label="Tela cheia" title="Tela cheia">⛶</button>
+          <div class="game-hud" aria-label="Interface da missão">
+            <section class="hud-panel hud-profile" aria-label="Cadete e localização">
+              <img src="/assets/visuals/hud_assets/svg/avatar_astronauta.svg" alt="" class="hud-avatar">
+              <div class="hud-profile-copy">
+                <span class="hud-kicker">CADETE · OPPORTUNITY</span>
+                <strong id="hudCadetName">Astronauta</strong>
+                <span id="hudLocation">Instrument Lab</span>
+              </div>
+            </section>
+
+            <section class="hud-panel hud-vitals" aria-label="Suporte vital da missão">
+              <div class="vitals-heading"><span>SUPORTE VITAL</span><span><i></i>NOMINAL</span></div>
+              <div class="vital-grid">
+                <div class="vital-item" style="--vital-color:#4fd1ff">
+                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_oxigenio.svg" alt=""><span>O₂</span><strong>100%</strong></div>
+                  <div class="vital-track" role="meter" aria-label="Oxigênio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                </div>
+                <div class="vital-item" style="--vital-color:#4a86ff">
+                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_agua.svg" alt=""><span>ÁGUA</span><strong>100%</strong></div>
+                  <div class="vital-track" role="meter" aria-label="Água" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                </div>
+                <div class="vital-item" style="--vital-color:#ff9a3c">
+                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_alimentacao.svg" alt=""><span>ALIMENTO</span><strong>100%</strong></div>
+                  <div class="vital-track" role="meter" aria-label="Alimentação" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                </div>
+                <div class="vital-item" style="--vital-color:#ffe45e">
+                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_energia.svg" alt=""><span>ENERGIA</span><strong>100%</strong></div>
+                  <div class="vital-track" role="meter" aria-label="Energia" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                </div>
+              </div>
+            </section>
+
+            <div class="hud-system-controls" aria-label="Controles da simulação">
+              <button class="hud-button" id="pauseButton" type="button" aria-label="Pausar" title="Pausar">Ⅱ</button>
+              <button class="hud-button" id="resetButton" type="button" aria-label="Reiniciar" title="Reiniciar">↻</button>
+              <button class="hud-button" id="fullscreenButton" type="button" aria-label="Tela cheia" title="Tela cheia">⛶</button>
+            </div>
           </div>
+
+          <div class="quick-tools-panel hud-panel" id="quickToolsPanel" role="region" aria-labelledby="quickToolsTitle" hidden>
+            <div class="quick-tools-heading">
+              <div><span class="hud-kicker">AÇÃO 03</span><strong id="quickToolsTitle">Pesquisa científica</strong></div>
+              <button class="hud-close" id="closeQuickTools" type="button" aria-label="Fechar ferramentas">×</button>
+            </div>
+            <div class="tool-controls" id="toolControls"></div>
+          </div>
+
+          <nav class="hud-action-dock" aria-label="Ações da missão">
+            <button class="hud-action unavailable" type="button" disabled title="Construção indisponível neste treinamento">
+              <img src="/assets/visuals/hud_assets/svg/acao_1_obra.svg" alt="">
+              <span>OBRA</span><small>FUTURO</small>
+            </button>
+            <button class="hud-action unavailable" type="button" disabled title="Reparo indisponível neste treinamento">
+              <img src="/assets/visuals/hud_assets/svg/acao_2_reparo.svg" alt="">
+              <span>REPARO</span><small>FUTURO</small>
+            </button>
+            <button class="hud-action" id="researchAction" type="button" aria-expanded="false" aria-controls="quickToolsPanel" title="Abrir ferramentas científicas">
+              <img src="/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg" alt="">
+              <span>PESQUISA</span><small>1–4</small>
+            </button>
+            <button class="hud-action" id="mapAction" type="button" title="Abrir mapa (M)">
+              <img src="/assets/visuals/hud_assets/svg/acao_4_mapa.svg" alt="">
+              <span>MAPA</span><small>M</small>
+            </button>
+            <button class="hud-inventory" id="inventoryAction" type="button" aria-label="Abrir mochila (Tab)">TAB <span>MOCHILA</span></button>
+          </nav>
           <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
             <p class="eyebrow">OBJETIVO DO TREINAMENTO</p>
             <h2 id="tutorialTitle"></h2>
@@ -116,11 +176,6 @@
           </ul>
         </div>
         <div class="panel-section">
-          <p class="eyebrow">FERRAMENTAS · 1–4</p>
-          <h2>Kit científico</h2>
-          <div class="tool-controls" id="toolControls"></div>
-        </div>
-        <div class="panel-section">
           <p class="eyebrow">ASTRONAUT SPRITES</p>
           <h2>Prévia de animação</h2>
           <div id="animationControls" class="button-row animation-controls"></div>
@@ -142,7 +197,7 @@
       </aside>
     </section>
 
-    <footer class="footer"><span>OPPORTUNITY · MAP ENGINE</span><span>Explorar. Aprender. Viver.</span><span>v1.0.0</span></footer>
+    <footer class="footer"><span>OPPORTUNITY · MAP ENGINE</span><span>Explorar. Aprender. Viver.</span><span>v2.0.0</span></footer>
   </main>
 
   <div class="main-menu" id="mainMenuOverlay">
@@ -226,13 +281,22 @@
     </section>
   </div>
 
+  <div class="equipment-animation-overlay" id="equipmentAnimationOverlay" hidden>
+    <section class="equipment-animation-dialog" role="dialog" aria-modal="true" aria-labelledby="equipmentAnimationTitle">
+      <h2 id="equipmentAnimationTitle" class="visually-hidden">Animação de preparação do astronauta</h2>
+      <iframe id="equipmentAnimationFrame" title="Animação de preparação do astronauta" allow="autoplay"></iframe>
+      <button class="equipment-animation-skip" id="skipEquipmentAnimation" type="button">Pular animação</button>
+    </section>
+  </div>
+
   <script src="js/config.js"></script>
-  <script src="js/map-data.js"></script>
+  <script src="/map-engine-v2/js/map-data.js"></script>
+  <script src="js/map-data-training.js"></script>
   <script src="js/animation.js"></script>
   <script src="js/character.js"></script>
-  <script src="js/renderer.js"></script>
-  <script src="js/controls.js"></script>
-  <script src="js/engine.js"></script>
+  <script src="/map-engine-v2/js/renderer.js"></script>
+  <script src="/map-engine-v2/js/controls.js"></script>
+  <script src="/map-engine-v2/js/engine.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preparação do Astronauta — 8-bit</title>
+<script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.dataset.embed='true'</script>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07080f; --fg:#9dffb0; --btn:#e8ecf4; --btnbg:#2a3350;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg);display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;padding:16px;
+  font-family:'Press Start 2P',monospace;
+}
+#stage{
+  position:relative;width:min(100%,960px);aspect-ratio:16/9;
+  overflow:hidden;background:#080b18;container-type:inline-size;
+  border:3px solid #303b66;box-shadow:0 0 0 4px #11162b,0 12px 40px #0009;
+}
+canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+#stage:after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.17) 0 1px,transparent 1px 3px);
+}
+#hud{
+  position:absolute;left:5%;top:7%;color:var(--fg);font-size:clamp(7px,1.25cqw,12px);
+  line-height:2.1;text-shadow:0 0 7px #78ffa0aa;z-index:2;
+}
+#hud div{visibility:hidden}
+#hud div.on{visibility:visible}
+#caption{
+  position:absolute;left:3%;right:3%;bottom:7%;text-align:center;color:#f0f2fa;
+  font-size:clamp(7px,1.25cqw,12px);line-height:1.8;z-index:2;
+  text-shadow:2px 2px 0 #000,0 0 6px #000;
+}
+.controls{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+button{
+  font:inherit;font-size:10px;color:var(--btn);background:var(--btnbg);
+  border:3px solid var(--btn);padding:11px 14px;cursor:pointer;
+}
+button:hover{background:#3b496f}
+button:focus-visible{outline:3px solid #ffb04d;outline-offset:3px}
+@media(max-width:520px){body{padding:8px}.controls{gap:7px}button{font-size:8px;padding:9px}}
+html[data-embed="true"] body{gap:0;padding:0;background:transparent}
+html[data-embed="true"] #stage{width:min(100vw,177.77vh);max-width:none;border:0;box-shadow:none}
+html[data-embed="true"] .controls{display:none}
+</style>
+</head>
+<body>
+<main id="stage" aria-label="Animação em pixel art de um astronauta vestindo o traje espacial">
+  <canvas id="screen" width="192" height="108"></canvas>
+  <div id="hud">
+    <div data-time="2.2">SISTEMA DE SUPORTE: OK</div>
+    <div data-time="4.6">TRAJE PRESSURIZADO: OK</div>
+    <div data-time="7.0">LUVAS E BOTAS: OK</div>
+    <div data-time="9.4">CAPACETE: SELADO</div>
+    <div data-time="10.8">VERIFICACAO FINAL: OK</div>
+  </div>
+  <div id="caption" aria-live="polite"></div>
+</main>
+<div class="controls">
+  <button id="restart">REINICIAR</button>
+  <button id="sound">SOM: OFF</button>
+</div>
+<script>
+/*
+  ANIMAÇÃO: ASTRONAUTA VESTINDO O TRAJE
+  -------------------------------------
+  Resolução lógica: 192 x 108 pixels.
+  Para mudar o ritmo, edite DURATION e os tempos em captions/status.
+  Para mudar as cores, edite COLORS.
+  O desenho é feito em retângulos e elipses pixelados no canvas.
+*/
+(() => {
+  'use strict';
+
+  const W = 192, H = 108;
+  const embedded = new URLSearchParams(location.search).get('embed') === '1';
+  const canvas = document.getElementById('screen');
+  const ctx = canvas.getContext('2d');
+  const caption = document.getElementById('caption');
+  const hudLines = [...document.querySelectorAll('#hud div')];
+
+  const COLORS = {
+    background:'#080b18', wall:'#20294b', wallLight:'#39466f',
+    floor:'#151b35', floorLine:'#303b64', white:'#e8ecf4',
+    whiteShade:'#bfc8da', dark:'#293354', orange:'#ff8a3d',
+    orangeDark:'#a94f2a', visor:'#18223e', visorBlue:'#5d9fbd',
+    metal:'#8794b2', green:'#9dffb0', screen:'#111a32'
+  };
+  const DURATION = 13.5;
+  const captions = [
+    [0, 'PREPARANDO O TRAJE ESPACIAL'],
+    [1.0, 'VESTINDO A PARTE INFERIOR...'],
+    [3.0, 'AJUSTANDO O TORSO E O SUPORTE DE VIDA'],
+    [5.4, 'FIXANDO OS BRACOS E AS LUVAS...'],
+    [7.5, 'CALCANDO AS BOTAS...'],
+    [9.0, 'COLOCANDO O CAPACETE'],
+    [10.8, 'CONFERINDO OS SISTEMAS'],
+    [12.0, 'ASTRONAUTA PRONTO PARA A MISSAO!']
+  ];
+
+  const clamp = n => Math.max(0, Math.min(1, n));
+  const ease = n => { n=clamp(n); return n<.5 ? 2*n*n : 1-Math.pow(-2*n+2,2)/2; };
+  const rect = (x,y,w,h,color) => {
+    ctx.fillStyle=color;
+    ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));
+  };
+  function ellipse(cx,cy,rx,ry,color){
+    for(let y=-Math.round(ry);y<=Math.round(ry);y++){
+      const width=Math.floor(rx*Math.sqrt(Math.max(0,1-(y*y)/(ry*ry))));
+      rect(cx-width,cy+y,width*2+1,1,color);
+    }
+  }
+  const hash = (a,b) => {
+    const n=Math.sin(a*12.9898+b*78.233)*43758.5453;
+    return n-Math.floor(n);
+  };
+
+  function drawRoom(t){
+    rect(0,0,W,H,COLORS.background);
+    // Painéis da estação
+    for(let i=0;i<8;i++){
+      const px=i*25;
+      rect(px+2,5,22,64,COLORS.wall);
+      rect(px+2,5,22,1,COLORS.wallLight);
+      rect(px+2,5,1,64,COLORS.wallLight);
+      rect(px+22,5,1,64,'#141b35');
+      rect(px+7,12,12,1,'#303c65');
+      rect(px+7,14,8,1,'#303c65');
+    }
+    rect(0,70,W,38,COLORS.floor);
+    rect(0,70,W,2,COLORS.wallLight);
+    for(let i=0;i<W;i+=16) rect(i,72,1,36,COLORS.floorLine);
+    // Janela com a Terra
+    ellipse(96,34,28,28,'#11172c');
+    ellipse(96,34,25,25,'#8996b5');
+    ellipse(96,34,22,22,'#17213b');
+    ellipse(91,38,11,8,'#286d9b');
+    ellipse(104,28,8,7,'#3a8b58');
+    rect(82,27,5,4,'#3a8b58');
+    rect(100,39,8,4,'#3a8b58');
+    rect(87,17,18,1,'#d5deed');
+    // Luzes de status
+    const blink=Math.floor(t*3)%2;
+    rect(9,12,3,3,blink?COLORS.orange:'#653c2b');
+    rect(180,12,3,3,blink?'#653c2b':COLORS.green);
+    // Bancada e suporte do traje
+    rect(26,87,140,13,'#29365d');
+    rect(26,87,140,2,'#53648e');
+    rect(31,90,130,2,'#1b2545');
+    rect(39,100,5,5,'#080d1d'); rect(148,100,5,5,'#080d1d');
+    // Pequenos painéis
+    rect(8,45,16,20,'#111a32');rect(10,47,12,7,'#253d5d');
+    rect(12,49,3,2,COLORS.green);rect(17,49,3,2,COLORS.orange);
+    rect(168,44,16,21,'#111a32');rect(171,47,10,2,'#4d638a');
+    rect(171,52,7,2,COLORS.green);
+  }
+
+  function drawBoot(x,y,scale=1){
+    const s=scale;
+    rect(x,y,8*s,5*s,COLORS.whiteShade);
+    rect(x-2*s,y+4*s,12*s,4*s,COLORS.white);
+    rect(x-3*s,y+7*s,14*s,3*s,COLORS.dark);
+    rect(x+1*s,y+1*s,2*s,2*s,COLORS.orange);
+  }
+
+  function drawLeg(x,y,scale=1){
+    const s=scale;
+    rect(x,y,10*s,22*s,COLORS.white);
+    rect(x+1*s,y,3*s,22*s,'#f7f8fb');
+    rect(x+7*s,y+3*s,3*s,17*s,COLORS.whiteShade);
+    rect(x-1*s,y+8*s,12*s,3*s,COLORS.dark);
+    rect(x+2*s,y+9*s,7*s,1*s,COLORS.orange);
+    drawBoot(x-2*s,y+19*s,s);
+  }
+
+  function drawTorso(x,y,scale=1){
+    const s=scale;
+    // mochila / unidade de suporte de vida
+    rect(x-13*s,y+4*s,8*s,25*s,COLORS.dark);
+    rect(x-12*s,y+6*s,6*s,19*s,COLORS.metal);
+    rect(x+5*s,y+4*s,8*s,25*s,COLORS.dark);
+    rect(x+6*s,y+6*s,6*s,19*s,COLORS.whiteShade);
+    // tronco
+    rect(x-8*s,y,16*s,27*s,COLORS.white);
+    rect(x-6*s,y+2*s,4*s,22*s,'#f8f9fc');
+    rect(x+5*s,y+3*s,3*s,20*s,COLORS.whiteShade);
+    // gola e fecho
+    rect(x-6*s,y-3*s,12*s,5*s,COLORS.metal);
+    rect(x-5*s,y-2*s,10*s,2*s,COLORS.white);
+    // painel do peito
+    rect(x-5*s,y+7*s,10*s,8*s,COLORS.dark);
+    rect(x-3*s,y+9*s,6*s,4*s,'#426080');
+    rect(x-2*s,y+10*s,2*s,2*s,COLORS.green);
+    rect(x+1*s,y+10*s,2*s,2*s,COLORS.orange);
+    // faixas e emblema
+    rect(x-8*s,y+18*s,16*s,2*s,COLORS.orange);
+    rect(x-3*s,y+21*s,6*s,4*s,COLORS.whiteShade);
+    rect(x-2*s,y+22*s,4*s,2*s,COLORS.orange);
+  }
+
+  function drawArm(x,y,side,scale=1,glove=true){
+    const s=scale;
+    rect(x,y,8*s,18*s,COLORS.white);
+    rect(x+(side<0?0:5*s),y+2*s,3*s,14*s,COLORS.whiteShade);
+    rect(x-1*s,y+5*s,10*s,3*s,COLORS.dark);
+    rect(x,y+6*s,8*s,1*s,COLORS.orange);
+    if(glove){
+      rect(x-2*s,y+16*s,12*s,8*s,COLORS.whiteShade);
+      rect(x-1*s,y+17*s,10*s,5*s,COLORS.white);
+      rect(x+(side<0?0:6*s),y+18*s,3*s,4*s,COLORS.metal);
+    }
+  }
+
+  function drawHelmet(x,y,scale=1,visor=true){
+    const s=scale;
+    ellipse(x,y,14*s,13*s,COLORS.dark);
+    ellipse(x,y,12*s,11*s,COLORS.metal);
+    ellipse(x-1*s,y-1*s,10*s,9*s,COLORS.white);
+    rect(x-6*s,y-12*s,12*s,3*s,COLORS.orange);
+    if(visor){
+      ellipse(x,y+1*s,9*s,7*s,COLORS.visor);
+      ellipse(x-1*s,y,7*s,5*s,'#263b5c');
+      rect(x-6*s,y-3*s,5*s,2*s,COLORS.visorBlue);
+      rect(x-6*s,y-1*s,2*s,2*s,'#a7d9e9');
+      rect(x+5*s,y+4*s,3*s,1*s,'#638eae');
+    } else {
+      rect(x-5*s,y-2*s,10*s,2*s,COLORS.whiteShade);
+    }
+    rect(x-9*s,y+11*s,18*s,4*s,COLORS.metal);
+    rect(x-7*s,y+14*s,14*s,2*s,COLORS.dark);
+  }
+
+  function drawAstronaut(t){
+    const bob=Math.sin(t*2.5)*.5;
+    const cx=96, baseY=84+bob;
+    // Progresso das peças aparecendo no corpo
+    const legs=ease((t-.5)/2.0);
+    const torso=ease((t-2.4)/1.8);
+    const arms=ease((t-4.6)/1.8);
+    const boots=ease((t-6.8)/1.0);
+    const helmet=ease((t-8.5)/1.4);
+
+    // Pernas: entram e se ajustam
+    if(legs>0){
+      ctx.save();ctx.globalAlpha=legs;
+      const rise=(1-legs)*13;
+      drawLeg(cx-12,baseY-24+rise,1);
+      drawLeg(cx+2,baseY-24+rise,1);
+      ctx.restore();
+    }
+    // Corpo e mochila
+    if(torso>0){
+      ctx.save();ctx.globalAlpha=torso;
+      const rise=(1-torso)*12;
+      drawTorso(cx,baseY-52+rise,1);
+      ctx.restore();
+    }
+    // Braços entram pelas laterais e encaixam nos ombros
+    if(arms>0){
+      ctx.save();ctx.globalAlpha=arms;
+      const offset=(1-arms)*18;
+      drawArm(cx-22-offset,baseY-48,-1,1,true);
+      drawArm(cx+14+offset,baseY-48,1,1,true);
+      ctx.restore();
+    }
+    // Botas ganham detalhes de travamento
+    if(boots>0){
+      ctx.save();ctx.globalAlpha=boots;
+      rect(cx-15,baseY-4,11,2,COLORS.orange);
+      rect(cx+4,baseY-4,11,2,COLORS.orange);
+      ctx.restore();
+    }
+    // Capacete desce até a gola
+    if(helmet>0){
+      ctx.save();ctx.globalAlpha=helmet;
+      const y=baseY-68+(1-helmet)*-20;
+      drawHelmet(cx,y,1,true);
+      // brilho passando pela viseira
+      const shine=(t*13)%22;
+      rect(cx-7+shine*.35,y-2,2,1,'#c6edf7');
+      ctx.restore();
+    } else if(t>7.8){
+      // gola visível antes do encaixe do capacete
+      rect(cx-8,baseY-55,16,3,COLORS.orange);
+    }
+
+    // Pequeno efeito de confirmação ao final
+    if(t>10.8){
+      const pulse=(Math.sin(t*7)+1)/2;
+      rect(125,34,24,15,'#111a32');
+      rect(128,37,18,2,COLORS.green);
+      rect(128,41,12,1,COLORS.green);
+      rect(128,45,15,1,COLORS.green);
+      if(pulse>.55){rect(153,38,3,3,COLORS.green);rect(154,37,1,5,COLORS.green);}
+    }
+  }
+
+  function draw(t){
+    drawRoom(t);
+    // luz suave de ambiente
+    rect(0,69,W,1,'#52618a');
+    drawAstronaut(t);
+    // vinheta pixelada discreta
+    for(let i=0;i<5;i++){
+      rect(0,i,W,1,'#050711');
+      rect(0,H-1-i,W,1,'#050711');
+    }
+  }
+
+  let startedAt=performance.now();
+  let soundOn=false, audio=null, played={};
+  const soundEvents=[[1.0,420],[3.0,520],[5.4,620],[7.5,360],[9.0,740],[10.8,880],[12.0,1040]];
+  function beep(freq){
+    if(!soundOn||!audio)return;
+    const osc=audio.createOscillator(), gain=audio.createGain();
+    osc.type='square';osc.frequency.value=freq;gain.gain.value=.035;
+    osc.connect(gain);gain.connect(audio.destination);
+    osc.start();gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.11);
+    osc.stop(audio.currentTime+.12);
+  }
+  function animate(now){
+    const elapsed=(now-startedAt)/1000;
+    let t=embedded?Math.min(elapsed,DURATION):elapsed%DURATION;
+    t=Math.floor(t*15)/15;
+    if(t<.08)played={};
+    draw(t);
+    hudLines.forEach(line=>line.classList.toggle('on',t>=Number(line.dataset.time)));
+    let text='';
+    for(const [time,label] of captions)if(t>=time)text=label;
+    caption.textContent=text;
+    soundEvents.forEach(([time,freq],i)=>{
+      if(t>=time&&!played[i]){played[i]=true;beep(freq);}
+    });
+    if(embedded&&elapsed>=DURATION){window.parent.postMessage('suit-animation-complete',location.origin);return}
+    requestAnimationFrame(animate);
+  }
+
+  document.getElementById('restart').addEventListener('click',()=>{
+    startedAt=performance.now();played={};
+  });
+  document.getElementById('sound').addEventListener('click',function(){
+    soundOn=!soundOn;
+    this.textContent='SOM: '+(soundOn?'ON':'OFF');
+    if(soundOn&&!audio)audio=new (window.AudioContext||window.webkitAudioContext)();
+    if(audio&&audio.state==='suspended')audio.resume();
+  });
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

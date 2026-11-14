@@ -3,9 +3,10 @@
  * Altere este arquivo para personalizar o comportamento e a aparência do mapa.
  */
 window.MAP_ENGINE_CONFIG = {
-  grid: { tileSize: 40, columns: 28, rows: 18 },
+  grid: { tileSize: 40, columns: 80, rows: 52 },
+  camera: { viewTiles: { w: 26, h: 15 }, smooth: 8 },
   player: {
-    startX: 13, startY: 4, speed: 3.2, collisionRadius: 0.30,
+    startX: 60, startY: 11, speed: 4.4, collisionRadius: 0.30,
     spriteSize: 50, animationFps: { idle: 7, run: 10, jump: 8, death: 7 }
   },
   assets: {
@@ -24,7 +25,7 @@ window.MAP_ENGINE_CONFIG = {
     }
   },
   interaction: { distance: 0.9, key: "e" },
-  rendering: { pixelated: true, renderScale: 0.5, showRoomLabels: true, showFloorDetails: true },
+  rendering: { pixelated: true, showRoomLabels: true, showFloorDetails: true, showNasaMarks: false },
   atmosphere: {
     default: "clean",
     presets: {
@@ -48,7 +49,7 @@ window.MAP_ENGINE_CONFIG = {
   },
   colors: {
     wallTop: "#c4ccd5", wallSide: "#5d6c7b", wallLine: "#46535f",
-    floors: ["#4b5660", "#d3dce4", "#2d343b", "#34475d"],
-    floorLines: ["#3d4750", "#b9c5d0", "#222930", "#2a3a4d"]
+    floors: ["#4b5660", "#d3dce4", "#2d343b", "#34475d", "#59615c", "#2a2f36", "#27384f"],
+    floorLines: ["#3d4750", "#b9c5d0", "#222930", "#2a3a4d", "#474e49", "#20252b", "#1d2b3e"]
   }
 };

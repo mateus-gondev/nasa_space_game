@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Capacete – POV 8-bit</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07080f;--fg:#9dffb0;--btn:#e8ecf4;--btnbg:#2a3350;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07080f}}
+:root[data-theme="dark"]{--bg:#07080f}
+html,body{height:100%;margin:0}
+body{background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:'Press Start 2P',monospace,monospace}
+#stage{position:relative;width:min(100vw,177vh);aspect-ratio:16/9;container-type:inline-size;overflow:hidden;background:#000}
+canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+#stage::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px)}
+#hud{position:absolute;left:12cqw;top:15cqw;color:var(--fg);font-size:1.5cqw;line-height:2.1;text-shadow:0 0 6px rgba(120,255,160,.7);z-index:2}
+#hud div{visibility:hidden}
+#hud div.on{visibility:visible}
+#cap{position:absolute;left:0;right:0;bottom:1.2cqw;text-align:center;color:#e8ecf4;font-size:1.4cqw;z-index:2;text-shadow:2px 2px 0 #000}
+.bar{display:flex;gap:10px}
+button{font:inherit;font-size:10px;color:var(--btn);background:var(--btnbg);border:3px solid var(--btn);padding:10px 12px;cursor:pointer}
+button:focus-visible{outline:3px solid #ffb04d;outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="stage">
+  <canvas id="c" width="192" height="108"></canvas>
+  <div id="hud">
+    <div data-t="6.5">SELANDO TRAJE...</div>
+    <div data-t="7.5">PRESSAO .... OK</div>
+    <div data-t="8.4">O2 ........ 100%</div>
+    <div data-t="9.4">BOA MISSAO!</div>
+  </div>
+  <div id="cap"></div>
+</div>
+<div class="bar">
+  <button id="rep">REINICIAR</button>
+  <button id="snd">SOM: OFF</button>
+</div>
+<script>
+const W=192,H=108,c=document.getElementById('c'),x=c.getContext('2d'),cap=document.getElementById('cap');
+const R=(a,b,w,h,col)=>{x.fillStyle=col;x.fillRect(Math.round(a),Math.round(b),Math.round(w),Math.round(h))};
+const disc=(cx,cy,rx,ry,col)=>{for(let j=-Math.round(ry);j<=Math.round(ry);j++){const w=Math.floor(rx*Math.sqrt(Math.max(0,1-j*j/(ry*ry))));R(cx-w,cy+j,2*w+1,1,col)}};
+const hs=(a,b)=>{const n=Math.sin(a*12.9898+b*78.233)*43758.5453;return n-Math.floor(n)};
+const cl=v=>Math.max(0,Math.min(1,v)),e=u=>{u=cl(u);return u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2};
+const LOOP=13,embedded=new URLSearchParams(location.search).get('embed')==='1';
+
+function room(t){
+  for(let i=0;i<9;i++){R(i*24+2,6,20,64,'#262e55');R(i*24+2,6,20,1,'#3c4770');R(i*24+2,6,1,64,'#3c4770')}
+  R(0,70,W,38,'#161a33');
+  for(let i=0;i<W;i+=16)R(i,70,1,38,'#232a52');
+  R(0,70,W,2,'#4a5580');
+  disc(96,34,26,26,'#3c4770');disc(96,34,24,24,'#8c96b5');
+  for(let yy=-22;yy<=22;yy++)for(let xx=-22;xx<=22;xx++){
+    if(xx*xx+yy*yy>484)continue;
+    const px=96+xx,py=34+yy,ed=Math.hypot(px-102,py-92);
+    let col='#05060f';
+    if(ed<52)col=ed>49?'#7fc7ff':(hs(Math.floor(px/3),Math.floor(py/3))>.62?'#3d8a4f':'#2c6fbb');
+    else if(hs(px,py)>.985)col=(Math.floor(t*3+px)%2)?'#ffffff':'#8c96b5';
+    R(px,py,1,1,col);
+  }
+  R(96-24,34,48,1,'#3c4770');
+  const on=Math.floor(t*2)%2;
+  R(8,12,3,3,on?'#ff8a3d':'#5a2f1a');R(181,12,3,3,on?'#5a2f1a':'#ff8a3d');
+  R(40,84,112,24,'#2f3860');R(40,84,112,3,'#5a6798');R(40,87,112,1,'#1a2040');
+}
+
+function helmet(cx,cy,s){
+  const r=14*s;
+  R(cx-9*s,cy+r-3*s,18*s,5*s,'#8c96b5');R(cx-9*s,cy+r+1*s,18*s,s,'#2a3350');
+  R(cx-r-2*s,cy-3*s,3*s,8*s,'#aab3c8');R(cx+r-s,cy-3*s,3*s,8*s,'#aab3c8');
+  disc(cx,cy,r+s,r*.95+s,'#2a3350');
+  disc(cx,cy,r,r*.95,'#aab3c8');
+  disc(cx-s,cy-s,r-2*s,r*.95-2*s,'#e8ecf4');
+  R(cx-3*s,cy-r+s,6*s,2*s,'#ff8a3d');
+  disc(cx,cy+s,r*.74,r*.6,'#1b1f3a');
+  disc(cx,cy+s,r*.68,r*.54,'#d9a441');
+  disc(cx,cy+3*s,r*.6,r*.36,'#b9772a');
+  R(cx-r*.45,cy-r*.3,r*.34,1.6*s,'#fff3c4');
+  R(cx-r*.45,cy-r*.12,2*s,1.6*s,'#fff3c4');
+}
+function arm(hx,hy,s,left){
+  R(hx-s,hy+8*s,11*s,H,'#2a3350');
+  R(hx,hy+8*s,9*s,H,'#e8ecf4');R(hx,hy+14*s,9*s,2*s,'#ff8a3d');
+  R(hx-s,hy-s,11*s,11*s,'#2a3350');R(hx,hy,9*s,9*s,'#c9d0e0');
+  R(left?hx+9*s:hx-3*s,hy+2*s,3*s,4*s,'#c9d0e0');
+  R(hx+3*s,hy+5*s,s,4*s,'#7a85a6');R(hx+6*s,hy+5*s,s,4*s,'#7a85a6');
+}
+
+function interior(t){
+  const o=e((t-5.4)/1.3),bob=Math.sin(t*2)*1;
+  const cx=96,cy=54+bob,rx=96*o,ry=52*o;
+  // tint, glare e vapor sobre o vidro
+  x.fillStyle='rgba(217,164,65,.14)';x.fillRect(0,0,W,H);
+  const g=((t*14)%90)-20;
+  x.fillStyle='rgba(255,255,255,.12)';
+  for(let y=0;y<H;y++)x.fillRect(g+(H-y)*.5,y,8,1);
+  const fog=Math.max(0,Math.sin(t*1.4-1))*.1;x.fillStyle='rgba(255,255,255,'+fog+')';x.fillRect(0,0,W,H);
+  for(let y=0;y<H;y++){
+    const d=(y-cy)/ry,d2=(y-cy)/(ry+4);
+    const w=Math.abs(d)<1?rx*Math.sqrt(1-d*d):0;
+    const w2=Math.abs(d2)<1?(rx+4)*Math.sqrt(1-d2*d2):0;
+    const shell=(y%2?'#10142b':'#171b33');
+    if(w2>0){
+      R(0,y,cx-w2,1,shell);R(cx+w2,y,W,1,shell);
+      if(w>0){R(cx-w2,y,w2-w,1,'#e8ecf4');R(cx+w,y,w2-w,1,'#e8ecf4')}
+      else R(cx-w2,y,2*w2,1,'#e8ecf4');
+    }else R(0,y,W,1,shell);
+  }
+  if(t>5.4&&t<5.55)R(0,0,W,H,'#fff');
+}
+
+function frame(t){
+  x.fillStyle='#1a2040';x.fillRect(0,0,W,H);
+  room(t);
+  if(t<5.4){
+    let s,cx=96,cy,hd=0;
+    if(t<1.6){s=1;cy=70;hd=(1-e(t/1.2))*60}
+    else if(t<4.2){const u=e((t-1.6)/2.6);s=1+1.4*u;cy=70-18*u;cx=96+Math.sin(t*5)*u*1.3}
+    else{const u=Math.pow(cl((t-4.2)/1.1),2);s=2.4+5.1*u;cy=52+2*u}
+    const r=14*s,hy=cy+3*s+hd;
+    arm(cx-r-6*s,hy,s,true);arm(cx+r-3*s,hy,s,false);
+    helmet(cx,cy+hd*.0,s);
+    x.fillStyle='#e8ecf4';
+    // luvas por cima das laterais
+    R(cx-r-6*s,hy,9*s,9*s,'#c9d0e0');R(cx+r-3*s,hy,9*s,9*s,'#c9d0e0');
+    R(cx-r-3*s,hy+2*s,3*s,4*s,'#c9d0e0');R(cx+r-3*s,hy+2*s,3*s,4*s,'#c9d0e0');
+  }else interior(t);
+}
+
+// legendas e sons
+const caps=[[0,'VOCE PEGA O CAPACETE'],[1.8,'LEVANTANDO...'],[4.2,'ENCAIXANDO'],[5.4,''],[6.5,'']];
+let ctx=null,sound=false,fired={},t0=performance.now();
+const beeps=[[1.0,330,.1],[4.2,220,.1],[5.4,90,.25],[6.5,880,.08],[7.5,880,.08],[8.4,880,.08],[9.4,1320,.2]];
+function beep(f,d,type){if(!sound||!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+d)}
+function loop(now){
+  const elapsed=(now-t0)/1000;
+  let t=embedded?Math.min(elapsed,LOOP):elapsed%LOOP;
+  t=Math.floor(t*15)/15;
+  if(t<.1)fired={};
+  frame(t);
+  document.querySelectorAll('#hud div').forEach(d=>d.classList.toggle('on',t>=+d.dataset.t));
+  let ct='';for(const k of caps)if(t>=k[0])ct=k[1];cap.textContent=ct;
+  beeps.forEach((b,i)=>{if(t>=b[0]&&!fired[i]){fired[i]=1;beep(b[1],b[2])}});
+  if(embedded&&elapsed>=LOOP){window.parent.postMessage('helmet-animation-complete',location.origin);return}
+  requestAnimationFrame(loop);
+}
+if(embedded){document.querySelector('.bar').hidden=true;document.body.style.background='transparent'}
+document.getElementById('rep').onclick=()=>{t0=performance.now();fired={}};
+document.getElementById('snd').onclick=function(){
+  sound=!sound;this.textContent='SOM: '+(sound?'ON':'OFF');
+  if(sound&&!ctx)ctx=new (window.AudioContext||window.webkitAudioContext)();
+};
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

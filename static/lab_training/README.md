@@ -1,6 +1,6 @@
 # Opportunity — Lab Training
 
-Projeto separado que preserva a planta top-down original do Opportunity, com o astronauta como único personagem no Instrument Lab. A geometria e os objetos do mapa vêm de `opportunity-map-engine/js/map-data.js`; os sprites são carregados da pasta original CC0, sem duplicar os PNGs.
+Projeto de treinamento baseado no mapa ampliado do Opportunity Map Engine v2. O personagem jogável é o astronauta com sprites e animações; a câmera, colisões, salas e renderização usam a engine v2.
 
 ## Executar
 
@@ -10,7 +10,7 @@ Na raiz do projeto, use `npm run server` ou `npm run start` e abra:
 http://localhost:3000/lab-training/
 ```
 
-O atalho `http://localhost:3000/game` redireciona para a mesma página. O servidor entrega o projeto em `/lab-training` e os sprites em `/assets`. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
+O atalho `http://localhost:3000/game` redireciona para a mesma página. O servidor entrega o projeto em `/lab-training`, os sprites em `/assets` e o código da engine v2 em `/map-engine-v2`. A engine é carregada de `static/opportunity-map-engine-v2/opportunity-map-engine`; mantenha essa pasta junto ao projeto. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
 
 ## Estrutura
 
@@ -21,19 +21,22 @@ static/lab_training/
 ├── assets/             # Logo e arte de fundo do menu inicial
 ├── css/style.css       # Layout fullscreen, HUD e menu
 └── js/
-    ├── config.js       # Início no Instrument Lab, velocidade e sprites
-    ├── map-data.js     # Planta original, salas, portas e objetos Opportunity
+    ├── config.js       # Parâmetros v2, início no Instrument Lab e sprites
+    ├── map-data-training.js # Ajustes do mapa para o treinamento, sem logos NASA
     ├── animation.js    # Carregamento e reprodução dos spritesheets
     ├── character.js    # Estado e animações do astronauta
-    ├── renderer.js     # Desenho do mapa original e do astronauta
-    ├── controls.js     # WASD, setas e controles de toque
-    ├── engine.js       # Movimento top-down, colisão, interação e loop
     └── app.js          # Inicialização, UI e API pública
 ```
+
+`renderer.js`, `controls.js`, `engine.js` e `map-data.js` são servidos diretamente da pasta da Opportunity Map Engine v2 em `/map-engine-v2/js/`. A engine mantém seu comportamento genérico quando usada sem o personagem customizado; no Lab Training, ela conecta o `LabCharacter` e a interação do tutorial.
 
 ## Menu inicial
 
 O menu com Play, Settings, Info e Créditos aparece antes de cada nova sessão. Settings altera a ambientação e permite alternar a tela cheia; Info resume os controles. Play inicia a missão com o perfil salvo ou abre o cadastro e a preparação do traje no primeiro acesso.
+
+Na preparação, selecionar traje e capacete reproduz as animações 8-bit correspondentes. Cada etapa avança ao terminar a sequência e também pode ser pulada.
+
+Durante a missão, o HUD usa os ícones pixelados do pacote `static/assets/visuals/hud_assets`: perfil e localização, indicadores de suporte vital e atalhos para pesquisa, mapa e mochila. Os recursos aparecem como nominais (100%) nesta fase; ainda não há consumo de sobrevivência implementado. Obra e reparo ficam sinalizados como indisponíveis neste treinamento.
 
 ## Controles
 
@@ -41,6 +44,7 @@ O menu com Play, Settings, Info e Créditos aparece antes de cada nova sessão. 
 - `E` ou espaço: interagir com o objeto próximo.
 - `1`–`4`: selecionar ferramenta científica.
 - `M`: abrir/fechar o mapa; `Tab`: abrir/fechar a mochila.
+- Clique em Pesquisa para abrir as ferramentas científicas ou em Mapa/Mochila para abrir esses painéis.
 - `Esc`: fechar painéis. No celular, use os controles sobre o mapa.
 - Os controles de pausa, reinício e tela cheia ficam no canto superior direito.
 
@@ -54,11 +58,11 @@ Após carregar, use `window.labTraining`:
 labTraining.goToRoom("Instrument Lab");
 labTraining.playAnimation("jump");
 labTraining.playAnimation("death");
-labTraining.setPosition(13, 4);
+labTraining.setPosition(60, 11);
 labTraining.setMoveSpeed(4);
 labTraining.pause();
 labTraining.resume();
 labTraining.reset();
 ```
 
-`window.opportunityMap` continua disponível com a API original da engine do mapa. Ajustes de salas e objetos ficam em `js/map-data.js`; coordenadas são medidas em tiles de 40 px. Animações, número e dimensões dos quadros e FPS ficam em `js/config.js`.
+`window.opportunityMap` continua disponível com a API do mapa. A planta base e os objetos vêm de `static/opportunity-map-engine-v2/opportunity-map-engine/js/map-data.js`; coordenadas são medidas em tiles de 40 px. O treinamento remove decals e logos NASA. Animações, número e dimensões dos quadros e FPS ficam em `js/config.js`.
