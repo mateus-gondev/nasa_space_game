@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OPPORTUNITY — Um jogo narrativo</title>
+<link rel="stylesheet" href="css/styles.css"></head><body>
+<canvas id="c"></canvas>
+<div id="hud">
+ <div class="hb" id="hM"><b>MER-B / SISTEMAS</b><span id="hSt">OPERACIONAL</span></div>
+ <div class="hb" id="hL"><b>LOCALIZAÇÃO</b><span id="hl"></span></div>
+ <div class="hb" id="hS"><b>DIA MARCIANO</b><span id="hs"></span></div>
+ <div class="hb" id="hE"><b>ENERGIA</b><span id="he"></span><div id="eb"><div id="ef"></div></div></div>
+ <div class="hb" id="hC"><b>COMUNICAÇÃO</b><span id="hc">Estabelecida</span></div>
+</div>
+<div id="goal"></div><div id="toast"></div>
+<div id="pw"><b>SISTEMA DE ENERGIA — CRÍTICO</b><br>Instrumentos científicos: Desligados<br>Movimentação: Suspensa<br>Prioridade: Sobrevivência<br><small style="color:#a88">Representação ilustrativa</small></div>
+<div id="prog"><span id="pt"></span><div id="pb"><div id="pf"></div></div></div>
+<div id="lost">CONEXÃO PERDIDA.</div>
+<div id="ctl"><div><button id="L">◀</button> <button id="R">▶</button> <button id="arq" style="font-size:12px">Arquivo</button></div><button id="act" disabled>—</button></div>
+<div id="say"><span id="st"></span><i>▸ clique / espaço</i></div>
+<div class="ov" id="mg"></div><div class="ov" id="black"></div>
+<div class="ov" id="term"><div id="tt"></div><div><button id="tb" style="margin-top:16px;display:none">ENVIAR COMANDO</button></div></div>
+<div class="ov" id="cs"><canvas id="cu"></canvas></div><div class="ov" id="card"></div>
+<div class="ov on" id="title">
+ <h1>OPPORTUNITY</h1>
+ <p><i>“Construído para durar 90 dias. Destinado a explorar por quase 15 anos.”</i></p>
+ <p>Você controla um pequeno robô, sozinho em Marte. Não é um jogo sobre salvar o Opportunity. É sobre viver sua história.</p>
+ <button id="go">INICIAR</button>
+ <p style="font-size:12px">← → ou A/D para mover · Espaço/clique para avançar o texto · botão de ação para interagir<br>Fatos baseados na missão real; diálogos dramatizados.</p>
+ <div class="jump" id="jump">POC · ir para: </div>
+</div>
+<script type="module" src="js/game.js"></script></body></html>

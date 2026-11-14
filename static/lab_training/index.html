@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080d12">
+  <title>Opportunity — Lab Training</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="app-shell" id="appShell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">OPPORTUNITY / LAB TRAINING</p>
+        <h1>Opportunity Research Facility</h1>
+        <p class="subtitle">Mapa original da instalação · exploração top-down em pixel art</p>
+      </div>
+      <div class="topbar-actions">
+        <button class="ui-button" id="pauseButton" type="button">Pausar</button>
+        <button class="ui-button" id="resetButton" type="button">Reiniciar</button>
+      </div>
+    </header>
+
+    <section class="toolbar" aria-label="Controles do mapa">
+      <div class="toolbar-group">
+        <span class="toolbar-label">AMBIENTAÇÃO</span>
+        <div id="moodControls" class="button-row"></div>
+      </div>
+      <div class="toolbar-group room-group">
+        <span class="toolbar-label">IR PARA SALA</span>
+        <div id="roomControls" class="button-row"></div>
+      </div>
+    </section>
+
+    <section class="game-layout">
+      <div class="game-column">
+        <div class="stage" id="stage">
+          <canvas id="gameCanvas" tabindex="0" aria-label="Mapa top-down da instalação Opportunity com um astronauta"></canvas>
+          <div class="stage-vignette" aria-hidden="true"></div>
+          <div class="stage-status" id="stageStatus">CARREGANDO ASTRONAUTA <span></span></div>
+          <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
+            <p class="eyebrow">OBJETIVO DO TREINAMENTO</p>
+            <h2 id="tutorialTitle"></h2>
+            <p id="tutorialDescription"></p>
+          </section>
+          <div class="tutorial-feedback" id="tutorialFeedback" role="status" aria-live="polite" hidden></div>
+          <div class="hint" id="interactionHint" hidden></div>
+          <aside class="inspect-card" id="inspectCard" hidden>
+            <div class="inspect-card-heading">
+              <span class="toolbar-label">REGISTRO DO OBJETO</span>
+              <button class="icon-button" id="closeInspect" type="button" aria-label="Fechar">×</button>
+            </div>
+            <h2 id="inspectTitle"></h2>
+            <p id="inspectDescription"></p>
+            <span class="inspect-footnote">OPPORTUNITY / FIELD DATABASE</span>
+          </aside>
+          <div class="stage-modal" id="mapOverlay" hidden>
+            <section class="modal-card map-card" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
+              <div class="modal-heading">
+                <div><p class="eyebrow">M · MAPA</p><h2 id="mapTitle">Mapa da instalação</h2></div>
+                <button class="icon-button" id="closeMap" type="button" aria-label="Fechar mapa">×</button>
+              </div>
+              <canvas id="miniMap" width="280" height="180" aria-label="Minimapa da instalação"></canvas>
+              <p class="modal-footnote">PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL</p>
+            </section>
+          </div>
+          <div class="stage-modal" id="inventoryOverlay" hidden>
+            <section class="modal-card inventory-card" role="dialog" aria-modal="true" aria-labelledby="inventoryTitle">
+              <div class="modal-heading">
+                <div><p class="eyebrow">TAB · MOCHILA</p><h2 id="inventoryTitle">Inventário de missão</h2></div>
+                <button class="icon-button" id="closeInventory" type="button" aria-label="Fechar mochila">×</button>
+              </div>
+              <p class="modal-description" id="inventoryCount">Quatro slots disponíveis para os resultados do treinamento.</p>
+              <div class="inventory-slots" id="inventorySlots"></div>
+            </section>
+          </div>
+          <div class="paused-overlay" id="pausedOverlay" hidden>SIMULAÇÃO PAUSADA</div>
+        </div>
+        <div class="mobile-controls" aria-label="Controles de movimento">
+          <button type="button" data-key="ArrowUp" aria-label="Cima">▲</button>
+          <div class="mobile-controls-row">
+            <button type="button" data-key="ArrowLeft" aria-label="Esquerda">◀</button>
+            <button type="button" data-key="ArrowDown" aria-label="Baixo">▼</button>
+            <button type="button" data-key="ArrowRight" aria-label="Direita">▶</button>
+          </div>
+          <button type="button" data-action="inspect">E · INSPECIONAR</button>
+        </div>
+      </div>
+
+      <aside class="side-panel">
+        <div class="panel-section">
+          <p class="eyebrow">MISSION TELEMETRY</p>
+          <h2>Status da missão</h2>
+          <dl class="telemetry-list">
+            <div><dt>LOCALIZAÇÃO</dt><dd id="telemetryRoom">Mission Control</dd></div>
+            <div><dt>AMBIENTE</dt><dd id="telemetryMood">Operacional</dd></div>
+            <div><dt>CADETE</dt><dd id="telemetryCadet">Astronauta</dd></div>
+            <div><dt>ANIMAÇÃO</dt><dd id="telemetryAnimation">idle</dd></div>
+            <div><dt>POSIÇÃO</dt><dd id="telemetryPosition">13.0 / 04.0</dd></div>
+            <div><dt>INTERAÇÃO</dt><dd id="telemetryTarget">Nenhum objeto</dd></div>
+          </dl>
+        </div>
+        <div class="panel-section">
+          <p class="eyebrow">CONTROLES</p>
+          <h2>Como explorar</h2>
+          <ul class="control-list">
+            <li><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> <span>Mover</span></li>
+            <li><kbd>E</kbd> <span>Selecionar / usar</span></li>
+            <li><kbd>1</kbd>–<kbd>4</kbd> <span>Ferramenta</span></li>
+            <li><kbd>M</kbd> <span>Mapa</span></li>
+            <li><kbd>Tab</kbd> <span>Mochila</span></li>
+            <li><kbd>Esc</kbd> <span>Fechar painel</span></li>
+          </ul>
+        </div>
+        <div class="panel-section">
+          <p class="eyebrow">FERRAMENTAS · 1–4</p>
+          <h2>Kit científico</h2>
+          <div class="tool-controls" id="toolControls"></div>
+        </div>
+        <div class="panel-section">
+          <p class="eyebrow">ASTRONAUT SPRITES</p>
+          <h2>Prévia de animação</h2>
+          <div id="animationControls" class="button-row animation-controls"></div>
+          <p class="asset-feedback" id="animationFeedback">Idle e corrida acompanham o movimento no mapa.</p>
+        </div>
+        <div class="panel-section asset-section">
+          <p class="eyebrow">CUSTOM ASSETS</p>
+          <h2>Personalizar sprites</h2>
+          <p>Carregue PNGs com o nome do tipo do objeto, por exemplo <code>rover.png</code>, <code>crate.png</code> ou <code>floor1.png</code>.</p>
+          <label class="upload-button" for="assetInput">＋ Carregar imagens PNG</label>
+          <input id="assetInput" type="file" accept="image/png" multiple hidden>
+          <p class="asset-feedback" id="assetFeedback">Nenhum pacote carregado.</p>
+        </div>
+        <div class="panel-section">
+          <p class="eyebrow">ENGINE API</p>
+          <h2>Configuração por código</h2>
+          <p>Edite <code>js/config.js</code> para ajustar o mapa, o personagem e as animações. A planta Opportunity foi preservada.</p>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="footer"><span>OPPORTUNITY · MAP ENGINE</span><span>Explorar. Aprender. Viver.</span><span>v1.0.0</span></footer>
+  </main>
+
+  <div class="story-overlay" id="introOverlay">
+    <section class="story-card" id="welcomeScreen" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+      <p class="eyebrow">HOUSTON, TEXAS · CENTRO ESPACIAL LYNDON B. JOHNSON</p>
+      <h2 id="welcomeTitle">Treinamento Júnior de Astronautas</h2>
+      <p class="story-copy">Parabéns, cadete <strong id="welcomeCadet">_________</strong>. Você foi selecionado para participar do Treinamento Júnior de Astronautas da NASA no Centro Espacial Lyndon B. Johnson. Antes de viajar de vez para Marte, você vai participar de uma simulação para aprender a controlar o que deve ser feito na nave e como sobreviver no ambiente marciano.</p>
+      <form id="welcomeForm">
+        <label for="cadetName">Identificação do cadete</label>
+        <input id="cadetName" name="cadetName" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome" required>
+        <button class="story-button" type="submit">Continuar briefing</button>
+      </form>
+    </section>
+    <section class="story-card suit-screen" id="suitScreen" role="dialog" aria-modal="true" aria-labelledby="suitTitle" hidden>
+      <p class="eyebrow">PREPARAÇÃO · EQUIPAMENTO PESSOAL</p>
+      <h2 id="suitTitle">Verificação do traje</h2>
+      <div class="suit-preview" role="img" aria-label="Astronauta vestindo traje espacial e capacete"></div>
+      <p class="story-copy"><strong id="suitCadet">Cadete</strong>, vista o traje pressurizado, ajuste as luvas e as botas e vede o capacete. Confirme o rádio e o sistema de suporte à vida antes de entrar na simulação de gravidade marciana.</p>
+      <div class="suit-steps">
+        <button class="suit-step" id="wearSuit" type="button" aria-pressed="false">
+          <kbd>01</kbd><span>Vestir traje, botas e luvas</span><span class="suit-step-state">PENDENTE</span>
+        </button>
+        <button class="suit-step" id="wearHelmet" type="button" aria-pressed="false" disabled>
+          <kbd>02</kbd><span>Colocar e vedar o capacete</span><span class="suit-step-state">PENDENTE</span>
+        </button>
+      </div>
+      <p class="suit-feedback" id="suitFeedback" role="status">Complete as duas etapas para iniciar a simulação.</p>
+      <button class="story-button" id="confirmSuit" type="button" disabled>Entrar na simulação</button>
+    </section>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/map-data.js"></script>
+  <script src="js/animation.js"></script>
+  <script src="js/character.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/controls.js"></script>
+  <script src="js/engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
