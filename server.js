@@ -24,6 +24,12 @@ app.get('/game', disableCache, (req, res) => {
 app.use('/assets', disableCache, express.static(path.join(__dirname, 'static/assets')));
 app.use('/main-menu', disableCache, express.static(path.join(__dirname, 'static/main_menu')));
 app.use('/lab-training', disableCache, express.static(path.join(__dirname, 'static/lab_training')));
+// Expose only the browser runtime and scenario, not LIFE's pipeline or reports.
+app.get('/life/:file', disableCache, (req, res) => {
+  const allowed = ['engine.js', 'management.js', 'browser-ui.js', 'scenario-mars.json', 'management-config.json'];
+  if (!allowed.includes(req.params.file)) return res.sendStatus(404);
+  res.sendFile(path.join(__dirname, 'LIFE', req.params.file));
+});
 app.use('/map-engine-v2', disableCache, express.static(path.join(__dirname, 'static/opportunity-map-engine-v2/opportunity-map-engine')));
 
 app.use(disableCache, express.static(path.join(__dirname, 'static/main_menu')));

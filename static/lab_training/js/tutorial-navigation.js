@@ -70,7 +70,7 @@ window.MapRenderer = class TrainingRenderer extends window.MapRenderer {
     ctx.save();
     ctx.translate(-this.cam.x, -this.cam.y);
     if (route.length > 1) {
-      ctx.strokeStyle = "#ffca70aa"; ctx.lineWidth = 3; ctx.setLineDash([5, 9]); ctx.lineDashOffset = -state.time * 18;
+      ctx.strokeStyle = "#ff4040"; ctx.lineWidth = 3; ctx.setLineDash([5, 9]); ctx.lineDashOffset = -state.time * 18;
       ctx.beginPath();
       route.forEach((point, index) => ctx[index ? "lineTo" : "moveTo"](point.x * tile, point.y * tile));
       ctx.stroke(); ctx.setLineDash([]);

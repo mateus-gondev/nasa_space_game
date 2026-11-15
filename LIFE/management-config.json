@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "secondsPerTick": 10,
+  "fatigueWarning": 75,
+  "scenarioId": "mars-management",
+  "scenarioVersion": "1.0.0",
+  "fatigueWork": 1,
+  "fatigueRest": 2,
+  "recyclerDemand": 1
+}

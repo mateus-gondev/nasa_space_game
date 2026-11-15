@@ -7,6 +7,7 @@ RUN npm install --omit=dev
 
 COPY server.js ./
 COPY static ./static
+COPY LIFE/engine.js LIFE/management.js LIFE/browser-ui.js LIFE/scenario-mars.json LIFE/management-config.json ./LIFE/
 
 ENV NODE_ENV=production
 EXPOSE 3000
