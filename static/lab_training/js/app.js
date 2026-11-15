@@ -234,6 +234,7 @@
   }
 
   function renderInventory() {
+    renderInventoryOverview();
     const slots = $("#inventorySlots");
     slots.replaceChildren();
     for (let index = 0; index < 4; index++) {
@@ -254,6 +255,42 @@
       ? `${inventoryItems.length}/4 resultados do treinamento guardados.`
       : "Quatro slots disponíveis para os resultados do treinamento.";
   }
+
+  function renderInventoryOverview() {
+    const cadetName = $("#hudCadetName").textContent.trim() || "Astronauta";
+    $("#inventoryCadetName").textContent = cadetName;
+    $("#inventoryLocation").textContent = $("#hudLocation").textContent.trim();
+    $("#inventoryAstronaut").setAttribute("aria-label", `Astronauta de ${cadetName}`);
+
+    document.querySelectorAll("#inventoryVitals .inventory-vital").forEach(inventoryVital => {
+      const sourceLabel = inventoryVital.dataset.sourceLabel;
+      const sourceVital = [...document.querySelectorAll(".hud-vitals .vital-item")].find(vital =>
+        vital.querySelector(".vital-track")?.getAttribute("aria-label") === sourceLabel
+      );
+      const sourceMeter = sourceVital?.querySelector(".vital-track");
+      const sourceValue = sourceMeter?.getAttribute("aria-valuenow");
+      const value = Number(sourceValue);
+      if (sourceValue === null || sourceValue === undefined || !Number.isFinite(value)) {
+        console.error(`Valor de suporte vital indisponível: ${sourceLabel}.`);
+        return;
+      }
+
+      const percent = Math.max(0, Math.min(100, value));
+      const displayValue = Number.isInteger(percent) ? percent : percent.toFixed(1);
+      inventoryVital.querySelector(".inventory-vital-value").textContent = `${displayValue}%`;
+      const inventoryMeter = inventoryVital.querySelector(".inventory-vital-track");
+      inventoryMeter.setAttribute("aria-valuenow", String(percent));
+      inventoryVital.querySelector(".inventory-vital-fill").style.width = `${percent}%`;
+    });
+  }
+
+  const inventoryHudObserver = new MutationObserver(renderInventoryOverview);
+  inventoryHudObserver.observe($("#hudCadetName"), { childList: true, characterData: true, subtree: true });
+  inventoryHudObserver.observe($("#hudLocation"), { childList: true, characterData: true, subtree: true });
+  inventoryHudObserver.observe($(".hud-vitals"), {
+    attributes: true, childList: true, characterData: true, subtree: true,
+    attributeFilter: ["aria-valuenow", "style"]
+  });
 
   function drawMinimap() {
     const ctx = miniMap.getContext("2d");
@@ -422,7 +459,7 @@
     $("#suitFeedback").textContent = isSuit ? "Vestindo o traje..." : "Colocando o capacete...";
     equipmentAnimationOverlay.hidden = false;
     equipmentAnimationFrame.src = isSuit
-      ? "/assets/Animations/astronauta_vestindo_traje_8bit.html?embed=1"
+      ? "/assets/Animations/astronauta_traje_espacial_8bit.html?embed=1"
       : "/assets/Animations/Capacete%20%E2%80%93%20POV%208-bit.html?embed=1";
     $("#skipEquipmentAnimation").focus();
   }
@@ -525,6 +562,11 @@
     mainMenuOverlay.hidden = true;
     introOverlay.hidden = false;
     cadetInput.focus();
+  });
+  $("#backToMenu").addEventListener("click", () => {
+    introOverlay.hidden = true;
+    mainMenuOverlay.hidden = false;
+    showMenuPage("home");
   });
   $("#settingsButton").addEventListener("click", () => showMenuPage("settings"));
   $("#infoButton").addEventListener("click", () => showMenuPage("info"));
