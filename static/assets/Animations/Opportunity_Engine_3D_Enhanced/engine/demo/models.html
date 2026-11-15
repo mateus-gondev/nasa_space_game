@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Opportunity · Modelos do mapa</title>
+  <link rel="icon" href="/lab-training/favicon.svg" type="image/svg+xml">
+  <script type="importmap">{"imports":{"three":"/vendor/three/three.module.js"}}</script>
+  <style>
+    :root{color-scheme:dark;font-family:system-ui,sans-serif;color:#dce8ef;background:#0b131c}*{box-sizing:border-box}body{margin:0}button,select,a{font:inherit}button,select{background:#182938;border:1px solid #365268;border-radius:6px;color:#dce8ef;padding:9px 12px;cursor:pointer}button:hover,button[aria-pressed=true]{background:#24445b;border-color:#76d9dd}:focus-visible{outline:2px solid #ffcb77;outline-offset:3px}header{padding:16px 24px;border-bottom:1px solid #284154;display:flex;justify-content:space-between;align-items:center;gap:14px}header small{color:#76d9dd;letter-spacing:.15em}h1{font-size:21px;margin:5px 0}header a{color:#a0c6dd;font-size:13px}.shell{display:grid;grid-template-columns:230px minmax(0,1fr);height:calc(100dvh - 96px)}nav{padding:14px;overflow:auto;border-right:1px solid #284154;display:flex;flex-direction:column;gap:6px}nav button{text-align:left;font-size:12px}main{min-height:0;display:flex;flex-direction:column}.heading{padding:16px 24px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.heading h2{font-size:18px;margin:0 0 5px}.heading p{color:#9aafbf;font-size:12px;margin:0}.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}.comparison{display:grid;grid-template-columns:210px minmax(0,1fr);flex:1;min-height:160px}.reference{padding:18px;background:#101f2b;border-right:1px solid #284154;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}.reference h3{font-size:11px;letter-spacing:.1em;color:#9cbdce}.reference canvas{max-width:100%;max-height:240px;object-fit:contain;image-rendering:pixelated}.reference p{font-size:11px;color:#8faabc;line-height:1.6}.viewport{min-width:0;min-height:0;position:relative;touch-action:none}.viewport canvas{display:block;width:100%;height:100%;cursor:grab}.viewport canvas:active{cursor:grabbing}.help{padding:12px 24px;border-top:1px solid #284154;color:#9aafbf;font-size:12px;margin:0}.error{color:#ffb9a3;padding:24px}#modelStats{display:block;font-size:11px;color:#76d9dd;line-height:1.8} @media(max-width:800px){header{padding:12px}h1{font-size:16px}.shell{grid-template-columns:145px minmax(0,1fr)}nav{padding:8px}.comparison{grid-template-columns:1fr;grid-template-rows:130px minmax(200px,1fr)}.reference{flex-direction:row;border-right:0;padding:8px 14px;gap:12px}.reference canvas{max-width:50%;max-height:100px}.reference h3{max-width:80px}.reference p{display:none}.heading{padding:12px}.tools{gap:5px}.help{padding:10px}button,select{padding:7px}.shell{height:calc(100dvh - 84px)}}
+  </style>
+</head>
+<body>
+  <header><div><small>OPPORTUNITY / COLEÇÃO DO LABORATÓRIO</small><h1>Do mapa para o ambiente 3D</h1></div><a href="/lab-training/">Voltar ao treinamento</a></header>
+  <div class="shell">
+    <nav id="modelList" aria-label="Objetos do mapa"></nav>
+    <main>
+      <section class="heading"><div><h2 id="modelName">Carregando modelos</h2><p id="modelDimensions"></p></div><div class="tools"><label for="quality">Qualidade</label><select id="quality"><option value="low">Baixa</option><option value="balanced">Equilibrada</option><option value="high" selected>Alta</option></select><button id="viewTop">Ver de cima</button><button id="resetView">Restaurar vista</button></div></section>
+      <section class="comparison"><aside class="reference"><h3>DESENHO ORIGINAL DO MAPA</h3><canvas id="sprite" aria-label="Desenho 2D original do objeto selecionado"></canvas><p id="referenceNote">Mesma forma e paleta do mapa, com volume e detalhes visíveis de todos os lados.</p></aside><div class="viewport" id="modelViewport" aria-label="Modelo 3D selecionado"></div></section>
+      <p class="help">Arraste para girar a vista · Scroll para aproximar · Selecione outro objeto na lista. <span id="modelStats"></span></p>
+    </main>
+  </div>
+  <script src="/lab-training/js/config.js"></script>
+  <script src="/map-engine-v2/js/map-data.js"></script>
+  <script src="/lab-training/js/map-data-training.js"></script>
+  <script src="/map-engine-v2/js/renderer.js"></script>
+  <script type="module" src="./models.js"></script>
+</body>
+</html>

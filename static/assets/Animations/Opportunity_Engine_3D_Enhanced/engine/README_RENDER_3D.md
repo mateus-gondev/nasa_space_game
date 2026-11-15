@@ -1,5 +1,11 @@
 # Opportunity — melhoria de renderização e biblioteca de ambientes 3D
 
+## Modelos fiéis aos desenhos do mapa
+
+`props.js` contém modelos específicos para os 31 tipos reais da planta, com dimensões sem o antigo limite de 3 tiles e cores derivadas de `drawProp`/`drawExtra`. Foram incluídos rover com seis rodas e suspensão, Pancam binocular, refletor parabólico, microscópio, espectrômetros, braço articulado, móveis, vitrines, mesa holográfica e equipamentos de energia. O alvo fotográfico continua sendo uma bandeja de terreno para preservar a etapa do tutorial.
+
+Compare o desenho 2D original e o modelo em `/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/models.html`. A galeria usa os dados e o renderer reais do mapa, oferece órbita, zoom, vista superior e seleção de qualidade. Texturas de gráficos, quadros, células solares e globo marciano são geradas localmente e compartilhadas; peças repetidas são agrupadas com instâncias. A suíte `npm test` verifica todos os modelos nos três perfis.
+
 ## O que havia no arquivo original
 
 O `engine.rar` recebido contém **apenas o motor de animações** (`engine/`), não o projeto `nasa_space_game` descrito em `Engine_3D_Threejs.docx`. Por isso, este pacote **preserva todos os arquivos originais** e adiciona módulos reutilizáveis. Ele não substitui diretamente `static/lab_training/js/camera-view.js`, que não veio no RAR.

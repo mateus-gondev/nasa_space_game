@@ -83,6 +83,25 @@ export function createEnvironmentMaterials({ quality='balanced' }={}) {
     rock:std(PALETTE.stone,0,0.99),soil:std(PALETTE.clay,0,0.98),
     black:new MeshBasicMaterial({color:'#08131b'}),
     detail:std('#cbdce1',0.36,0.53),
+    // Cores do drawProp/drawExtra do mapa; cada equipamento conserva sua identidade.
+    body:std('#cfd5db',.32,.48), console:std('#56677a',.35,.55),
+    navy:std('#17306b',.3,.47), panelBlue:std('#10265a',.32,.42),
+    drawer:std('#8795a3',.32,.58), locker:std('#7a8b9d',.35,.52),
+    crate:std('#5f7385',.35,.65), strap:std('#4a5b6b',.45,.55),
+    bench:std('#d8dfe6',.22,.5), instrument:std('#8c96a2',.48,.38),
+    cartRed:std('#b33a3a',.3,.5), shelf:std('#39424c',.5,.55),
+    olive:std('#56624a',.35,.6), fin:std('#5d636c',.62,.45),
+    wood:std('#7d6b55',0,.87), palletWood:std('#b08a58',0,.9),
+    pot:std('#6b4a35',0,.88), leaf:std('#2f7a3d',0,.8), leafLight:std('#3f8f4a',0,.76),
+    sampleBlue:std('#6fd3ff',.1,.4), sampleGreen:std('#9bff9b',.1,.4), sampleAmber:std('#ffc66f',.1,.4),
+    amber:std('#f5c518',.22,.5), paper:std('#f0f0ea',0,.94),
+    cartonGold:std('#c9a050',0,.85), cartonBlue:std('#6a8caf',0,.8),
+    cartonRed:std('#b0585a',0,.8), cartonGreen:std('#7aa37a',0,.85),
+    ledGreen:std('#9bff9b',0,.4,{emissive:'#9bff9b',emissiveIntensity:.65}),
+    ledRed:std('#ff5252',0,.4,{emissive:'#ff5252',emissiveIntensity:.5}),
+    hologram:std('#ffbb8e',0,.5,{transparent:true,opacity:.7,emissive:'#b45b30',emissiveIntensity:.45,depthWrite:false}),
+    beam:std('#4dd0ff',0,1,{transparent:true,opacity:.055,emissive:'#4dd0ff',emissiveIntensity:.7,depthWrite:false,side:DoubleSide}),
+    displayGlass:std('#bfe9ff',.05,.1,{transparent:true,opacity:.15,depthWrite:false,side:DoubleSide}),
   };
   return {materials,textures,dispose(){
     for(const value of Object.values(materials))value.dispose();
@@ -97,8 +116,54 @@ export function createSignMaterial(text, { color='#ddf7fb', background='#172e3b'
   ctx.fillStyle=background;ctx.fillRect(0,0,512,128);
   ctx.strokeStyle='#567e8c';ctx.lineWidth=5;ctx.strokeRect(6,6,500,116);
   ctx.fillStyle=color;ctx.font='bold 51px monospace';ctx.textAlign='center';ctx.textBaseline='middle';
-  const name=String(text||'INSTRUMENT').toUpperCase().slice(0,18);
+  const name=String(text||'INSTRUMENT').toUpperCase().slice(0,40);
   ctx.fillText(name,256,68,465);
   const map=new CanvasTexture(canvas);map.colorSpace=SRGBColorSpace;
   return new MeshBasicMaterial({map,transparent:false,side:DoubleSide});
+}
+
+/** Face graphics reproduce the map's graphs, solar cells and Martian globe. */
+export function createPanelMaterial(kind) {
+  const canvas=document.createElement('canvas');
+  canvas.width=kind==='mars'?1024:768;canvas.height=kind==='mars'?512:384;
+  const c=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
+  let seed=5821;
+  const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
+  c.fillStyle=kind==='board'?'#eef2f5':kind==='solar'?'#10265a':kind==='mars'?'#c57349':'#06223d';
+  c.fillRect(0,0,w,h);
+  if(kind==='mars'){
+    for(let i=0;i<650;i++){
+      c.fillStyle=['#a25535','#b76440','#e28b5c','#8a4530','#da8052'][i%5];
+      c.beginPath();c.ellipse(random()*w,random()*h,3+random()*42,2+random()*14,random()*3,0,Math.PI*2);c.fill();
+    }
+    c.fillStyle='#e9d8bb';c.fillRect(0,0,w,12);c.fillRect(0,h-10,w,10);
+  }else if(kind==='solar'){
+    for(let x=8;x<w;x+=64)for(let y=7;y<h;y+=64){
+      c.fillStyle='#17346b';c.fillRect(x,y,56,56);
+      c.strokeStyle='#3b6fd1';c.lineWidth=2;c.strokeRect(x,y,56,56);
+      c.strokeStyle='#9aa6b2';c.lineWidth=.7;
+      for(let j=1;j<5;j++){c.beginPath();c.moveTo(x+3,y+j*11);c.lineTo(x+53,y+j*11);c.stroke();}
+    }
+  }else if(kind==='board'){
+    c.strokeStyle='#d2dce3';c.lineWidth=1;
+    for(let x=30;x<w;x+=32){c.beginPath();c.moveTo(x,36);c.lineTo(x,h-45);c.stroke();}
+    for(let y=36;y<h-30;y+=32){c.beginPath();c.moveTo(30,y);c.lineTo(w-30,y);c.stroke();}
+    c.strokeStyle='#2f6fd6';c.lineWidth=5;c.beginPath();
+    for(let i=0;i<18;i++){const x=38+i*(w-80)/17,y=190+Math.sin(i*.92)*48; i?c.lineTo(x,y):c.moveTo(x,y);}c.stroke();
+    c.fillStyle='#fc3d21';for(let i=0;i<4;i++)c.fillRect(45+i*160,48,95,8);
+    c.fillStyle='#f5c518';c.fillRect(w-100,h-90,65,52);
+    c.fillStyle='#1e3a52';c.font='21px monospace';c.fillText('MERIDIANI  /  SOL 5111',40,h-28);
+  }else{
+    c.strokeStyle='#16435d';c.lineWidth=1;
+    for(let x=0;x<w;x+=40){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();}
+    for(let y=0;y<h;y+=32){c.beginPath();c.moveTo(0,y);c.lineTo(w,y);c.stroke();}
+    for(let n=0;n<3;n++){
+      c.strokeStyle=['#4dd0ff','#9bff9b','#ffc66f'][n];c.lineWidth=3;c.beginPath();
+      for(let x=25;x<w-24;x+=4){const y=105+n*95+Math.sin(x/(20+n*14)+n)*18+Math.sin(x/7)*4;x===25?c.moveTo(x,y):c.lineTo(x,y);}c.stroke();
+    }
+    c.fillStyle='#a5d9ef';c.font='22px monospace';c.fillText('OPPORTUNITY   /   TELEMETRY',25,31);
+  }
+  const map=new CanvasTexture(canvas);map.colorSpace=SRGBColorSpace;map.anisotropy=4;
+  const emissive=['board','solar','mars'].includes(kind)?'#000000':'#245d77';
+  return new MeshStandardMaterial({map,roughness:kind==='solar'?.4:.8,metalness:kind==='solar'?.25:0,emissive,emissiveIntensity:.4});
 }
