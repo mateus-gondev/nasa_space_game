@@ -19,6 +19,7 @@ window.MARS_TILEMAP_READY = fetch('/assets/marte_tilemap/scene_manifest.json')
         w: o.width / T, h: o.height / T, solid: o.solid, name: labels[o.sprite] || null,
         description: o.resource ? 'Recurso de campo: ' + o.resource.replaceAll('_', ' ') + '. Aproxime-se para registrar ou recolher.' : 'Equipamento da expedição em Marte.',
         action: o.kind === 'energia' ? 'charge' : o.kind === 'comunicacao' ? 'beacon' : o.resource ? (o.kind === 'recurso' || o.kind === 'amostras' ? 'scan' : 'collect') : labels[o.sprite] ? 'log' : null,
+        sprite: o.sprite, resource: o.resource, kind: o.kind,
         completed: false, important: !!labels[o.sprite]
       }));
       const transitions = source.transitions.map(t => ({

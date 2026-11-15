@@ -60,8 +60,10 @@ window.MapEngine = class MapEngine {
       if (!this.collides(this.player.x, this.player.y + dy)) this.player.y += dy;
       const moved=Math.hypot(this.player.x-x0,this.player.y-y0);
       this.odometer+=moved;
-      this.energy=Math.max(3, this.energy-(this.map.weather==='storm'?.45:.14)*moved);
-      if(moved>0 && this.map.weather==='storm')this.energy=Math.max(3,this.energy-delta*.4);
+      if (!this.campaignMode) {
+        this.energy=Math.max(3, this.energy-(this.map.weather==='storm'?.45:.14)*moved);
+        if(moved>0 && this.map.weather==='storm')this.energy=Math.max(3,this.energy-delta*.4);
+      }
     }
 
     this.map.doors.forEach(door => {

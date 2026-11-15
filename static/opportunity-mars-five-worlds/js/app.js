@@ -13,7 +13,9 @@
   let saved={};try{saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')||{}}catch(_){saved={}}
   for(const world of worlds)for(const p of world.props)if(saved.completed?.[p.id])p.completed=true;
   const requestedWorld=new URLSearchParams(window.location.search).get('world');
-  const initial=worlds.find(world=>world.id===requestedWorld)||worlds.find(world=>world.id===saved.world)||worlds[0];
+  let campaignWorld;try{campaignWorld=JSON.parse(localStorage.getItem('opportunity.campaign.v1')||'null')?.meta?.world;}catch(_){}
+  const arrival=new URLSearchParams(window.location.search).get('arrival')==='1';
+  const initial=(arrival?byId.mars01_ship_interior:worlds.find(world=>world.id===requestedWorld))||worlds.find(world=>world.id===campaignWorld)||worlds[0];
   const canvas=$('#gameCanvas'),toast=$('#toast');
   const engine=new MapEngine({canvas,config,map:initial,onStateChange:updateInterface,onInspect:showInspection,onTravel:(id,spawn)=>switchWorld(id,spawn)});
   Object.assign(engine.player,{x:initial.spawn[0],y:initial.spawn[1]});
@@ -28,7 +30,7 @@
     const completed={};for(const w of worlds)for(const p of w.props)if(p.completed)completed[p.id]=true;
     try{localStorage.setItem(STORAGE_KEY,JSON.stringify({world:engine.map.id,completed,energy:engine.energy,odometer:engine.odometer,collected:engine.collected,journal:journal.slice(0,30)}));}catch(e){console.warn('Progresso local indisponível',e)}
   }
-  function notify(message){toast.textContent=message;toast.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>toast.hidden=true,3700);}
+  function notify(message){if(window.marsCampaign?.announce){toast.hidden=true;window.marsCampaign.announce(message);return;}toast.textContent=message;toast.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>toast.hidden=true,3700);}
   function addJournal(text){journal.unshift({text,world:engine.map.short,time:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})});while(journal.length>30)journal.pop();persist();}
   function counts(world=engine.map){const scans=world.props.filter(p=>p.action==='scan'),beacons=world.props.filter(p=>p.action==='beacon');return{scan:scans.filter(p=>p.completed).length,beacon:beacons.filter(p=>p.completed).length,total:Math.min(3,scans.filter(p=>p.completed).length)+Math.min(1,beacons.filter(p=>p.completed).length),goal:4};}
   function switchWorld(id,spawn){const target=byId[id];if(!target)return;
@@ -103,6 +105,7 @@
     engine.inspectObjectAt(cam.x/tile+(event.clientX-rect.left)/rect.width*view.w,cam.y/tile+(event.clientY-rect.top)/rect.height*view.h);
   });
   window.addEventListener('keydown',ev=>{
+    if(document.querySelector('#missionDialog')?.open)return;
     const key=ev.key.toLowerCase();
     if(ev.repeat)return;
     if(key==='escape'){
@@ -135,16 +138,16 @@
     for(let i=0;i<230;i++){const x=70+rnd()*720,y=rnd()*H,r=2+rnd()*31;ctx.fillStyle=rnd()>.5?'rgba(38,17,22,.13)':'rgba(246,190,125,.10)';ctx.beginPath();ctx.ellipse(x,y,r,r*.4,rnd()*Math.PI,0,Math.PI*2);ctx.fill();}
     for(let i=0;i<34;i++){const x=90+rnd()*670,y=10+rnd()*290,r=4+rnd()*14;ctx.strokeStyle='#f5b27a55';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#2f171744';ctx.beginPath();ctx.arc(x,y,r*.7,0,Math.PI*2);ctx.fill();}
     ctx.restore();
-    const points=worlds.map((_,i)=>[110+(i%4)*210,100+Math.floor(i/4)*105]);
+    const points=worlds.map((_,i)=>[95+(i%5)*166,100+Math.floor(i/5)*105]);
     ctx.strokeStyle='#f6dcb1a0';ctx.lineWidth=2;ctx.setLineDash([6,8]);ctx.beginPath();points.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.stroke();ctx.setLineDash([]);
     points.forEach(([x,y],i)=>{const world=worlds[i],active=world.id===engine.map.id;ctx.beginPath();ctx.arc(x,y,active?11:8,0,Math.PI*2);ctx.fillStyle=active?'#a6f2e4':'#ffd2a0';ctx.fill();ctx.strokeStyle='#171d20';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#ffffff';ctx.textAlign='center';ctx.font='bold 12px monospace';ctx.fillText(world.short,x,y-19);});
-    ctx.fillStyle='#c6a78e';ctx.font='11px monospace';ctx.textAlign='left';ctx.fillText('MARS / MER-B WORLD TRAVERSE · MAPA ESTILIZADO',15,H-12);
+    ctx.fillStyle='#8ecbff';ctx.font='11px monospace';ctx.textAlign='left';ctx.fillText('SEUS LUGARES EM MARTE',15,H-12);
   }
   function openAtlas(){
     if(!$('#atlasModal').hidden)return;
     engine.closeInspection();atlasWasPaused=engine.paused;
     $('#atlasModal').hidden=false;engine.setPaused(true);
-    $('#atlasChoices').replaceChildren(...worlds.map((w,i)=>{const b=document.createElement('button');b.type='button';b.className='atlas-choice'+(w.id===engine.map.id?' active':'');b.innerHTML=`<strong>0${i+1} · </strong><span></span><small></small>`;b.querySelector('span').textContent=w.short;b.querySelector('small').textContent=w.subtitle;b.addEventListener('click',()=>switchWorld(w.id));return b;}));
+    $('#atlasChoices').replaceChildren(...worlds.map(w=>{const b=window.MarsUI.tile({label:w.short,icon:w.interior?'ship':'map',detail:w.id===engine.map.id?'✓ Você está aqui':'Ir para cá',onClick:()=>switchWorld(w.id)});b.className+=' atlas-choice'+(w.id===engine.map.id?' active':'');return b;}));
     drawAtlas();$('#closeAtlas').focus();
   }
   function closeAtlas(){$('#atlasModal').hidden=true;engine.controls.keys.clear();engine.setPaused(atlasWasPaused);if(!engine.paused)canvas.focus();}
@@ -157,9 +160,10 @@
   // API compatível com a Map Engine original e extensões para o atlas.
   window.opportunityMap={engine,worlds,goToWorld:switchWorld,goToRoom:name=>engine.goToRoom(name),setAtmosphere:key=>engine.setAtmosphere(key),
     pause:()=>engine.setPaused(true),resume:()=>engine.setPaused(false),reset:()=>engine.reset(),openAtlas,
-    inspect:name=>{const p=engine.map.props.find(x=>x.name?.toLowerCase()===name.toLowerCase());if(p){engine.inspectedObject=p;showInspection(p)}},
+    inspect:name=>{const p=engine.map.props.find(x=>x.name?.toLowerCase()===name.toLowerCase());if(p){engine.inspectedObject=p;engine.onInspect(p)}},
     addProp:prop=>{if(!prop?.type||!Number.isFinite(prop.x)||!Number.isFinite(prop.y))throw Error('type/x/y obrigatórios');engine.map.props.push({w:1,h:1,solid:false,...prop});engine.map.props.sort((a,b)=>(a.y+a.h)-(b.y+b.h));},
     loadAsset:(name,url)=>{const img=new Image();img.onload=()=>engine.loadAsset(name,img);img.src=url;},
     getProgress:()=>worlds.map(w=>({id:w.id,...counts(w)})),getWorld:()=>engine.map.id};
   console.info('Opportunity Mars Atlas carregado: cinco mapas + ações científicas e persistência local.');
+  await window.MarsCampaignUI.mount({engine, worlds, notify, switchWorld, updateInterface});
 })().catch(error=>{console.error(error);const toast=document.querySelector('#toast');toast.textContent='Falha ao carregar os mapas. Recarregue a página para tentar novamente.';toast.hidden=false;});

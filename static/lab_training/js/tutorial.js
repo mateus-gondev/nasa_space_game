@@ -9,6 +9,7 @@ window.LabTutorial = class LabTutorial {
     this.completedTools.clear();
     this.mapOpened = false;
     this.inventoryOpened = false;
+    this.report = null;
   }
 
   equip() {
@@ -36,10 +37,15 @@ window.LabTutorial = class LabTutorial {
   inventory(open) {
     if (this.phase !== "inventory") return;
     if (open) this.inventoryOpened = true;
-    else if (this.inventoryOpened) this.phase = "ship";
+    else if (this.inventoryOpened) this.phase = "communication";
   }
 
   interact(id, tool) {
+    if (this.phase === "communication" && id === "communication" && this.completedTools.size === 4) {
+      this.report = "Quatro instrumentos verificados; fotografia, textura, leitura térmica e rególito registrados. Objetivo: manter a base, investigar evidências e recuperar arquivos históricos MER-B em uma expedição fictícia.";
+      this.phase = "ship";
+      return true;
+    }
     if (this.phase === "gravity" && id === "gravity") {
       this.phase = "gravityWalk";
       this.distance = 0;
@@ -72,7 +78,7 @@ window.LabTutorial = class LabTutorial {
   get targetId() {
     if (this.phase === "map") return "gravity";
     if (this.phase === "lab") return "camera";
-    return ["gravity", "camera", "microscope", "temperature", "drill", "ship"].includes(this.phase) ? this.phase : null;
+    return ["gravity", "camera", "microscope", "temperature", "drill", "communication", "ship"].includes(this.phase) ? this.phase : null;
   }
 
   get step() {
@@ -87,6 +93,7 @@ window.LabTutorial = class LabTutorial {
       temperature: ["07 / 10 · SENSOR DE TEMPERATURA", "Meça a temperatura de um sólido", "Aproxime-se da rocha marcada. Pressione 3 para equipar o sensor e E para registrar a leitura térmica.", "3 → E"],
       drill: ["08 / 10 · FURADEIRA DE AMOSTRAS", "Extraia material do solo", "Vá à estação de solo marcada. Pressione 4 para equipar a furadeira e E para extrair uma amostra de rególito.", "4 → E"],
       inventory: ["09 / 10 · MOCHILA", "Confira seus resultados", "Pressione Tab ou toque em Mochila. Os quatro slots abrem no centro da tela. Confira os registros e feche a mochila para avançar.", "TAB"],
+      communication: ["RELATÓRIO · COMUNICAÇÃO", "Envie o relatório de treinamento", "Siga a trilha até o terminal de comunicação e pressione E. NOVA reunirá os quatro registros e enviará seu briefing: sustentar a base e recuperar arquivos históricos do Opportunity em uma expedição fictícia.", "E"],
       ship: ["10 / 10 \u00b7 LAN\u00c7AMENTO", "Entre na sala de lan\u00e7amento", "Siga a trilha at\u00e9 o Rover Bay e atravesse a porta da sala MARS 01. L\u00e1 dentro, inicie o lan\u00e7amento do foguete 3D.", "W A S D"],
       launch: ["10 / 10 \u00b7 LAN\u00c7AMENTO", "Lance o MARS 01", "Use Iniciar lan\u00e7amento e acompanhe o voo para concluir o treinamento.", "LAN\u00c7AR"],
       complete: ["TREINAMENTO CONCLUÍDO", "Vamos para Marte!", "Excelente trabalho, cadete. Você concluiu os módulos básicos de treinamento. Agora é hora da sua primeira missão. Vamos para Marte!", ""]

@@ -2,7 +2,7 @@
 window.MAP_ENGINE_CONFIG = {
   grid: { tileSize: 32, columns: 128, rows: 92 },
   camera: { viewTiles: { w: 30, h: 18 }, smooth: 9 },
-  player: { startX: 62, startY: 47, speed: 7.6, collisionRadius: .26 },
+  player: { startX: 62, startY: 47, speed: 5.2, collisionRadius: .26 },
   interaction: { distance: 2.25, key: 'e' },
   rendering: { pixelated: true, showRoomLabels: true, showFloorDetails: true },
   atmosphere: {

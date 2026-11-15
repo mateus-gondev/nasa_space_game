@@ -7,6 +7,7 @@
   <title>Opportunity — Lab Training</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/assets/assistant/nova.css">
   <script type="importmap">{"imports":{"three":"/vendor/three/three.module.js"}}</script>
 </head>
 <body>
@@ -137,10 +138,11 @@
               <span class="inventory-copy"><kbd>TAB</kbd><b data-i18n="MOCHILA">MOCHILA</b></span>
             </button>
           </nav>
-          <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
+          <section class="tutorial-objective" id="tutorialObjective" hidden>
             <p class="eyebrow" id="tutorialStepLabel">OBJETIVO DO TREINAMENTO</p>
-            <h2 id="tutorialTitle"></h2>
-            <p id="tutorialDescription"></p>
+            <h2 id="tutorialTitle" hidden></h2>
+            <p id="tutorialDescription" hidden></p>
+            <div id="objectiveSpeech"></div>
             <div class="tutorial-next"><kbd id="tutorialKey"></kbd><span id="tutorialDistance"></span></div>
             <progress id="tutorialProgress" max="100" value="0" aria-label="Progresso da etapa" data-i18n-aria-label="Progresso da etapa" hidden></progress>
             <button id="showTutorialHelp" type="button" data-i18n="Rever instrução">Rever instrução</button>
@@ -281,7 +283,7 @@
     <section class="story-card tutorial-coach-card" role="dialog" aria-modal="true" aria-labelledby="coachTitle" aria-describedby="coachDescription" tabindex="-1">
       <p class="eyebrow" id="coachStep"></p>
       <h2 id="coachTitle"></h2>
-      <p class="story-copy" id="coachDescription"></p>
+      <div id="coachSpeech"></div>
       <div class="coach-shortcut" id="coachKey"></div>
       <button class="story-button" id="continueTutorial" type="button" data-i18n="Entendido, vamos lá">Entendido, vamos lá</button>
       <a class="tutorial-menu-link" id="tutorialMenuLink" href="/" hidden data-i18n="Voltar ao menu">Voltar ao menu</a>
@@ -331,7 +333,7 @@
           </button>
           <button class="story-button" id="confirmSuit" type="submit" disabled><span class="prep-action-label">Iniciar missão</span><span class="prep-step-number">03</span></button>
         </div>
-        <p class="suit-feedback" id="suitFeedback" role="status" aria-live="polite"></p>
+        <div id="suitSpeech"></div>
       </form>
     </section>
   </div>
@@ -362,7 +364,7 @@
       </header>
       <div class="camera-viewport" id="cameraViewport">
         <div class="camera-reticle" aria-hidden="true">＋</div>
-        <p id="cameraMessage" role="status" aria-live="polite">Carregando ambiente 3D…</p>
+        <div id="cameraSpeech"></div>
       </div>
       <footer class="camera-footer">
         <p id="cameraHelp" data-i18n="Arraste para olhar · Setas: orientar · Scroll: zoom · R: centralizar · E: fotografar. A posição fica fixa; volte ao mapa para caminhar.">Arraste para olhar · Setas: orientar · Scroll: zoom · R: centralizar · E: fotografar. A posição fica fixa; volte ao mapa para caminhar.</p>
@@ -385,6 +387,7 @@
   <script src="js/map-data-training.js"></script>
   <script src="js/animation.js"></script>
   <script src="js/character.js"></script>
+  <script src="/assets/astronaut/explorer-sprite.js"></script>
   <script src="/map-engine-v2/js/renderer.js"></script>
   <script src="js/tutorial.js"></script>
   <script src="js/tutorial-navigation.js"></script>
@@ -393,6 +396,7 @@
   <script src="/life/engine.js"></script>
   <script src="/life/management.js"></script>
   <script src="/life/browser-ui.js"></script>
+  <script src="/assets/assistant/nova.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

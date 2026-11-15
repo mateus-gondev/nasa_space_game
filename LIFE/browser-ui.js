@@ -4,6 +4,12 @@ window.LifeUI = {
     const panel = document.querySelector("#lifePanel");
     const open = document.querySelector("#lifeOpen");
     const message = panel.querySelector("#lifeMessage");
+    const speechHost = message.parentElement;
+    const speechAnchor = message.nextSibling;
+    const assistant = window.NovaAssistant?.create({ compact: true, textNode: message, translate: window.GameI18n?.t });
+    if (assistant) speechHost.insertBefore(assistant.element, speechAnchor);
+    function speak(text, mood) { if (assistant) assistant.say(text, { mood }); else message.textContent = text; }
+    speak("Vamos cuidar da equipe? Escolha uma ação e confira as reservas.");
     const storageKey = "nasaJourney.life.management.v1";
     const names = { waterClean: "Água limpa", waterUsed: "Água usada", oxygen: "Oxigênio", food: "Alimento", energy: "Energia", fatigue: "Fadiga", co2: "CO₂", seeds: "Sementes", materials: "Materiais", repairParts: "Peças" };
     const labels = { explore: "Explorar", research: "Pesquisar", buildShelter: "Construir abrigo", transferToShelter: "Ir ao abrigo", repairFilter: "Reparar filtro", plant: "Plantar", harvest: "Colher", recycleWater: "Reciclar água", rest: "Descansar" };
@@ -59,10 +65,11 @@ window.LifeUI = {
       try {
         const serialized = JSON.stringify(manager.save());
         if (serialized !== lastSaved) { localStorage.setItem(storageKey, serialized); lastSaved = serialized; }
-      } catch { message.textContent = "Não foi possível salvar a gestão neste navegador."; }
+      } catch { speak("Não foi possível salvar a gestão neste navegador.", "warning"); }
     }
     function close() {
       panel.hidden = true;
+      assistant?.hide();
       for (const [element, inert] of background) element.inert = inert;
       background = [];
       open.setAttribute("aria-expanded", "false");
@@ -78,6 +85,7 @@ window.LifeUI = {
       game.controls.movementEnabled = false;
       game.controls.keys.clear();
       panel.hidden = false;
+      assistant?.say(message.textContent);
       background = [...panel.parentElement.children].filter(element => element !== panel).map(element => [element, element.inert]);
       for (const [element] of background) element.inert = true;
       open.setAttribute("aria-expanded", "true");
@@ -176,10 +184,10 @@ window.LifeUI = {
     function execute(type, payload) {
       try {
         manager.command(type, payload);
-        message.textContent = "Alteração aplicada. A gestão avança ao voltar ao jogo.";
+        speak("Pronto! Feche o painel para continuar a aventura.", "success");
         persist(); render();
         if (document.activeElement === document.body || document.activeElement?.disabled) panel.querySelector("#lifeClose").focus();
-      } catch (error) { message.textContent = error.message; render(); }
+      } catch (error) { speak(error.message, "warning"); render(); }
     }
     try {
       const fetchJSON = async url => { const response = await fetch(url); if (!response.ok) throw new Error(`Não foi possível carregar ${url}`); return response.json(); };
@@ -187,9 +195,9 @@ window.LifeUI = {
       const { LifeManagement, createManagementScenario } = window.LifeManagement;
       const scenario = createManagementScenario(base, settings);
       let saved;
-      try { saved = JSON.parse(localStorage.getItem(storageKey) || "null"); } catch { message.textContent = "Save ilegível. Uma nova gestão protegida foi preparada."; }
+      try { saved = JSON.parse(localStorage.getItem(storageKey) || "null"); } catch { speak("Não deu para abrir o progresso. Preparei um novo treino.", "warning"); }
       try { manager = new LifeManagement(scenario, settings, saved); }
-      catch { manager = new LifeManagement(scenario, settings); message.textContent = "Save incompatível. Uma nova gestão protegida foi preparada."; }
+      catch { manager = new LifeManagement(scenario, settings); speak("Este progresso é de outra versão. Preparei um novo treino.", "warning"); }
       for (const [type, label] of Object.entries(labels)) {
         const row = document.createElement("div"), button = document.createElement("button"), detail = document.createElement("small");
         button.type = "button"; button.textContent = label;
@@ -203,11 +211,11 @@ window.LifeUI = {
         select.addEventListener("change", () => { select.dataset.dirty = "true"; });
         label.append(select); panel.querySelector("#lifePriorities").append(label); priorityInputs[key] = select;
       }
-      panel.querySelector("#lifeActivate").addEventListener("click", () => { manager.active = true; message.textContent = "Gestão ativada. Feche este painel para iniciar o consumo. Seu tutorial não será bloqueado pela gestão."; persist(); render(); panel.querySelector("#lifeClose").focus(); });
+      panel.querySelector("#lifeActivate").addEventListener("click", () => { manager.active = true; speak("Tudo ligado! Feche o painel para começar a cuidar das reservas.", "success"); persist(); render(); panel.querySelector("#lifeClose").focus(); });
       panel.querySelector("#lifeNew").addEventListener("click", () => {
         manager = new LifeManagement(scenario, settings); lastTime = game.elapsed;
         for (const select of Object.values(priorityInputs)) delete select.dataset.dirty;
-        message.textContent = "Nova gestão preparada, sem consumo até você ativá-la."; persist(); render();
+        speak("Novo treino pronto! As reservas só começam a baixar quando você ativar."); persist(); render();
       });
       panel.querySelector("#lifeCancel").addEventListener("click", () => execute("cancelActivity", { activityId: manager.engine.getState().activeActivity?.id }));
       panel.querySelector("#lifePrioritiesApply").addEventListener("click", () => {
@@ -229,7 +237,7 @@ window.LifeUI = {
       document.addEventListener("visibilitychange", () => { lastTime = game.elapsed; if (document.hidden) persist(); });
       window.lifeManagement = { getState: () => manager.engine.getState(), save: () => manager.save() };
     } catch (error) {
-      message.textContent = `Gestão indisponível: ${error.message}. O treinamento permanece disponível.`;
+      speak("Não consegui abrir os cuidados da base. Você pode continuar o treinamento.", "warning");
       open.disabled = false;
       cancelAnimationFrame(frameId);
     }

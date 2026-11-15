@@ -3,6 +3,7 @@ window.MapRenderer = class MapRenderer {
   constructor(canvas, config, map) {
     this.canvas = canvas;
     this.ctx = canvas.getContext("2d");
+    this.ctx.imageSmoothingEnabled=false;
     this.config = config;
     this.map = map;
     this.tile = config.grid.tileSize;
@@ -43,6 +44,18 @@ window.MapRenderer = class MapRenderer {
     const previous = this.ctx;
     this.ctx = ctx;
     ctx.clearRect(0,0,this.worldW,this.worldH);
+    if(this.map.interior){
+      const T=this.tile;ctx.fillStyle='#091426';ctx.fillRect(0,0,this.worldW,this.worldH);
+      for(let y=0;y<this.map.height;y++)for(let x=0;x<this.map.width;x++){
+        const cell=this.map.grid[y][x],px=x*T,py=y*T;
+        if(cell===0){if((x*17+y*11)%13===0){ctx.fillStyle='#7599bc';ctx.fillRect(px+12,py+7,2,2);}continue;}
+        ctx.fillStyle=cell===1?'#526a84':(x+y)%2?'#bed0dd':'#c5d5df';ctx.fillRect(px,py,T,T);
+        ctx.strokeStyle=cell===1?'#253e55':'#9bb5c8';ctx.lineWidth=1;ctx.strokeRect(px+.5,py+.5,T-1,T-1);
+        if(cell===1){ctx.fillStyle='#7ae0ef';ctx.fillRect(px+4,py+T-5,T-8,2);}
+      }
+      ctx.fillStyle='#243a58';ctx.fillRect(10*T,1.5*T,6*T,T);ctx.fillStyle='#d6774c';ctx.beginPath();ctx.ellipse(13*T,2*T,52,14,0,0,Math.PI*2);ctx.fill();
+      ctx.fillStyle='#3b8f9c44';ctx.fillRect(11*T,10*T,4*T,4*T);ctx.fillStyle='#345b70';ctx.font='bold 13px monospace';ctx.textAlign='center';ctx.fillText('MARS 01',13*T,7*T);ctx.fillText('SAÍDA ↓',13*T,13.5*T);this.ctx=previous;return;
+    }
     if(this.map.backgroundImage){
       ctx.imageSmoothingEnabled=false;
       ctx.drawImage(this.map.backgroundImage,0,0,this.worldW,this.worldH);
@@ -238,6 +251,17 @@ window.MapRenderer = class MapRenderer {
   }
 
   drawProp(prop, time, mood) {
+    if(prop.type==='shipAirlock'){
+      const c=this.ctx,T=this.tile;c.fillStyle='#0d8c78';c.fillRect(prop.x*T,prop.y*T,prop.w*T,prop.h*T);c.strokeStyle='#9affd5';c.lineWidth=3;c.strokeRect(prop.x*T+2,prop.y*T+2,prop.w*T-4,prop.h*T-4);c.fillStyle='#fff';c.font='bold 12px sans-serif';c.textAlign='center';c.fillText('ABRIR PORTA ↓',(prop.x+prop.w/2)*T,(prop.y+.65)*T);return;
+    }
+    if(prop.type==='campaignSector') {
+      const ctx=this.ctx,T=this.tile,x=prop.x*T,y=prop.y*T,w=prop.w*T,h=prop.h*T;
+      ctx.save();ctx.strokeStyle=prop.built?'#b8debd':'#e7bd7b';ctx.lineWidth=2;ctx.setLineDash(prop.built?[]:[4,5]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+      if(prop.built){const img=this.assets.get(prop.asset);if(img)ctx.drawImage(img,x+4,y+4,w-8,h-8);ctx.fillStyle='#132d2a88';ctx.fillRect(x,y,w,h);}
+      else{ctx.fillStyle='#142b2744';ctx.fillRect(x,y,w,h);}
+      if(prop.sector==='greenhouseBuilt'&&prop.built&&this.cropImage)ctx.drawImage(this.cropImage,x+12,y+8,w-24,h-16);
+      ctx.fillStyle='#0b171bea';ctx.fillRect(x-3,y+h,w+6,16);ctx.fillStyle=prop.built?'#c4f3ce':'#efd5a8';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText((prop.built?'':'＋ ')+prop.name,x+w/2,y+h+11);ctx.restore();return;
+    }
     if(prop.type==='tilemapObject')return;
     const ctx = this.ctx, tile = this.tile;
     const x = prop.x * tile, y = prop.y * tile, w = prop.w * tile, h = prop.h * tile;
@@ -440,6 +464,13 @@ window.MapRenderer = class MapRenderer {
   }
 
   drawPlayer(player, time) {
+    const explorer=this.assets.get('crew-hd');
+    if(explorer&&window.ExplorerSprite){window.ExplorerSprite.draw(this.ctx,explorer,player,time,this.tile,64);return;}
+    if(this.campaignState){
+      const image=this.assets.get(player.moving?'crew-run':'crew-idle');
+      if(image){const ctx=this.ctx,x=player.x*this.tile,y=player.y*this.tile,frame=Math.floor(time*(player.moving?10:6))%6;
+        ctx.save();ctx.translate(x,y);ctx.fillStyle='#1d131c66';ctx.beginPath();ctx.ellipse(0,10,12,5,0,0,Math.PI*2);ctx.fill();if(Math.cos(player.angle)<0)ctx.scale(-1,1);ctx.drawImage(image,frame*24,0,24,24,-20,-26,40,40);ctx.restore();return;}
+    }
     if(this.map.worldId){this.drawMarsRover(player,time);return;}
     const ctx = this.ctx, tile = this.tile;
     const x = player.x * tile, y = player.y * tile + (player.moving ? Math.sin(time * 12) * 1.2 : 0);
@@ -504,6 +535,7 @@ window.MapRenderer = class MapRenderer {
   }
 
   drawAtmosphere(time, mood, player) {
+    if(this.map.interior)return;
     const ctx = this.ctx, cam = this.cam, vw = this.canvas.width, vh = this.canvas.height;
     if (mood.tint) { ctx.fillStyle = mood.tint; ctx.fillRect(cam.x, cam.y, vw, vh); }
     if (mood.grime > 0) {
@@ -566,6 +598,7 @@ window.MapRenderer = class MapRenderer {
       ctx.strokeRect(nearObject.x * T - 3, nearObject.y * T - 3, nearObject.w * T + 6, nearObject.h * T + 6);
       ctx.setLineDash([]);
     }
+    if(this.guideTarget){const p=this.guideTarget,x=(p.x+p.w/2)*T,y=(p.y+p.h/2)*T;ctx.strokeStyle='#70eaff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(x,y,Math.max(p.w,p.h)*T*.65+Math.sin(time*3)*3,0,Math.PI*2);ctx.stroke();}
     this.drawAtmosphere(time, mood, player);
     ctx.restore();
   }

@@ -71,6 +71,10 @@ test('tutorial equips once, then requires movement, map, gravity, tools and inve
   tutorial.inventory(false);
   assert.equal(tutorial.phase, 'inventory');
   tutorial.inventory(true); tutorial.inventory(false);
+  assert.equal(tutorial.phase, 'communication');
+  assert.equal(tutorial.interact('ship'), false, 'report required before boarding');
+  assert.equal(tutorial.interact('communication'), true);
+  assert.match(tutorial.report, /MER-B/);
   assert.equal(tutorial.phase, 'ship');
   assert.equal(tutorial.finishLaunch(), false, 'entering the room is required');
   assert.equal(tutorial.interact('ship'), true);
@@ -111,7 +115,7 @@ test('every objective has a walkable route from the previous station on the actu
   const { MAP_DATA: map, MAP_ENGINE_CONFIG: config, MapEngine, findTrainingRoute } = loadTraining();
   const engine = { map, config, player: { x: config.player.startX, y: config.player.startY } };
   engine.collides = MapEngine.prototype.collides.bind(engine);
-  for (const id of ['gravity', 'camera', 'microscope', 'temperature', 'drill', 'ship']) {
+  for (const id of ['gravity', 'camera', 'microscope', 'temperature', 'drill', 'communication', 'ship']) {
     const target = map.props.find(prop => prop.trainingId === id);
     const route = findTrainingRoute(engine, target);
     assert(route.length > 0, `reachable station: ${id}`);
