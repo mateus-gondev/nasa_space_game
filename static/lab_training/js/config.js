@@ -10,6 +10,7 @@ window.MAP_ENGINE_CONFIG = {
     spriteSize: 50, animationFps: { idle: 7, run: 10, jump: 8, death: 7 }
   },
   assets: {
+    background: "/assets/visuals/grass-background.png",
     basePath: "/assets/Space%20Runner%20Assets%20-%2027-11-20/Astronaut/",
     animations: {
       idle: { file: "Astronaut_Idle.png", frameWidth: 24, frameHeight: 24, frames: 6, loop: true },
