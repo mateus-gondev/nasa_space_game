@@ -1,11 +1,12 @@
 /* Engine: estado do jogo, colisões, interação, atualização e ciclo de animação. */
 window.MapEngine = class MapEngine {
-  constructor({ canvas, config, map, onStateChange = () => {}, onInspect = () => {} }) {
+  constructor({ canvas, config, map, onStateChange = () => {}, onInspect = () => {}, onTravel = () => {} }) {
     this.config = config;
     this.map = map;
     this.renderer = new MapRenderer(canvas, config, map);
     this.onStateChange = onStateChange;
     this.onInspect = onInspect;
+    this.onTravel = onTravel;
     this.player = { x: config.player.startX, y: config.player.startY, angle: 0, moving: false };
     this.moodKey = map.weather || config.atmosphere.default;
     this.nearObject = null;
@@ -72,6 +73,8 @@ window.MapEngine = class MapEngine {
     const previous = this.nearObject;
     this.nearObject = this.findNearbyObject();
     if (previous !== this.nearObject) this.onStateChange(this.getState());
+    const transition=this.map.transitions?.find(t=>this.player.x>=t.x&&this.player.x<=t.x+t.w&&this.player.y>=t.y&&this.player.y<=t.y+t.h);
+    if(transition)this.onTravel(transition.target,transition.destinationSpawn);
   }
 
   collides(x, y) {

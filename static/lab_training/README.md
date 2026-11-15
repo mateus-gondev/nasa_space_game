@@ -50,7 +50,7 @@ O treinamento avança por ações do jogador, com briefings, objetivo persistent
 4. Seguir ao laboratório na sala Atrium e testar, em ordem, câmera (1), microscópio (2), sensor de temperatura (3) e furadeira (4). E usa a ferramenta no alvo destacado; ferramentas ou estações incorretas não avançam o tutorial.
 5. Abrir a mochila com Tab para conferir os quatro resultados nos slots centrais e fechá-la.
 6. Seguir a trilha até a sala de lançamento MARS 01 no Rover Bay, mantendo o traje e o capacete colocados no início. Atravesse a porta para entrar no protótipo 3D.
-7. Usar **Iniciar lançamento** e acompanhar o voo do foguete para concluir o treinamento. Ao terminar o voo, o jogador segue automaticamente para a fase de teste em **Meridiani Planum**, de `static/opportunity-mars-five-worlds`, na rota `/mars-test/?world=meridiani`. **Voltar ao laboratório** ou Esc sai da sala sem concluir; é possível entrar de novo.
+7. Usar **Iniciar lançamento** e acompanhar o voo do foguete para concluir o treinamento. Ao terminar o voo, o jogador segue automaticamente para a **Área de pouso com a nave**, de `static/assets/marte_tilemap`, na rota `/mars-test/?world=mapa_01_pouso`. A passagem leste dá acesso à mineração e, depois, à pesquisa; as passagens oeste permitem retornar. **Voltar ao laboratório** ou Esc sai da sala sem concluir; é possível entrar de novo.
 
 O botão Reiniciar limpa o progresso e retorna à preparação. Os controles de toque permitem realizar as mesmas etapas no celular. Execute `npm test` para verificar a progressão e os percursos de todos os objetivos na planta real.
 

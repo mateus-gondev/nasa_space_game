@@ -637,7 +637,7 @@
     launchRoomFrame.src = "about:blank";
     if (completed && tutorial.finishLaunch()) {
       engine.stop();
-      window.location.href = "/mars-test/?world=meridiani";
+      window.location.href = "/mars-test/?world=mapa_01_pouso";
       return;
     }
     tutorial.leaveLaunchRoom();

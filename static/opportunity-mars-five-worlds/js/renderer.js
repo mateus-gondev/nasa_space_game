@@ -43,6 +43,11 @@ window.MapRenderer = class MapRenderer {
     const previous = this.ctx;
     this.ctx = ctx;
     ctx.clearRect(0,0,this.worldW,this.worldH);
+    if(this.map.backgroundImage){
+      ctx.imageSmoothingEnabled=false;
+      ctx.drawImage(this.map.backgroundImage,0,0,this.worldW,this.worldH);
+      this.ctx=previous;return;
+    }
     for (let y = 0; y < this.map.height; y++) {
       for (let x = 0; x < this.map.width; x++) {
         const cell = this.map.grid[y][x];
@@ -233,6 +238,7 @@ window.MapRenderer = class MapRenderer {
   }
 
   drawProp(prop, time, mood) {
+    if(prop.type==='tilemapObject')return;
     const ctx = this.ctx, tile = this.tile;
     const x = prop.x * tile, y = prop.y * tile, w = prop.w * tile, h = prop.h * tile;
     const image = this.assets.get(prop.type);

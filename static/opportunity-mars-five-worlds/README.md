@@ -10,7 +10,9 @@ Expansão jogável da **Opportunity Map Engine V2** enviada pelo usuário, mante
 2. Abra `index.html` em um navegador moderno. A engine não requer backend nem conexão com Internet.
 3. Alternativa para desenvolvimento: `python -m http.server 8000` e acesse `http://localhost:8000`.
 
-No projeto principal, a rota `/mars-test/` serve este atlas. O voo do foguete no laboratório leva automaticamente a `/mars-test/?world=meridiani`, iniciando a fase de teste no ponto de pouso de Meridiani Planum. O parâmetro `world` escolhe a região inicial e tem prioridade sobre o setor salvo; sem ele, o atlas retoma o setor salvo. O progresso das descobertas é preservado.
+No projeto principal, a rota `/mars-test/` serve a exploração. O voo do foguete no laboratório leva automaticamente a `/mars-test/?world=mapa_01_pouso`, iniciando junto à nave do pacote `static/assets/marte_tilemap`. Suas passagens laterais conectam pouso, mineração e pesquisa, com retorno. O parâmetro `world` escolhe a região inicial e tem prioridade sobre o setor salvo; sem ele, a exploração retoma o setor salvo ou inicia no pouso. O progresso das descobertas é preservado.
+
+`js/tilemap-data.js` carrega o manifesto do pacote e adapta colisões, objetos e transições. Os três PNGs compostos fornecidos são usados como cenário, com o jogador e os indicadores de interação desenhados pela engine. As cinco regiões procedurais descritas abaixo continuam disponíveis no seletor de viagem. A integração do pacote requer servir os arquivos por HTTP.
 
 O mapa jogável ocupa toda a janela, sem cabeçalho, cartões, painéis informativos ou minimapa. A câmera se adapta à proporção da tela sem esticar o cenário. As fichas de interação aparecem ao inspecionar objetos; a pausa e a seleção de regiões abrem somente quando solicitadas. Em dispositivos de toque, os controles ficam sobre o mapa.
 
