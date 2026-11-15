@@ -10,7 +10,7 @@ Na raiz do projeto, use `npm run server` ou `npm run start` e abra:
 http://localhost:3000/lab-training/
 ```
 
-O atalho `http://localhost:3000/game` redireciona para o menu em `/`. Play abre o treinamento em `/lab-training/`. O servidor entrega os sprites em `/assets` e o código da engine v2 em `/map-engine-v2`. A engine é carregada de `static/opportunity-map-engine-v2/opportunity-map-engine`; mantenha essa pasta junto ao projeto. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
+O atalho `http://localhost:3000/game` redireciona para o menu em `/`. Iniciar (Start em inglês) abre o treinamento em `/lab-training/`. O servidor entrega os sprites em `/assets` e o código da engine v2 em `/map-engine-v2`. A engine é carregada de `static/opportunity-map-engine-v2/opportunity-map-engine`; mantenha essa pasta junto ao projeto. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
 
 ## Estrutura
 
@@ -36,7 +36,7 @@ static/lab_training/
 
 ## Menu inicial
 
-O menu com Jogar, Configurações, Info e Créditos fica em `static/main_menu/`, com logo ampliada e arquivos próprios. Acesse `http://localhost:3000/` ou `/game`. Configurações fica entre Jogar e Info e abre o modal com abas de áudio e legendas/idioma. Os volumes de música e efeitos são independentes; o idioma pode ser português ou inglês. As preferências ficam em `localStorage`, na chave `opportunity.labTraining.settings`, e são compartilhadas com o treinamento. A trilha Stellar Rift (`static/assets/audio/stellar-rift.mp3`) toca em loop apenas no menu; se o navegador bloquear autoplay, a primeira interação libera o áudio. Info resume os controles. Jogar abre a preparação do treinamento, preenchendo o nome salvo; o acesso direto a `/lab-training/` também funciona.
+O menu com Iniciar, Configurações, Info e Créditos fica em `static/main_menu/`, com logo ampliada e alinhada ao menu. Acesse `http://localhost:3000/` ou `/game`. Configurações fica entre Iniciar e Info e abre o modal com abas de áudio e legendas/idioma. Os volumes padrão são 50% para música e 100% para efeitos, preservando valores já salvos. O seletor de idioma mostra as bandeiras do Brasil e dos Estados Unidos, fornecidas pelo usuário, para português e inglês; aceita mouse e teclado. As preferências ficam em `localStorage`, na chave `opportunity.labTraining.settings`, e são compartilhadas com o treinamento. A trilha Stellar Rift (`static/assets/audio/stellar-rift.mp3`) toca em loop apenas no menu; se o navegador bloquear autoplay, a primeira interação libera o áudio. Info resume os controles. Iniciar abre a preparação do treinamento, preenchendo o nome salvo; o acesso direto a `/lab-training/` também funciona.
 
 Na preparação, selecionar traje e capacete reproduz as animações 8-bit correspondentes. Cada etapa avança ao terminar a sequência e também pode ser pulada.
 
@@ -50,7 +50,7 @@ O treinamento avança por ações do jogador, com briefings, objetivo persistent
 4. Seguir ao laboratório na sala Atrium e testar, em ordem, câmera (1), microscópio (2), sensor de temperatura (3) e furadeira (4). E usa a ferramenta no alvo destacado; ferramentas ou estações incorretas não avançam o tutorial.
 5. Abrir a mochila com Tab para conferir os quatro resultados nos slots centrais e fechá-la.
 6. Seguir a trilha até a sala de lançamento MARS 01 no Rover Bay, mantendo o traje e o capacete colocados no início. Atravesse a porta para entrar no protótipo 3D.
-7. Usar **Iniciar lançamento** e acompanhar o voo do foguete para concluir o treinamento. **Voltar ao laboratório** ou Esc sai da sala sem concluir; é possível entrar de novo. Ao terminar o voo, a mensagem final permite continuar explorando ou voltar ao menu; a próxima missão ainda não é carregada.
+7. Usar **Iniciar lançamento** e acompanhar o voo do foguete para concluir o treinamento. Ao terminar o voo, o jogador segue automaticamente para a fase de teste em **Meridiani Planum**, de `static/opportunity-mars-five-worlds`, na rota `/mars-test/?world=meridiani`. **Voltar ao laboratório** ou Esc sai da sala sem concluir; é possível entrar de novo.
 
 O botão Reiniciar limpa o progresso e retorna à preparação. Os controles de toque permitem realizar as mesmas etapas no celular. Execute `npm test` para verificar a progressão e os percursos de todos os objetivos na planta real.
 
