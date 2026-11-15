@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Capacete – POV 8-bit (Three.js)</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }
+</script>
+<style>
+  html,body{height:100%;margin:0;background:#07080f}
+  body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;font-family:'Press Start 2P',monospace}
+  #stage{width:100%}
+  #status{color:#9dffb0;font-size:10px;text-align:center;padding:0 16px;line-height:1.8}
+  .bar{display:flex;gap:10px}
+  .bar[hidden]{display:none}
+  button{font:inherit;font-size:10px;color:#e8ecf4;background:#2a3350;border:3px solid #e8ecf4;padding:10px 12px;cursor:pointer}
+  button:focus-visible{outline:3px solid #ffb04d;outline-offset:2px}
+</style>
+</head>
+<body>
+<div id="status">CARREGANDO THREE.JS...</div>
+<div id="stage"></div>
+<div class="bar">
+  <button id="rep">REINICIAR</button>
+  <button id="snd">SOM: OFF</button>
+</div>
+<script>
+  const loadingTimeout = setTimeout(function(){var s=document.getElementById('status');if(s)s.textContent='FALHA AO CARREGAR THREE.JS. VERIFIQUE A INTERNET OU O CONSOLE (F12).';},6000);
+</script>
+<script type="module">
+import { createHelmetIntro } from "./index.js";
+
+const status = document.getElementById('status');
+try {
+  const embedded = new URLSearchParams(location.search).get('embed') === '1';
+  let sound = false;
+  const intro = createHelmetIntro({
+    container: document.getElementById('stage'),
+    onComplete: () => { if (embedded) window.parent.postMessage('helmet-animation-complete', location.origin); },
+  });
+  clearTimeout(loadingTimeout);
+  status.remove();
+  window.addEventListener('pagehide', () => intro.dispose(), { once: true });
+  if (embedded) document.querySelector('.bar').hidden = true;
+  document.getElementById('rep').onclick = () => intro.restart();
+  document.getElementById('snd').onclick = function () {
+    sound = !sound; intro.setSound(sound); this.textContent = 'SOM: ' + (sound ? 'ON' : 'OFF');
+  };
+} catch (err) {
+  clearTimeout(loadingTimeout);
+  status.textContent = 'ERRO: ' + (err && err.message ? err.message : err);
+  console.error(err);
+}
+</script>
+</body>
+</html>

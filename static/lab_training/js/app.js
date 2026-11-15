@@ -35,11 +35,11 @@
   const inspectCard = $("#inspectCard");
   const interactionHint = $("#interactionHint");
   const animationFeedback = $("#animationFeedback");
-  const mainMenuOverlay = $("#mainMenuOverlay");
-  const mainMenuHome = $("#mainMenuHome");
   const introOverlay = $("#introOverlay");
   const equipmentAnimationOverlay = $("#equipmentAnimationOverlay");
   const equipmentAnimationFrame = $("#equipmentAnimationFrame");
+  const launchRoomOverlay = $("#launchRoomOverlay");
+  const launchRoomFrame = $("#launchRoomFrame");
   const mapOverlay = $("#mapOverlay");
   const inventoryOverlay = $("#inventoryOverlay");
   const quickToolsPanel = $("#quickToolsPanel");
@@ -49,6 +49,9 @@
   const cadetInput = $("#cadetName");
   const appShell = $("#appShell");
   const fullscreenButton = $("#fullscreenButton");
+  const cameraOverlay = $("#cameraOverlay");
+  let cameraView = null;
+  let cameraOpening = 0;
 
   const tools = [
     { key: 1, name: "Câmera científica", detail: "Fotografa terrenos e materiais", target: "telescope", targetName: "Pancam", result: "Imagem panorâmica registrada na mochila." },
@@ -56,14 +59,17 @@
     { key: 3, name: "Sensor de temperatura", detail: "Mede a temperatura de sólidos", target: "spec", targetName: "amostra no espectrômetro", result: "Leitura registrada: superfície sólida a -21,6 °C." },
     { key: 4, name: "Furadeira de amostras", detail: "Extrai material do solo", target: "bench", targetName: "bancada de amostras", result: "Amostra de rególito extraída e guardada." }
   ];
-  let tutorialPhase = savedProfile ? "gravity" : "intro";
+  const tutorial = new LabTutorial();
+  const tutorialCoach = $("#tutorialCoach");
+  let announcedPhase = null;
+  let lastObjectivePhase = null;
   let cadetName = savedProfile?.name || "";
   let character = savedProfile?.character || defaultCharacter;
   let selectedTool = null;
-  let suitWorn = Boolean(savedProfile);
-  let helmetWorn = Boolean(savedProfile);
+  let suitWorn = false;
+  let helmetWorn = false;
   let activeEquipmentAnimation = null;
-  const completedTests = new Set();
+  const completedTests = tutorial.completedTools;
   const inventoryItems = [];
   let feedbackTimer = 0;
 
@@ -80,27 +86,82 @@
   engine.onMapToggle = toggleMap;
   engine.onInventoryToggle = toggleInventory;
   engine.onEscape = handleEscape;
+  engine.renderer.tutorial = tutorial;
+  engine.renderer.engine = engine;
+  const findNearbyObject = engine.findNearbyObject.bind(engine);
+  engine.findNearbyObject = () => {
+    const target = map.props.find(prop => prop.trainingId === tutorial.targetId);
+    if (target) {
+      const dx = Math.max(target.x - engine.player.x, 0, engine.player.x - target.x - target.w);
+      const dy = Math.max(target.y - engine.player.y, 0, engine.player.y - target.y - target.h);
+      if (Math.hypot(dx, dy) < config.interaction.distance) return target;
+    }
+    return findNearbyObject();
+  };
+  let normalSpeed = config.player.speed;
+  const updateEngine = engine.update.bind(engine);
+  engine.update = delta => {
+    const { x, y } = engine.player;
+    updateEngine(delta);
+    if (engine.controls.enabled && engine.controls.movementEnabled && tutorialCoach.hidden) {
+      tutorial.move(Math.hypot(engine.player.x - x, engine.player.y - y), engine.getRoomName());
+      const room = map.launchRoom;
+      if (tutorial.phase === "ship" && engine.player.x >= room.x && engine.player.x < room.x + room.w && engine.player.y >= room.y && engine.player.y < room.y + room.h) {
+        tutorial.interact("ship");
+        openLaunchRoom();
+      }
+      updateInterface();
+    }
+  };
 
-  function objectiveForPhase() {
-    if (tutorialPhase === "gravity") {
-      return {
-        title: "Teste de gravidade marciana",
-        description: "Vá até a Antena de Alto Ganho e pressione E para iniciar a calibração."
-      };
+  function prepareEquipment() {
+    suitWorn = false;
+    helmetWorn = false;
+    appShell.inert = true;
+    introOverlay.hidden = false;
+    mapOverlay.hidden = true;
+    inventoryOverlay.hidden = true;
+    quickToolsPanel.hidden = true;
+    engine.controls.enabled = false;
+    engine.controls.movementEnabled = false;
+    $("#welcomeTitle").textContent = "Preparação do treinamento";
+    $("#confirmSuit").textContent = "Iniciar treinamento";
+    for (const id of ["wearSuit", "wearHelmet"]) {
+      const button = $(`#${id}`);
+      button.disabled = id === "wearHelmet";
+      button.setAttribute("aria-pressed", "false");
+      button.querySelector(".suit-step-state").textContent = "PENDENTE";
     }
-    if (tutorialPhase === "tools") {
-      return {
-        title: `Treino de ferramentas · ${completedTests.size}/4`,
-        description: "Caminhe pelo laboratório; aproxime-se do equipamento indicado, selecione a ferramenta com 1–4 e pressione E."
-      };
-    }
-    if (tutorialPhase === "complete") {
-      return {
-        title: "Treinamento inicial concluído",
-        description: "As quatro ferramentas foram testadas. Continue explorando a instalação e consulte o mapa com M."
-      };
-    }
-    return null;
+    $("#confirmSuit").disabled = true;
+    $("#suitFeedback").textContent = "Primeiro vista o traje e as botas. Depois coloque o capacete.";
+    cadetInput.value = cadetName;
+    (cadetName ? $("#wearSuit") : cadetInput).focus();
+  }
+
+  function showTutorialCoach() {
+    const step = tutorial.step;
+    if (!step || tutorial.phase === "launch") return;
+    $("#coachStep").textContent = step.label;
+    $("#coachTitle").textContent = step.title;
+    $("#coachDescription").textContent = step.description;
+    $("#coachKey").textContent = step.key;
+    $("#continueTutorial").textContent = tutorial.phase === "complete" ? "Explorar a instalação" : "Entendido, vamos lá";
+    $("#tutorialMenuLink").hidden = tutorial.phase !== "complete";
+    tutorialCoach.hidden = false;
+    appShell.inert = true;
+    // Bloqueia também os atalhos da engine enquanto o briefing está aberto.
+    engine.controls.enabled = false;
+    engine.controls.movementEnabled = false;
+    engine.controls.keys.clear();
+    $("#continueTutorial").focus();
+  }
+
+  function closeTutorialCoach() {
+    tutorialCoach.hidden = true;
+    appShell.inert = false;
+    engine.controls.enabled = true;
+    setModalState();
+    canvas.focus();
   }
 
   function updateInterface(state = engine.getState()) {
@@ -118,22 +179,43 @@
     pauseButton.setAttribute("aria-label", state.paused ? "Continuar" : "Pausar");
     pauseButton.title = state.paused ? "Continuar" : "Pausar";
 
-    const objective = objectiveForPhase();
+    const objective = tutorial.step;
     tutorialObjective.hidden = !objective;
     if (objective) {
-      $("#tutorialTitle").textContent = objective.title;
-      $("#tutorialDescription").textContent = objective.description;
+      if (lastObjectivePhase !== tutorial.phase) {
+        document.querySelectorAll(".tutorial-highlight").forEach(element => element.classList.remove("tutorial-highlight"));
+        const highlight = tutorial.phase === "map" ? $("#mapAction") : tutorial.phase === "inventory" ? $("#inventoryAction") : ["camera", "microscope", "temperature", "drill"].includes(tutorial.phase) ? $("#researchAction") : null;
+        highlight?.classList.add("tutorial-highlight");
+        $("#tutorialTitle").textContent = objective.title;
+        $("#tutorialDescription").textContent = objective.description;
+        $("#tutorialStepLabel").textContent = objective.label;
+        $("#tutorialKey").textContent = objective.key;
+        lastObjectivePhase = tutorial.phase;
+      }
+      const walking = ["movement", "gravityWalk"].includes(tutorial.phase);
+      $("#tutorialProgress").hidden = !walking;
+      if (walking) $("#tutorialProgress").value = Math.min(100, tutorial.distance / (tutorial.phase === "movement" ? 4 : 6) * 100);
+      const { target, route } = engine.renderer.getGuideRoute();
+      $("#tutorialDistance").textContent = target ? `${target.name} · ${Math.max(0, route.length - 1)} m de percurso` : walking ? `${tutorial.distance.toFixed(1)} / ${tutorial.phase === "movement" ? 4 : 6} m` : "";
+      $("#mapObjective").textContent = target ? `Objetivo: ${target.name}` : objective.title;
+    }
+    config.player.speed = tutorial.phase === "gravityWalk" ? normalSpeed * .7 : normalSpeed;
+    if (tutorial.phase !== announcedPhase) {
+      announcedPhase = tutorial.phase;
+      showTutorialCoach();
     }
 
-    const activeTutorial = ["gravity", "tools", "complete"].includes(tutorialPhase);
-    interactionHint.hidden = !activeTutorial || !engine.nearObject || Boolean(engine.inspectedObject) || !mapOverlay.hidden || !inventoryOverlay.hidden;
+    const nearbyObjective = tutorial.targetId && engine.nearObject?.trainingId === tutorial.targetId;
+    interactionHint.hidden = !nearbyObjective || Boolean(engine.inspectedObject) || !mapOverlay.hidden || !inventoryOverlay.hidden;
     if (!interactionHint.hidden) {
-      if (tutorialPhase === "gravity") {
+      if (tutorial.phase === "gravity") {
         interactionHint.textContent = "E · CALIBRAR";
-      } else if (tutorialPhase === "tools" && selectedTool) {
+      } else if (tutorial.phase === "ship") {
+        interactionHint.textContent = "ATRAVESSE A PORTA · SALA DE LANÇAMENTO";
+      } else if (["camera", "microscope", "temperature", "drill"].includes(tutorial.phase) && selectedTool) {
         interactionHint.textContent = "E · USAR FERRAMENTA";
       } else {
-        interactionHint.textContent = "E · ANALISAR";
+        interactionHint.textContent = `SELECIONE ${tutorial.step.key}`;
       }
     }
 
@@ -154,7 +236,7 @@
     if (!prop) return;
     $("#inspectTitle").textContent = prop.name;
     $("#inspectDescription").textContent = prop.description;
-    if (tutorialPhase === "tools" && !selectedTool) {
+    if (["camera", "microscope", "temperature", "drill"].includes(tutorial.phase) && !selectedTool) {
       showFeedback("Escolha uma ferramenta · 1–4");
     }
   }
@@ -188,47 +270,39 @@
   }
 
   function selectTool(key) {
-    if (!tools.some(tool => tool.key === key) || tutorialPhase === "intro" || tutorialPhase === "suit" || !mapOverlay.hidden || !inventoryOverlay.hidden) return;
+    if (!tools.some(tool => tool.key === key) || !introOverlay.hidden || !tutorialCoach.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden) return;
     selectedTool = key;
     quickToolsPanel.hidden = true;
     $("#researchAction").setAttribute("aria-expanded", "false");
     engine.closeInspection();
     showFeedback(`${tools[key - 1].name} ativa`);
     setModalState();
+    if (key === 1) openCamera();
   }
 
-  function handleInteraction(prop) {
-    if (!mapOverlay.hidden || !inventoryOverlay.hidden) return true;
-    if (tutorialPhase === "gravity") {
-      if (prop.type !== "dish") {
-        showFeedback("Encontre a antena.");
-        return true;
-      }
-      tutorialPhase = "tools";
+  function handleInteraction(prop, photo = null) {
+    if (!mapOverlay.hidden || !inventoryOverlay.hidden || !tutorialCoach.hidden) return true;
+    if (selectedTool === 1 && !photo) { openCamera(); return true; }
+    const phase = tutorial.phase;
+    if (phase === "ship" && prop.trainingId === "ship") {
+      showFeedback("Atravesse a porta para entrar na sala de lançamento.");
+      return true;
+    }
+    if (phase === "complete") return false;
+    if (!tutorial.interact(prop.trainingId, selectedTool)) {
+      showFeedback(tutorial.targetId === prop.trainingId
+        ? `Selecione a ferramenta indicada: ${tutorial.step.key}.`
+        : "Siga o objetivo destacado para concluir esta etapa.");
+      return true;
+    }
+    if (completedTests.has(selectedTool) && ["camera", "microscope", "temperature", "drill"].includes(phase)) {
+      const tool = tools[selectedTool - 1];
+      inventoryItems.push({ title: tool.name, result: tool.result, photo });
+      showFeedback(tool.result);
       selectedTool = null;
-      engine.closeInspection();
-      showFeedback("Gravidade marciana calibrada.");
-      updateInterface();
-      return true;
+      renderInventory();
     }
-    if (tutorialPhase !== "tools" || !selectedTool) return false;
-
-    const tool = tools[selectedTool - 1];
-    if (prop.type !== tool.target) {
-      showFeedback(`Use em ${tool.targetName}.`);
-      return true;
-    }
-    if (completedTests.has(tool.key)) {
-      showFeedback("Teste já registrado.");
-      return true;
-    }
-
-    completedTests.add(tool.key);
-    inventoryItems.push({ title: tool.name, result: tool.result });
     engine.closeInspection();
-    showFeedback("Resultado salvo na mochila.");
-    if (completedTests.size === tools.length) tutorialPhase = "complete";
-    renderInventory();
     updateInterface();
     return true;
   }
@@ -248,6 +322,13 @@
       const detail = document.createElement("span");
       detail.textContent = item ? item.result : "Sem registro";
       slot.append(number, label, detail);
+      if (item?.photo) {
+        const image = document.createElement("img");
+        image.className = "inventory-photo";
+        image.src = item.photo;
+        image.alt = "Fotografia do terreno simulado registrada com a câmera científica";
+        slot.append(image);
+      }
       slots.append(slot);
     }
     $("#inventoryCount").textContent = inventoryItems.length
@@ -270,23 +351,32 @@
       }
     }
     map.props.forEach(prop => {
-      const isObjective = tutorialPhase === "gravity"
-        ? prop.type === "dish"
-        : tutorialPhase === "tools" && tools.some(tool => !completedTests.has(tool.key) && tool.target === prop.type);
+      const isObjective = prop.trainingId && prop.trainingId === tutorial.targetId;
       ctx.fillStyle = isObjective ? "#ffb552" : "#b3c2c8";
       ctx.fillRect(prop.x * cellWidth + 2, prop.y * cellHeight + 2, Math.max(2, prop.w * cellWidth - 4), Math.max(2, prop.h * cellHeight - 4));
     });
+    const { target, route } = engine.renderer.getGuideRoute();
+    if (route.length > 1) {
+      ctx.strokeStyle = "#ffb552"; ctx.lineWidth = 2; ctx.beginPath();
+      route.forEach((point, index) => ctx[index ? "lineTo" : "moveTo"](point.x * cellWidth, point.y * cellHeight));
+      ctx.stroke();
+    }
+    if (target) {
+      ctx.strokeStyle = "#ffdc8a"; ctx.lineWidth = 2;
+      ctx.strokeRect(target.x * cellWidth - 3, target.y * cellHeight - 3, target.w * cellWidth + 6, target.h * cellHeight + 6);
+    }
     ctx.fillStyle = "#35e7f2";
     ctx.fillRect(engine.player.x * cellWidth - 3, engine.player.y * cellHeight - 3, 7, 7);
   }
 
   function setModalState() {
-    engine.controls.movementEnabled = mapOverlay.hidden && inventoryOverlay.hidden && quickToolsPanel.hidden;
+    engine.controls.movementEnabled = cameraOverlay.hidden && mapOverlay.hidden && inventoryOverlay.hidden && quickToolsPanel.hidden && tutorialCoach.hidden && introOverlay.hidden && launchRoomOverlay.hidden;
     engine.controls.keys.clear();
     updateInterface();
   }
 
   function toggleQuickTools() {
+    if (!introOverlay.hidden || !tutorialCoach.hidden) return;
     const opening = quickToolsPanel.hidden;
     quickToolsPanel.hidden = !opening;
     if (opening) {
@@ -300,6 +390,7 @@
   }
 
   function toggleMap() {
+    if (!introOverlay.hidden || !tutorialCoach.hidden) return;
     const opening = mapOverlay.hidden;
     mapOverlay.hidden = !opening;
     inventoryOverlay.hidden = true;
@@ -307,10 +398,12 @@
     $("#researchAction").setAttribute("aria-expanded", "false");
     if (opening) { drawMinimap(); $("#closeMap").focus(); }
     else canvas.focus();
+    tutorial.map(opening);
     setModalState();
   }
 
   function toggleInventory() {
+    if (!introOverlay.hidden || !tutorialCoach.hidden) return;
     const opening = inventoryOverlay.hidden;
     inventoryOverlay.hidden = !opening;
     mapOverlay.hidden = true;
@@ -318,77 +411,183 @@
     $("#researchAction").setAttribute("aria-expanded", "false");
     if (opening) { renderInventory(); $("#closeInventory").focus(); }
     else canvas.focus();
+    tutorial.inventory(opening);
     setModalState();
   }
 
   function handleEscape() {
-    if (!mapOverlay.hidden) { mapOverlay.hidden = true; canvas.focus(); setModalState(); return true; }
-    if (!inventoryOverlay.hidden) { inventoryOverlay.hidden = true; canvas.focus(); setModalState(); return true; }
+    if (!cameraOverlay.hidden) { closeCamera(); return true; }
+    if (!launchRoomOverlay.hidden) { closeLaunchRoom(); return true; }
+    if (!mapOverlay.hidden) { toggleMap(); return true; }
+    if (!inventoryOverlay.hidden) { toggleInventory(); return true; }
     if (!quickToolsPanel.hidden) { quickToolsPanel.hidden = true; $("#researchAction").setAttribute("aria-expanded", "false"); $("#researchAction").focus(); setModalState(); return true; }
     engine.closeInspection();
     return true;
   }
 
+  async function openCamera() {
+    if (!cameraOverlay.hidden || !introOverlay.hidden || !tutorialCoach.hidden || !launchRoomOverlay.hidden || engine.paused) return;
+    const opening = ++cameraOpening;
+    engine.closeInspection();
+    cameraOverlay.hidden = false;
+    appShell.inert = true;
+    engine.controls.enabled = false;
+    engine.controls.movementEnabled = false;
+    engine.controls.keys.clear();
+    $("#cameraMessage").textContent = "Carregando ambiente 3D…";
+    $("#closeCamera").focus();
+    try {
+      if (!cameraView) {
+        const { LabCameraView } = await import('./camera-view.js');
+        if (opening !== cameraOpening) return;
+        cameraView = new LabCameraView({
+          container: $("#cameraViewport"), map, config,
+          onChange: ({ yaw, pitch, fov, zoom, targetZoom }) => {
+            $("#cameraTelemetry").textContent = `${engine.getRoomName()} · YAW ${yaw.toFixed(1)}° · PITCH ${pitch.toFixed(1)}° · FOV ${fov.toFixed(1)}°`;
+            $("#cameraZoomValue").textContent = `${zoom.toFixed(1)}×`;
+            if (document.activeElement !== $("#cameraZoom")) $("#cameraZoom").value = targetZoom;
+          }
+        });
+      }
+      const target = map.props.find(prop => prop.trainingId === "camera");
+      cameraView.open(engine.player, engine.mood, isNearCameraTarget(target) ? target : null);
+      cameraControlsDisabled(false);
+      $("#cameraMessage").textContent = "Arraste para explorar. Enquadre o terreno simulado na mira e fotografe com E.";
+    } catch (error) {
+      cameraView?.dispose();
+      cameraView = null;
+      cameraControlsDisabled(true);
+      $("#cameraMessage").textContent = "Não foi possível iniciar a câmera 3D. Verifique o suporte a WebGL 2 e volte ao mapa para tentar novamente.";
+      console.error("Falha ao abrir a câmera científica:", error);
+    }
+  }
+
+  function cameraControlsDisabled(disabled) {
+    for (const id of ["cameraMouse", "cameraCenter", "cameraZoom", "cameraCapture"]) $("#" + id).disabled = disabled;
+  }
+
+  function closeCamera() {
+    ++cameraOpening; // Cancela também uma abertura cujo módulo ainda está carregando.
+    cameraView?.close();
+    cameraOverlay.hidden = true;
+    cameraControlsDisabled(true);
+    appShell.inert = false;
+    engine.controls.enabled = true;
+    setModalState();
+    canvas.focus();
+  }
+
+  function isNearCameraTarget(prop) {
+    if (!prop) return false;
+    const dx = Math.max(prop.x - engine.player.x, 0, engine.player.x - prop.x - prop.w);
+    const dy = Math.max(prop.y - engine.player.y, 0, engine.player.y - prop.y - prop.h);
+    return Math.hypot(dx, dy) < config.interaction.distance;
+  }
+
+  function captureCameraPhoto() {
+    if (cameraOverlay.hidden || !cameraView?.active) return;
+    const photo = cameraView.capture();
+    if (tutorial.phase !== "camera" || selectedTool !== 1) {
+      $("#cameraMessage").textContent = "Explore o ambiente. O registro estará disponível na etapa Câmera científica do treinamento.";
+      return;
+    }
+    if (photo?.prop?.trainingId !== "camera" || !isNearCameraTarget(photo.prop)) {
+      $("#cameraMessage").textContent = "Enquadre o terreno simulado na mira. Se estiver longe, volte ao mapa e aproxime-se do alvo destacado.";
+      return;
+    }
+    closeCamera();
+    handleInteraction(photo.prop, photo.image);
+  }
+
+  $("#closeCamera").addEventListener("click", closeCamera);
+  $("#cameraCapture").addEventListener("click", captureCameraPhoto);
+  $("#cameraCenter").addEventListener("click", () => cameraView?.controller.reset());
+  $("#cameraZoom").addEventListener("input", event => cameraView?.controller.setZoom(event.target.value));
+  $("#cameraMouse").addEventListener("click", () => cameraView?.controller.enable());
+  cameraOverlay.addEventListener("keydown", event => {
+    if (event.key === "Tab") {
+      const targets = [...cameraOverlay.querySelectorAll('button:not(:disabled), input:not(:disabled), canvas')];
+      const index = targets.indexOf(document.activeElement);
+      event.preventDefault();
+      targets[(index + (event.shiftKey ? targets.length - 1 : 1)) % targets.length].focus();
+    }
+  });
+  // Captura antes dos handlers do controller para Esc sempre fechar a vista 3D.
+  document.addEventListener("keydown", event => {
+    if (cameraOverlay.hidden) return;
+    if (event.key === "Escape" || (!event.repeat && event.code === "KeyE")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (event.key === "Escape") closeCamera();
+      else captureCameraPhoto();
+    }
+  }, true);
+  window.addEventListener("pagehide", () => cameraView?.dispose(), { once: true });
+
   function startTutorial() {
     if (!suitWorn || !helmetWorn) return;
-    tutorialPhase = "gravity";
-    mainMenuOverlay.hidden = true;
+    tutorial.equip();
     appShell.inert = false;
     introOverlay.hidden = true;
     engine.controls.enabled = true;
     engine.controls.movementEnabled = true;
+    canvas.focus();
+    updateInterface();
+  }
+
+  function openLaunchRoom() {
+    engine.closeInspection();
+    engine.controls.enabled = false;
+    engine.controls.movementEnabled = false;
+    engine.controls.keys.clear();
+    appShell.inert = true;
+    launchRoomOverlay.hidden = false;
+    launchRoomFrame.src = "/assets/Animations/opportunity_mars01_rocket.html?embed=1";
+    $("#leaveLaunchRoom").focus();
+  }
+
+  function closeLaunchRoom(completed = false) {
+    if (launchRoomOverlay.hidden) return;
+    launchRoomOverlay.hidden = true;
+    launchRoomFrame.src = "about:blank";
+    if (completed) tutorial.finishLaunch();
+    else tutorial.leaveLaunchRoom();
+    Object.assign(engine.player, map.launchRoom.exit);
+    appShell.inert = false;
+    engine.controls.enabled = true;
+    engine.controls.movementEnabled = true;
+    engine.controls.keys.clear();
     canvas.focus();
     updateInterface();
   }
 
   function resetTraining() {
+    if (!cameraOverlay.hidden) closeCamera();
     window.clearTimeout(feedbackTimer);
     tutorialFeedback.hidden = true;
-    tutorialFeedback.textContent = "";
-    tutorialPhase = "gravity";
+    tutorial.reset();
     selectedTool = null;
-    suitWorn = true;
-    helmetWorn = true;
-    completedTests.clear();
     inventoryItems.length = 0;
-    cadetInput.value = cadetName;
-    $("#wearSuit").disabled = true;
-    $("#wearSuit").setAttribute("aria-pressed", "true");
-    $("#wearSuit").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
-    $("#wearHelmet").disabled = true;
-    $("#wearHelmet").setAttribute("aria-pressed", "true");
-    $("#wearHelmet").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
-    $("#suitFeedback").textContent = "Equipamento pronto.";
-    $("#confirmSuit").disabled = false;
-    introOverlay.hidden = true;
-    appShell.inert = false;
+    announcedPhase = null;
+    lastObjectivePhase = null;
     mapOverlay.hidden = true;
     inventoryOverlay.hidden = true;
-    engine.controls.enabled = true;
-    engine.controls.movementEnabled = true;
+    quickToolsPanel.hidden = true;
+    tutorialCoach.hidden = true;
+    $("#researchAction").setAttribute("aria-expanded", "false");
     engine.controls.keys.clear();
+    equipmentAnimationOverlay.hidden = true;
+    equipmentAnimationFrame.src = "about:blank";
+    activeEquipmentAnimation = null;
+    launchRoomOverlay.hidden = true;
+    launchRoomFrame.src = "about:blank";
     engine.reset();
     renderInventory();
-    updateInterface();
-    canvas.focus();
-  }
-
-  function showMenuPage(page) {
-    mainMenuHome.hidden = page !== "home";
-    document.querySelectorAll(".menu-subpage").forEach(section => {
-      section.hidden = section.id !== `${page}Page`;
-    });
-    const focusTarget = page === "home"
-      ? $("#playButton")
-      : document.querySelector(`#${page}Page .menu-back`);
-    focusTarget?.focus();
+    prepareEquipment();
   }
 
   function selectAtmosphere(key) {
     engine.setAtmosphere(key);
-    document.querySelectorAll("[data-atmosphere]").forEach(button => {
-      button.classList.toggle("selected", button.dataset.atmosphere === key);
-    });
   }
 
   function finishEquipmentAnimation() {
@@ -423,7 +622,7 @@
     equipmentAnimationOverlay.hidden = false;
     equipmentAnimationFrame.src = isSuit
       ? "/assets/Animations/astronauta_vestindo_traje_8bit.html?embed=1"
-      : "/assets/Animations/Capacete%20%E2%80%93%20POV%208-bit.html?embed=1";
+      : "/assets/Animations/anima%C3%A7%C3%A3o%20capacete%20atualizada/index.html?embed=1";
     $("#skipEquipmentAnimation").focus();
   }
 
@@ -433,10 +632,9 @@
     button.addEventListener("click", () => selectAtmosphere(key));
     $("#moodControls").append(button);
   });
-  document.querySelectorAll("[data-atmosphere]").forEach(button => {
-    button.addEventListener("click", () => selectAtmosphere(button.dataset.atmosphere));
-  });
-  selectAtmosphere(config.atmosphere.default);
+  const requestedAtmosphere = new URLSearchParams(window.location.search).get("atmosphere");
+  selectAtmosphere(Object.hasOwn(config.atmosphere.presets, requestedAtmosphere)
+    ? requestedAtmosphere : config.atmosphere.default);
 
   map.destinations.forEach(destination => {
     const button = document.createElement("button");
@@ -498,11 +696,22 @@
     startEquipmentAnimation("helmet");
   });
   $("#skipEquipmentAnimation").addEventListener("click", finishEquipmentAnimation);
+  $("#leaveLaunchRoom").addEventListener("click", () => closeLaunchRoom());
   window.addEventListener("message", event => {
+    if (!launchRoomOverlay.hidden && event.source === launchRoomFrame.contentWindow && event.origin === window.location.origin) {
+      if (event.data === "rocket-animation-complete") closeLaunchRoom(true);
+      else if (event.data === "rocket-room-exit") closeLaunchRoom();
+      return;
+    }
     if (event.source !== equipmentAnimationFrame.contentWindow || event.origin !== window.location.origin) return;
     if (event.data === `${activeEquipmentAnimation}-animation-complete`) finishEquipmentAnimation();
   });
   document.addEventListener("keydown", event => {
+    if (!launchRoomOverlay.hidden && event.key === "Escape") {
+      event.preventDefault();
+      closeLaunchRoom();
+      return;
+    }
     if (!equipmentAnimationOverlay.hidden && event.key === "Escape") {
       event.preventDefault();
       finishEquipmentAnimation();
@@ -517,28 +726,15 @@
   });
   $("#mapAction").addEventListener("click", toggleMap);
   $("#inventoryAction").addEventListener("click", toggleInventory);
-  $("#playButton").addEventListener("click", () => {
-    if (savedProfile) {
-      startTutorial();
-      return;
-    }
-    mainMenuOverlay.hidden = true;
-    introOverlay.hidden = false;
-    cadetInput.focus();
-  });
-  $("#settingsButton").addEventListener("click", () => showMenuPage("settings"));
-  $("#infoButton").addEventListener("click", () => showMenuPage("info"));
-  $("#creditsButton").addEventListener("click", () => showMenuPage("credits"));
-  document.querySelectorAll("[data-menu-home]").forEach(button => {
-    button.addEventListener("click", () => showMenuPage("home"));
-  });
-  $("#settingsFullscreenButton").addEventListener("click", () => toggleFullscreen());
-  document.addEventListener("keydown", event => {
-    if (mainMenuOverlay.hidden || event.key !== "Escape") return;
-    const activePage = document.querySelector(".menu-subpage:not([hidden])");
-    if (activePage) {
+  $("#showTutorialHelp").addEventListener("click", showTutorialCoach);
+  $("#continueTutorial").addEventListener("click", closeTutorialCoach);
+  tutorialCoach.addEventListener("keydown", event => {
+    if (event.key === "Escape") { event.preventDefault(); closeTutorialCoach(); }
+    if (event.key === "Tab") {
+      const targets = [$("#continueTutorial"), ...(!$("#tutorialMenuLink").hidden ? [$("#tutorialMenuLink")] : [])];
+      const index = targets.indexOf(document.activeElement);
       event.preventDefault();
-      showMenuPage("home");
+      targets[(index + (event.shiftKey ? targets.length - 1 : 1)) % targets.length].focus();
     }
   });
   $("#pauseButton").addEventListener("click", () => engine.setPaused());
@@ -606,7 +802,7 @@
     toggleMap,
     toggleInventory,
     getTrainingState: () => ({
-      phase: tutorialPhase, cadetName, character, selectedTool, completedTools: [...completedTests], inventory: [...inventoryItems]
+      phase: tutorial.phase, cadetName, character, selectedTool, completedTools: [...completedTests], inventory: [...inventoryItems]
     }),
     inspect: name => {
       const prop = map.props.find(item => item.name.toLowerCase() === name.toLowerCase());
@@ -635,14 +831,14 @@
     },
     setMoveSpeed: speed => {
       if (!Number.isFinite(speed) || speed <= 0) throw new RangeError("A velocidade deve ser um número positivo.");
+      normalSpeed = speed;
       config.player.speed = speed;
     }
   });
 
   cadetInput.value = cadetName;
-  $("#menuCharacter").textContent = character === defaultCharacter ? "Astronauta" : character;
   updateInterface();
-  showMenuPage("home");
+  prepareEquipment();
   engine.start().then(() => {
     $("#stageStatus").innerHTML = "SISTEMA ONLINE <span></span>";
     console.info("Opportunity Lab Engine pronta. APIs disponíveis em window.labTraining e window.opportunityMap.");

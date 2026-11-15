@@ -102,9 +102,12 @@
             <button class="hud-inventory" id="inventoryAction" type="button" aria-label="Abrir mochila (Tab)">TAB <span>MOCHILA</span></button>
           </nav>
           <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
-            <p class="eyebrow">OBJETIVO DO TREINAMENTO</p>
+            <p class="eyebrow" id="tutorialStepLabel">OBJETIVO DO TREINAMENTO</p>
             <h2 id="tutorialTitle"></h2>
             <p id="tutorialDescription"></p>
+            <div class="tutorial-next"><kbd id="tutorialKey"></kbd><span id="tutorialDistance"></span></div>
+            <progress id="tutorialProgress" max="100" value="0" aria-label="Progresso da etapa" hidden></progress>
+            <button id="showTutorialHelp" type="button">Rever instrução</button>
           </section>
           <div class="tutorial-feedback" id="tutorialFeedback" role="status" aria-live="polite" hidden></div>
           <div class="hint" id="interactionHint" hidden></div>
@@ -124,7 +127,8 @@
                 <button class="icon-button" id="closeMap" type="button" aria-label="Fechar mapa">×</button>
               </div>
               <canvas id="miniMap" width="280" height="180" aria-label="Minimapa da instalação"></canvas>
-              <p class="modal-footnote">PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL</p>
+              <p class="modal-footnote">CIANO: VOCÊ · ÂMBAR: OBJETIVO E PERCURSO · M / ESC: FECHAR</p>
+              <p id="mapObjective" class="modal-description"></p>
             </section>
           </div>
           <div class="stage-modal" id="inventoryOverlay" hidden>
@@ -200,61 +204,14 @@
     <footer class="footer"><span>OPPORTUNITY · MAP ENGINE</span><span>Explorar. Aprender. Viver.</span><span>v2.0.0</span></footer>
   </main>
 
-  <div class="main-menu" id="mainMenuOverlay">
-    <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Menu principal">
-      <img class="menu-logo" src="assets/title.png" alt="Surviving in Mars">
-      <nav class="menu-frame" aria-label="Menu principal">
-        <span class="menu-corner menu-corner-tl" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-tr" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-bl" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-br" aria-hidden="true"></span>
-        <button class="menu-option selected" id="playButton" type="button">Play</button>
-        <button class="menu-option" id="settingsButton" type="button">Settings</button>
-        <button class="menu-option" id="infoButton" type="button">Info</button>
-      </nav>
-      <button class="credits-button" id="creditsButton" type="button">Créditos</button>
-    </section>
-
-    <section class="menu-subpage" id="settingsPage" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
-      <p class="menu-eyebrow">SURVIVING IN MARS</p>
-      <h2 id="settingsTitle">Settings</h2>
-      <div class="menu-setting">
-        <span>Ambiente</span>
-        <div class="menu-atmospheres">
-          <button type="button" data-atmosphere="clean">Operacional</button>
-          <button type="button" data-atmosphere="emergency">Emergência</button>
-          <button type="button" data-atmosphere="abandoned">Abandonada</button>
-          <button type="button" data-atmosphere="horror">Suspense</button>
-        </div>
-      </div>
-      <div class="menu-setting menu-profile-setting">
-        <span>Personagem</span>
-        <strong id="menuCharacter">Astronauta</strong>
-      </div>
-      <button class="menu-secondary-button" id="settingsFullscreenButton" type="button">Alternar tela cheia</button>
-    </section>
-
-    <section class="menu-subpage" id="infoPage" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
-      <p class="menu-eyebrow">OPPORTUNITY · MARTE</p>
-      <h2 id="infoTitle">Info</h2>
-      <p>Explore a instalação e treine os instrumentos antes da missão em Marte.</p>
-      <ul class="menu-info-list">
-        <li><kbd>W A S D</kbd> mover</li>
-        <li><kbd>E</kbd> interagir</li>
-        <li><kbd>1–4</kbd> ferramentas</li>
-        <li><kbd>M</kbd> mapa <kbd>Tab</kbd> mochila</li>
-      </ul>
-    </section>
-
-    <section class="menu-subpage" id="creditsPage" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
-      <p class="menu-eyebrow">SURVIVING IN MARS</p>
-      <h2 id="creditsTitle">Créditos</h2>
-      <p>Sprites do astronauta: Space Runner Assets, Matt Walkden (CC0).</p>
-      <p>Mapa de treinamento inspirado na missão Opportunity.</p>
-      <p>Cenário e logo: imagens fornecidas pelo usuário.</p>
+  <div class="story-overlay" id="tutorialCoach" hidden>
+    <section class="story-card tutorial-coach-card" role="dialog" aria-modal="true" aria-labelledby="coachTitle" aria-describedby="coachDescription" tabindex="-1">
+      <p class="eyebrow" id="coachStep"></p>
+      <h2 id="coachTitle"></h2>
+      <p class="story-copy" id="coachDescription"></p>
+      <div class="coach-shortcut" id="coachKey"></div>
+      <button class="story-button" id="continueTutorial" type="button">Entendido, vamos lá</button>
+      <a class="tutorial-menu-link" id="tutorialMenuLink" href="/" hidden>Voltar ao menu</a>
     </section>
   </div>
 
@@ -289,12 +246,47 @@
     </section>
   </div>
 
+  <div class="launch-room-overlay" id="launchRoomOverlay" hidden>
+    <section class="launch-room-dialog" role="dialog" aria-modal="true" aria-labelledby="launchRoomTitle">
+      <header class="launch-room-header">
+        <h2 id="launchRoomTitle">Sala de lançamento · MARS 01</h2>
+        <button id="leaveLaunchRoom" type="button">Voltar ao laboratório · Esc</button>
+      </header>
+      <iframe id="launchRoomFrame" title="Protótipo interativo de lançamento MARS 01" allow="autoplay"></iframe>
+    </section>
+  </div>
+
+  <div class="camera-overlay" id="cameraOverlay" hidden>
+    <section class="camera-dialog" role="dialog" aria-modal="true" aria-labelledby="cameraTitle" aria-describedby="cameraHelp">
+      <header class="camera-header">
+        <div><p class="eyebrow">PANCAM · VISÃO 3D</p><h2 id="cameraTitle">Câmera científica</h2></div>
+        <button id="closeCamera" type="button">Voltar ao mapa · Esc</button>
+      </header>
+      <div class="camera-viewport" id="cameraViewport">
+        <div class="camera-reticle" aria-hidden="true">＋</div>
+        <p id="cameraMessage" role="status" aria-live="polite">Carregando ambiente 3D…</p>
+      </div>
+      <footer class="camera-footer">
+        <p id="cameraHelp">Arraste para olhar · Setas: orientar · Scroll: zoom · R: centralizar · E: fotografar. A posição fica fixa; volte ao mapa para caminhar.</p>
+        <div class="camera-controls">
+          <button id="cameraMouse" type="button" disabled>Capturar mouse</button>
+          <button id="cameraCenter" type="button" disabled>Centralizar · R</button>
+          <label for="cameraZoom">Zoom <input id="cameraZoom" type="range" min="1" max="4" step="0.1" value="1" disabled> <output id="cameraZoomValue">1.0×</output></label>
+          <button id="cameraCapture" type="button" disabled>Fotografar · E</button>
+        </div>
+        <output id="cameraTelemetry" aria-label="Orientação da câmera"></output>
+      </footer>
+    </section>
+  </div>
+
   <script src="js/config.js"></script>
   <script src="/map-engine-v2/js/map-data.js"></script>
   <script src="js/map-data-training.js"></script>
   <script src="js/animation.js"></script>
   <script src="js/character.js"></script>
   <script src="/map-engine-v2/js/renderer.js"></script>
+  <script src="js/tutorial.js"></script>
+  <script src="js/tutorial-navigation.js"></script>
   <script src="/map-engine-v2/js/controls.js"></script>
   <script src="/map-engine-v2/js/engine.js"></script>
   <script src="js/app.js"></script>
