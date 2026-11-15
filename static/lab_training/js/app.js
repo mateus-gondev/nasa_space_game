@@ -635,8 +635,12 @@
     if (launchRoomOverlay.hidden) return;
     launchRoomOverlay.hidden = true;
     launchRoomFrame.src = "about:blank";
-    if (completed) tutorial.finishLaunch();
-    else tutorial.leaveLaunchRoom();
+    if (completed && tutorial.finishLaunch()) {
+      engine.stop();
+      window.location.href = "/mars-test/?world=meridiani";
+      return;
+    }
+    tutorial.leaveLaunchRoom();
     Object.assign(engine.player, map.launchRoom.exit);
     appShell.inert = false;
     engine.controls.enabled = true;
