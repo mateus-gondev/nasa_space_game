@@ -5820,6 +5820,13 @@
       "kind": "image"
     },
     {
+      "path": "/assets/marte_tilemap/sprites/rocket.webp",
+      "file": "assets/marte_tilemap/sprites/rocket.webp",
+      "group": "marte_tilemap",
+      "name": "rocket.webp",
+      "kind": "image"
+    },
+    {
       "path": "/assets/marte_tilemap/sprites/rover.png",
       "file": "assets/marte_tilemap/sprites/rover.png",
       "group": "marte_tilemap",

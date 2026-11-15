@@ -309,7 +309,7 @@ window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld}){
     if(prop.action?.startsWith('travel:')){$('#actionButton').textContent='Ir para lá';return;}
     $('#actionButton').hidden=true;$('#scanControls').hidden=true;
     const near=engine.canAct(prop),s=campaign.engine.state;
-    inspectArt.src=prop.sprite?'/assets/marte_tilemap/sprites/'+prop.sprite+'.png':UI.icon(prop.role==='ship-control'?'build':prop.role==='ship-rest'?'avatar':prop.role==='ship-supply'?'materials':prop.role==='ship-exit'?'ship':'map').src;
+    inspectArt.src=prop.sprite==='nave_perfuradora'?'/assets/marte_tilemap/sprites/rocket.webp':prop.sprite?'/assets/marte_tilemap/sprites/'+prop.sprite+'.png':UI.icon(prop.role==='ship-control'?'build':prop.role==='ship-rest'?'avatar':prop.role==='ship-supply'?'materials':prop.role==='ship-exit'?'ship':'map').src;
     function field(label,fn,blocked=false,task){const b=button(fieldActions,label,()=>{if(!engine.canAct(prop))throw Error('Chegue mais perto.');const world=engine.map.id;fn();if(!dialog.open&&engine.map.id===world&&engine.inspectedObject===prop)inspect(prop);},!near||blocked||!!(task&&!campaign.engine.availableActions()[task].enabled)||campaign.meta.result!=='active');if(task){const cost=element('div','cost-row');for(const [key,value]of Object.entries(scenario.activities[task].reserved))if(value)cost.append(UI.chip(key,value));cost.append(element('small','time-cost',scenario.activities[task].durationTicks+' etapas'));b.append(cost);}}
     if(prop.role==='ship-exit'){
       field('Sair da nave',()=>{engine.closeInspection();switchWorld('mapa_01_pouso');});
@@ -377,6 +377,8 @@ window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld}){
   }
   const images=new Map();
   function loadImage(key,url){if(!images.has(key))images.set(key,new Promise(resolve=>{const img=new Image();img.onload=()=>{engine.loadAsset(key,img);resolve(img);};img.onerror=()=>{console.warn('Asset indisponível:',url);notify('Um desenho não carregou. Você pode continuar a aventura!');resolve(null);};img.src=url;}));return images.get(key);}
+  loadImage('landed-rocket','/assets/marte_tilemap/sprites/rocket.webp');
+  loadImage('mars-terrain','/assets/marte_tilemap/tileset_terreno.png');
   loadImage('crew-hd','/assets/astronaut/explorer-v2.png').then(image=>{if(!image){loadImage('crew-idle','/assets/Space Runner Assets - 27-11-20/Astronaut/Astronaut_Idle.png');loadImage('crew-run','/assets/Space Runner Assets - 27-11-20/Astronaut/Astronaut_Run.png');}});
   const landing=worlds.find(w=>w.id==='mapa_01_pouso');
   // Plataformas não bloqueiam o caminho. Procura áreas livres para não cobrir assets existentes.

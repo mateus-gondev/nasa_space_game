@@ -59,6 +59,7 @@ window.MapRenderer = class MapRenderer {
     if(this.map.backgroundImage){
       ctx.imageSmoothingEnabled=false;
       ctx.drawImage(this.map.backgroundImage,0,0,this.worldW,this.worldH);
+      this.drawLandedRocket(ctx);
       this.ctx=previous;return;
     }
     for (let y = 0; y < this.map.height; y++) {
@@ -74,6 +75,25 @@ window.MapRenderer = class MapRenderer {
     this.drawFloorMarkings();
     this.drawRoomLabels();
     this.ctx = previous;
+  }
+
+  drawLandedRocket(ctx) {
+    const ship=this.map.props.find(prop=>prop.sprite==='nave_perfuradora');
+    const rocket=this.assets.get('landed-rocket'),terrain=this.assets.get('mars-terrain');
+    if(!ship||!rocket||!terrain)return;
+    const T=this.tile,x=ship.x*T,y=ship.y*T,w=ship.w*T,h=ship.h*T;
+    // O foguete antigo está no PNG do mapa. Recompõe só seu chão com os tiles originais.
+    ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();
+    const columns=Math.floor((terrain.naturalWidth||256)/T);
+    for(let row=Math.floor(ship.y);row<Math.ceil(ship.y+ship.h);row++){
+      for(let col=Math.floor(ship.x);col<Math.ceil(ship.x+ship.w);col++){
+        const tile=this.map.floorMap[row][col]-1;
+        ctx.drawImage(terrain,(tile%columns)*T,Math.floor(tile/columns)*T,T,T,col*T,row*T,T,T);
+      }
+    }
+    ctx.restore();
+    const height=h*2,width=height*(rocket.naturalWidth||192)/(rocket.naturalHeight||384);
+    ctx.drawImage(rocket,x+(w-width)/2,y+h-height,width,height);
   }
 
   drawFloor(x, y) {
