@@ -1,7 +1,7 @@
 /* Preferências persistentes, modal e canais independentes de música e efeitos. */
 (() => {
   const storageKey = "opportunity.labTraining.settings";
-  const defaults = { musicVolume: 65, gameVolume: 80, subtitles: true, language: "pt-BR" };
+  const defaults = { musicVolume: 50, gameVolume: 100, subtitles: true, language: "pt-BR" };
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(storageKey)) || {}; }
   catch (error) { console.warn("Não foi possível ler as configurações:", error); }

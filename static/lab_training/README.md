@@ -10,7 +10,7 @@ Na raiz do projeto, use `npm run server` ou `npm run start` e abra:
 http://localhost:3000/lab-training/
 ```
 
-O atalho `http://localhost:3000/game` redireciona para o menu em `/`. Play abre o treinamento em `/lab-training/`. O servidor entrega os sprites em `/assets` e o código da engine v2 em `/map-engine-v2`. A engine é carregada de `static/opportunity-map-engine-v2/opportunity-map-engine`; mantenha essa pasta junto ao projeto. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
+O atalho `http://localhost:3000/game` redireciona para o menu em `/`. Iniciar (Start em inglês) abre o treinamento em `/lab-training/`. O servidor entrega os sprites em `/assets` e o código da engine v2 em `/map-engine-v2`. A engine é carregada de `static/opportunity-map-engine-v2/opportunity-map-engine`; mantenha essa pasta junto ao projeto. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
 
 ## Estrutura
 
@@ -36,7 +36,7 @@ static/lab_training/
 
 ## Menu inicial
 
-O menu com Jogar, Configurações, Info e Créditos fica em `static/main_menu/`, com logo ampliada e arquivos próprios. Acesse `http://localhost:3000/` ou `/game`. Configurações fica entre Jogar e Info e abre o modal com abas de áudio e legendas/idioma. Os volumes de música e efeitos são independentes; o idioma pode ser português ou inglês. As preferências ficam em `localStorage`, na chave `opportunity.labTraining.settings`, e são compartilhadas com o treinamento. A trilha Stellar Rift (`static/assets/audio/stellar-rift.mp3`) toca em loop apenas no menu; se o navegador bloquear autoplay, a primeira interação libera o áudio. Info resume os controles. Jogar abre a preparação do treinamento, preenchendo o nome salvo; o acesso direto a `/lab-training/` também funciona.
+O menu com Iniciar, Configurações, Info e Créditos fica em `static/main_menu/`, com logo ampliada e alinhada ao menu. Acesse `http://localhost:3000/` ou `/game`. Configurações fica entre Iniciar e Info e abre o modal com abas de áudio e legendas/idioma. Os volumes padrão são 50% para música e 100% para efeitos, preservando valores já salvos. O seletor de idioma mostra as bandeiras do Brasil e dos Estados Unidos, fornecidas pelo usuário, para português e inglês; aceita mouse e teclado. As preferências ficam em `localStorage`, na chave `opportunity.labTraining.settings`, e são compartilhadas com o treinamento. A trilha Stellar Rift (`static/assets/audio/stellar-rift.mp3`) toca em loop apenas no menu; se o navegador bloquear autoplay, a primeira interação libera o áudio. Info resume os controles. Iniciar abre a preparação do treinamento, preenchendo o nome salvo; o acesso direto a `/lab-training/` também funciona.
 
 Na preparação, selecionar traje e capacete reproduz as animações 8-bit correspondentes. Cada etapa avança ao terminar a sequência e também pode ser pulada.
 
@@ -46,15 +46,18 @@ O treinamento avança por ações do jogador, com briefings, objetivo persistent
 
 1. Vestir traje e capacete; o nome salvo é reutilizado, mas a preparação acontece em cada sessão.
 2. Caminhar com WASD ou setas e abrir/fechar o mapa com M.
-3. Interagir com a Antena de Alto Ganho usando E e caminhar na simulação de baixa gravidade.
+3. Interagir com a Antena de Alto Ganho usando o clique esquerdo e caminhar na simulação de baixa gravidade.
 4. Seguir ao laboratório na sala Atrium e testar, em ordem, câmera (1), microscópio (2), sensor de temperatura (3) e furadeira (4). Clique com o botão esquerdo para usar a ferramenta selecionada no alvo destacado; ferramentas ou estações incorretas não avançam o tutorial.
 5. Abrir a mochila com Tab para conferir os quatro resultados nos slots centrais e fechá-la.
-6. Seguir a trilha até a sala de lançamento MARS 01 no Rover Bay, mantendo o traje e o capacete colocados no início. Atravesse a porta para entrar no protótipo 3D.
-7. Usar **Iniciar lançamento** e acompanhar o voo do foguete para concluir o treinamento. **Voltar ao laboratório** ou Esc sai da sala sem concluir; é possível entrar de novo. Ao terminar o voo, a mensagem final permite continuar explorando ou voltar ao menu; a próxima missão ainda não é carregada.
+6. Seguir ao Centro de comunicação e pressionar E, clicar ou usar X (Cross) no gamepad para reunir os quatro registros e enviar o relatório. NOVA apresenta a expedição fictícia de recuperação dos arquivos MER-B. O relatório é obrigatório no percurso guiado antes do embarque.
+7. Seguir a trilha até a sala de lançamento MARS 01 no Rover Bay, mantendo o traje e o capacete colocados no início. Atravesse a porta para entrar no protótipo 3D.
+8. Usar **Iniciar lançamento** e acompanhar o voo do foguete para concluir o treinamento. Ao terminar o voo, o jogador segue para **dentro da nave MARS 01**, na rota `/mars-test/?arrival=1`, com a LIFE ativa e o HUD real de sobrevivência. A porta verde leva à área externa de pouso. Nome, relatório e mochila são transferidos à primeira campanha. A passagem leste dá acesso à mineração e, depois, à pesquisa; as passagens oeste permitem retornar. **Voltar ao laboratório** ou Esc sai da sala sem concluir; é possível entrar de novo.
 
 O botão Reiniciar limpa o progresso e retorna à preparação. Os controles de toque permitem realizar as mesmas etapas no celular. Execute `npm test` para verificar a progressão e os percursos de todos os objetivos na planta real.
 
-Durante a missão, o HUD usa os ícones pixelados do pacote `static/assets/visuals/hud_assets`: perfil e localização, indicadores de suporte vital e atalhos para pesquisa, mapa e mochila. Os recursos aparecem como nominais (100%) nesta fase; ainda não há consumo de sobrevivência implementado. Obra e reparo ficam sinalizados como indisponíveis neste treinamento.
+**Pular tutorial** mantém a exploração e o uso das ferramentas, sem inventar resultados ou marcar o treino como concluído. Após um lançamento real, esse percurso também segue para Marte e transfere somente os registros que o jogador coletou.
+
+O HUD usa os ícones pixelados do pacote `static/assets/visuals/hud_assets`. O painel LIFE oferece um exercício opcional de gestão, inicialmente protegido; depois de ativado, ele consome e produz recursos. Esse exercício tem seu próprio save e não bloqueia o tutorial. A campanha marciana usa a mesma engine com estoques de desembarque e regras próprias, construção, agricultura, eventos e retorno. Consulte [a documentação da campanha](../../docs/CAMPANHA.md).
 
 ## Controles
 
@@ -101,3 +104,5 @@ labTraining.reset();
 ```
 
 `window.opportunityMap` continua disponível com a API do mapa. A planta base e os objetos vêm de `static/opportunity-map-engine-v2/opportunity-map-engine/js/map-data.js`; coordenadas são medidas em tiles de 40 px. O treinamento remove decals e logos NASA. Animações, número e dimensões dos quadros e FPS ficam em `js/config.js`.
+
+As instruções aparecem com NOVA, usando as 12 imagens fornecidas pelo usuário. O balão acompanha preparo, cada etapa guiada, resultados de ferramentas, câmera, lançamento e mensagens da LIFE. O componente e seu CSS ficam em `static/assets/assistant`, compartilhados com Marte. Os briefings mantêm o bloqueio de movimento e o foco no botão de continuar; avisos no mapa podem ser recolhidos, sem interromper a progressão.

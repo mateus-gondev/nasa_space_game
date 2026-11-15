@@ -1,0 +1,23 @@
+[
+  {
+    "map": "mapa_01_pouso",
+    "reachableWalkableCells": 359,
+    "allTransitionsReachable": true,
+    "allResourcesReachable": true,
+    "validTerrainGids": true
+  },
+  {
+    "map": "mapa_02_mineracao",
+    "reachableWalkableCells": 365,
+    "allTransitionsReachable": true,
+    "allResourcesReachable": true,
+    "validTerrainGids": true
+  },
+  {
+    "map": "mapa_03_pesquisa",
+    "reachableWalkableCells": 371,
+    "allTransitionsReachable": true,
+    "allResourcesReachable": true,
+    "validTerrainGids": true
+  }
+]

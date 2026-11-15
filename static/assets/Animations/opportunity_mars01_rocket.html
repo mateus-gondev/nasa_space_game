@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#071018" />
   <title>MARS 01 — Rocket Prototype | Opportunity</title>
+  <link rel="stylesheet" href="/assets/assistant/nova.css">
   <script type="importmap">
     { "imports": { "three": "/vendor/three/three.module.js" } }
   </script>
@@ -87,7 +88,7 @@
     <section class="hero" aria-label="Informações do foguete" data-i18n-aria-label="Informações do foguete">
       <div class="eyebrow">EXPLORATION VEHICLE</div>
       <h1>MARS<span>.</span><br>01</h1>
-      <p class="lead" data-i18n="Uma nova forma de olhar para o desconhecido. Protótipo low-poly para uma aventura espacial na web.">Uma nova forma de olhar para o desconhecido. Protótipo low-poly para uma aventura espacial na web.</p>
+      <div id="launchSpeech" style="margin-top:20px"></div>
       <div class="hero-rule"></div><div class="hero-foot">[ MODEL: MER-LAUNCH / REV A ]</div>
     </section>
     <div class="microtag">CERAMIC NOSE / 01</div>
@@ -97,7 +98,6 @@
       <div class="stat"><span class="key">ENGINE</span><span class="val">THREE.JS</span></div>
       <div class="stat"><span class="key">ALTITUDE</span><span class="val" id="altitude">0000 M</span></div>
       <div class="stat"><span class="key">SYSTEM</span><span class="status" id="status">READY</span></div>
-      <p class="guide"><span data-i18n="ARRASTE PARA ROTACIONAR">ARRASTE PARA ROTACIONAR</span><br><span data-i18n="CONTROLE A ANIMAÇÃO PELOS BOTÕES">CONTROLE A ANIMAÇÃO PELOS BOTÕES</span></p>
     </aside>
     <div class="bottom">
       <div class="controls"><button class="cta" id="launch" data-i18n="▶ INICIAR LANÇAMENTO">▶ INICIAR LANÇAMENTO</button><button class="secondary" id="reset" aria-label="Reiniciar o protótipo" data-i18n-aria-label="Reiniciar o protótipo" data-i18n="↺ REINICIAR">↺ REINICIAR</button></div>
@@ -106,8 +106,13 @@
   </main>
   <script src="/lab-training/js/i18n.js"></script>
   <script src="/lab-training/js/animation-preferences.js"></script>
+  <script src="/assets/assistant/nova.js"></script>
   <script type="module">
     const t = window.GameI18n.t;
+    const assistant = window.NovaAssistant.create({compact:true,translate:t});
+    document.getElementById('launchSpeech').append(assistant.element);
+    const ready = () => assistant.say(t('Tudo pronto! Toque em Iniciar lançamento para decolar.'));
+    ready();
     const load = document.getElementById('load');
     const launchButton = document.getElementById('launch');
     const resetButton = document.getElementById('reset');
@@ -123,16 +128,18 @@
           launchButton.textContent = t(data.status === 'READY' ? '\u25b6 INICIAR LAN\u00c7AMENTO' : data.status === 'ASCENDING' ? '\u25cf LAN\u00c7AMENTO EM CURSO' : '\u2713 TRAJET\u00d3RIA CONCLU\u00cdDA');
         },
         onComplete() {
+          assistant.say(t('Conseguimos! Vamos para Marte!'),{mood:'success'});
           if (new URLSearchParams(location.search).get('embed') === '1') window.parent.postMessage('rocket-animation-complete', location.origin);
         },
       });
       launchButton.addEventListener('click', () => {
         if (intro.playing || intro.completed) return;
         intro.play();
+        assistant.say(t('Lá vamos nós! Acompanhe a decolagem.'));
         launchButton.disabled = true;
       });
-      resetButton.addEventListener('click', () => intro.reset());
-      window.addEventListener('pagehide', () => intro.dispose(), { once: true });
+      resetButton.addEventListener('click', () => { intro.reset(); ready(); });
+      window.addEventListener('pagehide', () => { intro.dispose(); assistant.destroy(); }, { once: true });
       window.addEventListener('keydown', event => {
         if (event.key === 'Escape' && new URLSearchParams(location.search).get('embed') === '1') {
           event.preventDefault();
@@ -146,6 +153,7 @@
       statusText.textContent = 'MODO 2D';
       launchButton.disabled = true;
       resetButton.disabled = true;
+      assistant.say(t('O foguete 3D não abriu. Aperte Esc para voltar e tentar de novo.'),{mood:'warning'});
       console.error('Falha ao iniciar a anima\u00e7\u00e3o 3D:', error);
     }
   </script>

@@ -202,6 +202,10 @@ function isActivityAvailable(state, scenario, type) {
   if (state.activeActivity) {
     reasons.push("A equipe já está ocupada em outra atividade.");
   }
+  for (const key of definition.requires || []) {
+    if (!state.systems[key]) reasons.push(`Requer: ${scenario.systemLabels?.[key] || key}.`);
+  }
+  if (definition.once && state.systems[definition.once]) reasons.push("Esta instalação ou tarefa já foi concluída.");
   if (state.team.fatigue >= 100 && type !== "rest") {
     reasons.push("A equipe precisa descansar antes de trabalhar.");
   }
@@ -217,7 +221,7 @@ function isActivityAvailable(state, scenario, type) {
   if (type === "plant" && state.crop) {
     reasons.push("Já existe um cultivo em andamento.");
   }
-  if (type === "harvest" && (!state.crop || state.crop.remainingTicks > 0)) {
+  if (type === "harvest" && (!state.crop || state.crop.remainingTicks > 0 || state.crop.failed)) {
     reasons.push("O cultivo ainda não está pronto para colher.");
   }
   if (type === "recycleWater" && resourceAvailable(state, "waterUsed") < scenario.rates.waterRecycleInput) {
@@ -231,7 +235,7 @@ function isActivityAvailable(state, scenario, type) {
   }
   for (const [name, quantity] of Object.entries(definition.reserved)) {
     if (resourceAvailable(state, name) < quantity) {
-      reasons.push(`Recursos insuficientes: ${name}.`);
+      reasons.push(`Recursos insuficientes: ${scenario.resourceLabels?.[name] || name}.`);
     }
   }
   return { enabled: reasons.length === 0, reasons };
@@ -270,6 +274,8 @@ function getActivePowerConsumers(state, scenario) {
   if (state.activeActivity?.type === "recycleWater" && scenario.power.consumers.waterRecycler) {
     active.push("waterRecycler");
   }
+  const activityConsumer = state.activeActivity && scenario.activities[state.activeActivity.type].powerConsumer;
+  if (activityConsumer && !active.includes(activityConsumer)) active.push(activityConsumer);
   return active.map((name) => ({
     name,
     demand: consumers[name].demand,
@@ -278,8 +284,10 @@ function getActivePowerConsumers(state, scenario) {
 }
 
 function distributePower(state, scenario) {
+  const cycle = scenario.power.cycle;
+  const daylight = !cycle || state.tick % cycle.ticks < cycle.daylightTicks;
   const generation = Math.floor(
-    scenario.power.baseGeneration * state.systems.solarCondition * state.power.solarMultiplier
+    scenario.power.baseGeneration * state.systems.solarCondition * state.power.solarMultiplier * (daylight ? 1 : 0)
   );
   let available = normalizeAmount(generation + resourceAvailable(state, "energy"));
   const allocation = {};
@@ -298,13 +306,13 @@ function distributePower(state, scenario) {
     }
   }
   const energy = state.resources.energy;
-  const stored = Math.min(energy.capacity, available);
+  const stored = Math.min(energy.capacity - energy.reserved, available);
   const discarded = normalizeAmount(available - stored);
   const allocated = Object.values(allocation).reduce((total, amount) => total + amount, 0);
   recordFlow(state, "energy", generation, "produced", "solar-panels");
   recordFlow(state, "energy", allocated, "consumed", "power-distribution");
   recordFlow(state, "energy", discarded, "discarded", "battery-capacity");
-  energy.amount = normalizeAmount(stored);
+  energy.amount = normalizeAmount(stored + energy.reserved);
   state.power.lastAllocation = allocation;
   state.power.lastGeneration = generation;
   return { allocation, generation, discarded };
@@ -382,11 +390,12 @@ function endScenarioEvent(state, eventDefinition) {
   state.activeEvents = state.activeEvents.filter((event) => event.id !== eventDefinition.id);
   if (eventDefinition.type === "solarDust") {
     state.power.solarMultiplier = 1;
+    if (eventDefinition.settledSolarCondition !== undefined) state.systems.solarCondition = eventDefinition.settledSolarCondition;
     addEvent(state, {
       type: "environmentalEventEnded",
       source: eventDefinition.id,
       title: "Poeira diminuiu",
-      message: "A geração solar voltou à condição normal do cenário."
+      message: eventDefinition.settledSolarCondition !== undefined ? "A poeira suspensa diminuiu; os painéis precisam de limpeza para recuperar toda a geração." : "A geração solar voltou à condição normal do cenário."
     });
   } else if (eventDefinition.type === "communicationsOutage") {
     state.power.channelAvailable = true;
@@ -458,6 +467,20 @@ function deliverMessage(state, message) {
 }
 
 function applyActivityCompletion(state, scenario, activity) {
+  const definition = scenario.activities[activity.type];
+  if (definition.location) state.team.location = activity.previousLocation || "habitat";
+  if (activity.type === "transferToShelter") state.team.location = "shelter";
+  if (definition.effects) {
+    Object.assign(state.systems, clone(definition.effects.systems || {}));
+    for (const [resource, amount] of Object.entries(definition.effects.resources || {})) addResource(state, resource, amount, activity.type);
+    addExplanation(state, {
+      whatHappened: definition.label || activity.type,
+      contributingDecisionOrCondition: definition.explanation || "A equipe investiu recursos e tempo nesta tarefa.",
+      affectedResources: Object.keys(definition.reserved),
+      availableAlternative: definition.alternative || "Preservar reservas para outro sistema.",
+      principle: "Tempo, materiais e energia são compartilhados entre os sistemas."
+    });
+  }
   if (activity.type === "buildShelter") {
     state.systems.shelterBuilt = true;
     state.systems.shelterProtection = scenario.rates.shelterBuildProtection;
@@ -485,7 +508,8 @@ function applyActivityCompletion(state, scenario, activity) {
       principle: "Manutenção usa recursos agora para reduzir riscos futuros."
     });
   } else if (activity.type === "plant") {
-    state.crop = { remainingTicks: scenario.rates.cropGrowthTicks, failed: false };
+    const crop = scenario.crops?.[activity.cropId];
+    state.crop = { remainingTicks: crop?.growthTicks ?? scenario.rates.cropGrowthTicks, failed: false, cropId: activity.cropId || null, yield: crop?.yield ?? scenario.rates.cropYield };
     addEvent(state, {
       type: "cropPlanted",
       source: activity.id,
@@ -493,7 +517,7 @@ function applyActivityCompletion(state, scenario, activity) {
       message: "A planta precisa de tempo, água e energia antes da colheita."
     });
   } else if (activity.type === "harvest") {
-    const result = addResource(state, "food", scenario.rates.cropYield, "crop-harvest");
+    const result = addResource(state, "food", state.crop.yield ?? scenario.rates.cropYield, "crop-harvest");
     state.crop = null;
     state.objectives.cropHarvested = true;
     addEvent(state, {
@@ -644,7 +668,17 @@ function runTick(state, scenario) {
       state.team.exposure + rates.outsideExposure * (1 - protection)
     );
   }
-  if (state.crop && state.crop.remainingTicks > 0 && (powerResult.allocation.cultivation || 0) > 0) {
+  if (scenario.radiation) {
+    const storm = state.tick >= scenario.radiation.startAt && state.tick <= scenario.radiation.endAt;
+    const protection = state.team.location === "shelter" ? state.systems.shelterProtection : state.team.location === "ship" ? 0.65 : 0;
+    state.team.exposure = normalizeAmount(state.team.exposure + (storm ? scenario.radiation.stormRate : scenario.radiation.baseRate) * (1 - protection));
+  }
+  if (state.crop && !state.crop.failed && state.crop.remainingTicks > 0 && scenario.crops) {
+    const need = scenario.crops[state.crop.cropId]?.waterPerTick || 0;
+    if (resourceAvailable(state, "waterClean") < need) state.crop.failed = true;
+    else consumeResource(state, "waterClean", need, "cultivation");
+  }
+  if (state.crop && !state.crop.failed && state.crop.remainingTicks > 0 && (powerResult.allocation.cultivation || 0) > 0) {
     state.crop.remainingTicks -= 1;
   }
 
@@ -689,6 +723,10 @@ function updateMissionStatus(state, scenario) {
     interruption = "A reserva de oxigênio terminou.";
   } else if (resourceAvailable(state, "food") <= 0) {
     interruption = "A reserva de alimento terminou.";
+  } else if (scenario.limits.waterCritical && resourceAvailable(state, "waterClean") <= 0) {
+    interruption = "A reserva de água limpa terminou. Reciclagem e produção de O₂ disputaram a mesma água.";
+  } else if (scenario.limits.exposureCritical && state.team.exposure >= scenario.limits.exposureCritical) {
+    interruption = "A exposição ultrapassou o limite pedagógico. Reforce o abrigo e ocupe-o durante o alerta.";
   } else if (state.systems.co2 >= limits.co2Critical) {
     interruption = "A qualidade do ar chegou ao limite crítico.";
   } else if (
@@ -877,10 +915,11 @@ class MissionEngine {
     const actions = {};
     for (const [type, definition] of Object.entries(this.scenario.activities)) {
       const availability = isActivityAvailable(this.state, this.scenario, type);
+      const durationTicks = type === "rest" && this.scenario.restUpgradeTicks && this.state.systems.dormitoryBuilt ? this.scenario.restUpgradeTicks : definition.durationTicks;
       actions[type] = {
         enabled: availability.enabled,
         reasons: availability.reasons,
-        durationTicks: definition.durationTicks,
+        durationTicks,
         reservedResources: clone(definition.reserved),
         cancelable: true
       };
@@ -909,13 +948,14 @@ class MissionEngine {
       throw new EngineError("UNKNOWN_ACTIVITY", `Atividade desconhecida: ${type}`);
     }
     const availability = isActivityAvailable(this.state, this.scenario, type);
+    const durationTicks = type === "rest" && this.scenario.restUpgradeTicks && this.state.systems.dormitoryBuilt ? this.scenario.restUpgradeTicks : definition.durationTicks;
     return {
       activity: type,
       stateVersion: this.state.stateVersion,
       available: availability.enabled,
       blockers: availability.reasons,
-      durationTicks: definition.durationTicks,
-      durationMinutes: definition.durationTicks * this.scenario.clock.tickMinutes,
+      durationTicks,
+      durationMinutes: durationTicks * this.scenario.clock.tickMinutes,
       resourcesReserved: clone(definition.reserved),
       assumptions: [
         "A estimativa considera o cenário e o estado conhecidos agora.",
@@ -997,12 +1037,42 @@ class MissionEngine {
     if (type === "sendEarthMessage") {
       return this.sendEarthMessage(state, payload);
     }
+    if (type === "claimSupply" && this.scenario.supplies) {
+      const supply = this.scenario.supplies[payload.id];
+      if (!supply || state.systems.claimedSupplies?.includes(payload.id)) throw new EngineError("INVALID_SUPPLY", "Suprimento indisponível ou já recolhido.");
+      state.systems.claimedSupplies ||= [];
+      for (const [name, amount] of Object.entries(supply)) addResource(state, name, amount, payload.id);
+      state.systems.claimedSupplies.push(payload.id);
+      return { id: payload.id };
+    }
+    if (type === "discardCrop" && this.scenario.crops) {
+      if (state.activeActivity || !state.crop) throw new EngineError("ACTION_BLOCKED", "Conclua a tarefa atual antes de remover o cultivo.");
+      state.crop = null;
+      return { discarded: true };
+    }
+    if (type === "setCrewLocation" && this.scenario.radiation) {
+      if (!["ship", "habitat", "outside", "shelter"].includes(payload.location)) throw new EngineError("INVALID_LOCATION", "Local desconhecido.");
+      if(payload.location === "shelter" && !state.systems.shelterBuilt) throw new EngineError("ACTION_BLOCKED", "Reforce o abrigo primeiro.");
+      state.team.location = payload.location;
+      return { location: state.team.location };
+    }
+    if (type === "compareSample" && this.scenario.sample) {
+      if (!state.systems.sampleCollected) throw new EngineError("ACTION_BLOCKED", "Extraia a amostra antes de comparar o espectro.");
+      const selected = payload.selected;
+      const peaks = this.scenario.sample.peaks;
+      const expected = peaks.map((value, index) => ({ value, index })).sort((a, b) => b.value - a.value).slice(0, 2).map(p => p.index).sort();
+      if (!Array.isArray(selected) || selected.length !== 2 || selected.some(i => !Number.isInteger(i) || i < 0 || i >= peaks.length) || stableStringify([...selected].sort()) !== stableStringify(expected)) throw new EngineError("INVALID_EVIDENCE", "Compare a altura dos picos e selecione os dois mais intensos.");
+      if (state.systems.sampleCompared) throw new EngineError("ACTION_BLOCKED", "A comparação desta amostra já foi registrada.");
+      state.systems.sampleCompared = true;
+      addExplanation(state, { whatHappened: "Os dois picos mais intensos do espectro ilustrativo foram identificados.", contributingDecisionOrCondition: "A equipe comparou as evidências antes de iniciar o ensaio.", affectedResources: [], availableAlternative: "Cruzar o resultado com textura e contexto geológico.", principle: "Um pico químico isolado não confirma água ou vida." });
+      return { compared: true };
+    }
     throw new EngineError("UNKNOWN_COMMAND", `Comando desconhecido: ${type}`);
   }
 
   startActivity(state, payload) {
     const type = payload.activity;
-    const definition = this.scenario.activities[type];
+    let definition = this.scenario.activities[type];
     if (!definition) {
       throw new EngineError("UNKNOWN_ACTIVITY", `Atividade desconhecida: ${type}`);
     }
@@ -1012,8 +1082,19 @@ class MissionEngine {
         reasons: availability.reasons
       });
     }
+    if (type === "plant" && this.scenario.crops) {
+      const crop = this.scenario.crops[payload.cropId];
+      if (!crop) throw new EngineError("INVALID_CROP", "Selecione uma cultura disponível.");
+      definition = { ...definition, reserved: { ...definition.reserved, waterClean: crop.plantWater } };
+    }
+    if (type === "rest" && this.scenario.restUpgradeTicks && state.systems.dormitoryBuilt) definition = { ...definition, durationTicks: this.scenario.restUpgradeTicks };
     reserveResources(state, definition.reserved);
     state.activeActivity = makeActivity(state, type, definition);
+    if (definition.location) {
+      state.activeActivity.previousLocation = state.team.location;
+      state.team.location = definition.location;
+    }
+    if (type === "plant" && this.scenario.crops) state.activeActivity.cropId = payload.cropId;
     if (type === "explore") {
       state.team.location = "outside";
     }
@@ -1032,7 +1113,7 @@ class MissionEngine {
       throw new EngineError("ACTIVITY_NOT_FOUND", "A atividade não está em andamento.");
     }
     releaseReservations(state, activity.reservedResources, false);
-    if (activity.type === "explore") {
+    if (activity.type === "explore" || this.scenario.activities[activity.type].location) {
       state.team.location = activity.previousLocation || "habitat";
     }
     state.activeActivity = null;

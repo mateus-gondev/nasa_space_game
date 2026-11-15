@@ -17,7 +17,8 @@
         <span class="menu-corner menu-corner-tr" aria-hidden="true"></span>
         <span class="menu-corner menu-corner-bl" aria-hidden="true"></span>
         <span class="menu-corner menu-corner-br" aria-hidden="true"></span>
-        <button class="menu-option selected" id="playButton" type="button" data-i18n="Jogar">Jogar</button>
+        <button class="menu-option selected" id="playButton" type="button" data-i18n="Iniciar">Iniciar</button>
+        <button class="menu-option" id="continueCampaign" type="button" data-i18n="Continuar expedição" hidden>Continuar expedição</button>
         <button class="menu-option" id="openSettings" type="button" data-i18n="Configurações" aria-haspopup="dialog">Configurações</button>
         <button class="menu-option" id="infoButton" type="button" data-i18n="Info">Info</button>
       </nav>
@@ -58,11 +59,11 @@
         <h3 data-i18n="Som">Som</h3>
         <div class="volume-setting">
           <label for="musicVolume" data-i18n="Volume da música">Volume da música</label>
-          <div class="volume-control"><input id="musicVolume" type="range" min="0" max="100" step="1" value="65"><output for="musicVolume" id="musicVolumeValue">65%</output></div>
+          <div class="volume-control"><input id="musicVolume" type="range" min="0" max="100" step="1" value="50"><output for="musicVolume" id="musicVolumeValue">50%</output></div>
         </div>
         <div class="volume-setting">
           <label for="gameVolume" data-i18n="Volume do jogo">Volume do jogo</label>
-          <div class="volume-control"><input id="gameVolume" type="range" min="0" max="100" step="1" value="80"><output for="gameVolume" id="gameVolumeValue">80%</output></div>
+          <div class="volume-control"><input id="gameVolume" type="range" min="0" max="100" step="1" value="100"><output for="gameVolume" id="gameVolumeValue">100%</output></div>
         </div>
       </section>
       <section class="settings-panel" id="languageSettings" role="tabpanel" aria-labelledby="languageSettingsTab" hidden>
@@ -72,8 +73,23 @@
           <input class="settings-switch" id="subtitlesEnabled" type="checkbox" role="switch" checked>
         </label>
         <div class="language-setting">
-          <label for="gameLanguage" data-i18n="Idioma">Idioma</label>
+          <label id="gameLanguageLabel" for="gameLanguage" data-i18n="Idioma">Idioma</label>
           <select id="gameLanguage"><option value="pt-BR" lang="pt-BR">Português</option><option value="en" lang="en">English</option></select>
+          <div class="language-picker" id="languagePicker" hidden>
+            <button class="language-picker-button" id="gameLanguageButton" type="button" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="gameLanguageOptions" aria-labelledby="gameLanguageLabel gameLanguageText">
+              <img class="language-flag" id="gameLanguageFlag" src="/main-menu/assets/flags/br.webp" alt="">
+              <span id="gameLanguageText" lang="pt-BR">Português</span>
+              <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
+            </button>
+            <ul class="language-options" id="gameLanguageOptions" role="listbox" aria-labelledby="gameLanguageLabel" hidden>
+              <li class="language-option" id="languagePortuguese" role="option" aria-selected="true" data-language="pt-BR">
+                <img class="language-flag" src="/main-menu/assets/flags/br.webp" alt=""><span lang="pt-BR">Português</span>
+              </li>
+              <li class="language-option" id="languageEnglish" role="option" aria-selected="false" data-language="en">
+                <img class="language-flag" src="/main-menu/assets/flags/us.webp" alt=""><span lang="en">English</span>
+              </li>
+            </ul>
+          </div>
         </div>
       </section>
       <nav class="settings-tabs" role="tablist" aria-label="Categorias de configurações" data-i18n-aria-label="Categorias de configurações" aria-orientation="vertical">
@@ -90,6 +106,7 @@
 
   <script src="/lab-training/js/i18n.js"></script>
   <script src="/lab-training/js/preferences.js"></script>
+  <script src="js/language-picker.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

@@ -74,6 +74,7 @@
     temperature: ["Aproxime-se da rocha. Use R1 para abrir os slots, selecione o sensor com o analógico esquerdo e confirme com Quadrado. Clique com o botão esquerdo para registrar a leitura.", [{ symbol: "R1", label: "Botão R1" }, { symbol: "L", label: "Analógico esquerdo" }, { symbol: "□", label: "Botão Quadrado" }, { symbol: "MOUSE_LEFT", label: "Botão esquerdo do mouse" }]],
     drill: ["Aproxime-se da estação de solo. Use R1 para abrir os slots, selecione a furadeira com o analógico esquerdo e confirme com Quadrado. Clique com o botão esquerdo para extrair uma amostra.", [{ symbol: "R1", label: "Botão R1" }, { symbol: "L", label: "Analógico esquerdo" }, { symbol: "□", label: "Botão Quadrado" }, { symbol: "MOUSE_LEFT", label: "Botão esquerdo do mouse" }]],
     inventory: ["Pressione Quadrado para abrir a mochila, confira os resultados e pressione Quadrado novamente para continuar.", [{ symbol: "□", label: "Botão Quadrado" }]],
+    communication: ["Siga a trilha até a antena. Pressione X para enviar os quatro registros à Terra.", [{ symbol: "×", label: "Botão X (Cross)" }]],
     ship: ["Use o analógico esquerdo para seguir a trilha e entrar na sala de lançamento.", [{ symbol: "L", label: "Analógico esquerdo" }]]
   };
   const tutorial = new LabTutorial();
@@ -91,6 +92,23 @@
   const completedTests = tutorial.completedTools;
   const inventoryItems = [];
   let feedbackTimer = 0;
+  function inlineAssistant(host, id, announce = true) {
+    const assistant = window.NovaAssistant.create({ compact: true, translate: t, announce });
+    if (id) assistant.text.id = id;
+    $(host).append(assistant.element);
+    return assistant;
+  }
+  const coachAssistant = inlineAssistant('#coachSpeech', 'coachDescription', false);
+  const objectiveAssistant = inlineAssistant('#objectiveSpeech');
+  const suitAssistant = inlineAssistant('#suitSpeech', 'suitFeedback');
+  const cameraAssistant = inlineAssistant('#cameraSpeech', 'cameraMessage');
+  $('#cameraSpeech').className = 'nova-camera';
+  const feedbackAssistant = window.NovaAssistant.create({ floating: true, compact: true, dismissible: true, translate: t, onDismiss: () => canvas.focus(), onInteract: () => canvas.focus() });
+  tutorialFeedback.parentElement.append(feedbackAssistant.element);
+  tutorialFeedback.setAttribute('aria-live', 'off');
+  let suitMessage = '';
+  function setSuitFeedback(message) { suitMessage = message; suitAssistant.say(t(message)); }
+  function setCameraMessage(message) { cameraAssistant.say(t(message), { mood: window.NovaAssistant.moodFor(message) === 'warning' ? 'warning' : 'science' }); }
 
   const engine = new MapEngine({
     canvas, config, map,
@@ -117,6 +135,7 @@
       return;
     }
     if (!introOverlay.hidden || !quickToolsPanel.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden) return;
+    if (tutorial.phase === "communication" && !engine.paused && $("#lifePanel").hidden) engine.interact("gamepad");
   };
   engine.onToolPanelToggle = () => {
     gamepadToolIndex = selectedTool ? selectedTool - 1 : 0;
@@ -182,7 +201,7 @@
       button.querySelector(".suit-step-state").textContent = t("PENDENTE");
     }
     $("#confirmSuit").disabled = true;
-    $("#suitFeedback").textContent = t("Primeiro vista o traje e as botas. Depois coloque o capacete.");
+    setSuitFeedback("Primeiro vista o traje e as botas. Depois coloque o capacete.");
     cadetInput.value = cadetName;
     (cadetName ? $("#wearSuit") : cadetInput).focus();
   }
@@ -192,7 +211,8 @@
     if (!step || tutorial.phase === "launch") return;
     $("#coachStep").textContent = t(step.label);
     $("#coachTitle").textContent = t(step.title);
-    $("#coachDescription").textContent = t(step.description);
+    coachAssistant.say(t(step.description), { key: tutorial.phase, mood: tutorial.phase === 'complete' ? 'success' : ['camera', 'microscope', 'temperature', 'drill'].includes(tutorial.phase) ? 'science' : 'guide' });
+    feedbackAssistant.hide();
     renderTutorialShortcut($("#coachKey"), step);
     $("#continueTutorial").textContent = t(tutorial.phase === "complete" ? "Explorar a instalação" : "Entendido, vamos lá");
     $("#tutorialMenuLink").hidden = tutorial.phase !== "complete";
@@ -207,6 +227,7 @@
 
   function closeTutorialCoach() {
     tutorialCoach.hidden = true;
+    coachAssistant.hide();
     appShell.inert = false;
     engine.controls.enabled = true;
     setModalState();
@@ -275,6 +296,7 @@
         highlight?.classList.add("tutorial-highlight");
         $("#tutorialTitle").textContent = t(objective.title);
         $("#tutorialDescription").textContent = t(objective.description);
+        objectiveAssistant.say(t(objective.title), { key: tutorial.phase, mood: tutorial.phase === 'complete' ? 'success' : 'guide' });
         $("#tutorialStepLabel").textContent = t(objective.label);
         renderTutorialShortcut($("#tutorialKey"), objective);
         lastObjectivePhase = tutorial.phase;
@@ -352,8 +374,10 @@
   function showFeedback(message, values = {}) {
     window.clearTimeout(feedbackTimer);
     tutorialFeedback.textContent = t(message, values);
-    tutorialFeedback.hidden = false;
-    feedbackTimer = window.setTimeout(() => { tutorialFeedback.hidden = true; }, 2200);
+    tutorialFeedback.hidden = true;
+    if (!tutorialCoach.hidden) return;
+    feedbackAssistant.say(t(message, values));
+    feedbackTimer = window.setTimeout(() => { feedbackAssistant.hide(); }, 7000);
   }
 
   function renderToolControls() {
@@ -411,11 +435,11 @@
   }
 
   function handleInteraction(prop, photo = null, source = "keyboard") {
-    if (!introOverlay.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden || !quickToolsPanel.hidden || !tutorialCoach.hidden || !launchRoomOverlay.hidden || (!cameraOverlay.hidden && !photo)) return true;
-    if (!photo && source !== "mouse") return true;
+    if (engine.paused || !$("#lifePanel").hidden || !introOverlay.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden || !quickToolsPanel.hidden || !tutorialCoach.hidden || !launchRoomOverlay.hidden || (!cameraOverlay.hidden && !photo)) return true;
+    if (!photo && source !== "mouse" && tutorial.phase !== "communication") return true;
     const phase = tutorial.phase;
     const toolPhases = ["camera", "microscope", "temperature", "drill"];
-    if (selectedTool === 1 && !photo) { openCamera(); return true; }
+    if (selectedTool === 1 && !photo && phase !== "communication") { openCamera(); return true; }
     if (phase === "ship" && prop.trainingId === "ship") {
       showFeedback("Atravesse a porta para entrar na sala de lançamento.");
       return true;
@@ -432,6 +456,7 @@
       return true;
     }
     window.GamePreferences.playEffect(phase === "gravity" ? 740 : 880, .12);
+    if (phase === "communication") showFeedback("Relatório enviado. Briefing MER-B recebido. Siga para o lançamento.");
     if (completedTests.has(selectedTool) && (toolPhases.includes(phase) || phase === "skipped")) {
       const tool = tools[selectedTool - 1];
       inventoryItems.push({ title: tool.name, result: tool.result, photo });
@@ -606,11 +631,12 @@
     const opening = ++cameraOpening;
     engine.closeInspection();
     cameraOverlay.hidden = false;
+    feedbackAssistant.hide();
     appShell.inert = true;
     engine.controls.enabled = false;
     engine.controls.movementEnabled = false;
     engine.controls.keys.clear();
-    $("#cameraMessage").textContent = t("Carregando ambiente 3D…");
+    setCameraMessage("Carregando ambiente 3D…");
     $("#closeCamera").focus();
     try {
       if (!cameraView) {
@@ -629,12 +655,12 @@
       cameraView.open(engine.player, engine.mood, isNearCameraTarget(target) ? target : null);
       $("#cameraQuality").value = cameraView.quality;
       cameraControlsDisabled(false);
-      $("#cameraMessage").textContent = t("Arraste para explorar. Enquadre o terreno simulado na mira e clique em Fotografar.");
+      setCameraMessage("Arraste para explorar. Enquadre o terreno simulado na mira e clique em Fotografar.");
     } catch (error) {
       cameraView?.dispose();
       cameraView = null;
       cameraControlsDisabled(true);
-      $("#cameraMessage").textContent = t("Não foi possível iniciar a câmera 3D. Verifique o suporte a WebGL 2 e volte ao mapa para tentar novamente.");
+      setCameraMessage("Não foi possível iniciar a câmera 3D. Verifique o suporte a WebGL 2 e volte ao mapa para tentar novamente.");
       console.error("Falha ao abrir a câmera científica:", error);
     }
   }
@@ -647,6 +673,7 @@
     ++cameraOpening; // Cancela também uma abertura cujo módulo ainda está carregando.
     cameraView?.close();
     cameraOverlay.hidden = true;
+    cameraAssistant.hide();
     cameraControlsDisabled(true);
     appShell.inert = false;
     engine.controls.enabled = true;
@@ -665,11 +692,11 @@
     if (cameraOverlay.hidden || !cameraView?.active) return;
     const photo = cameraView.capture();
     if ((tutorial.phase !== "camera" && tutorial.phase !== "skipped") || selectedTool !== 1) {
-      $("#cameraMessage").textContent = t("Explore o ambiente. O registro estará disponível na etapa Câmera científica do treinamento.");
+      setCameraMessage("Explore o ambiente. O registro estará disponível na etapa Câmera científica do treinamento.");
       return;
     }
     if (photo?.prop?.trainingId !== "camera" || !isNearCameraTarget(photo.prop)) {
-      $("#cameraMessage").textContent = t("Enquadre o terreno simulado na mira. Se estiver longe, volte ao mapa e aproxime-se do alvo destacado.");
+      setCameraMessage("Enquadre o terreno simulado na mira. Se estiver longe, volte ao mapa e aproxime-se do alvo destacado.");
       return;
     }
     closeCamera();
@@ -685,7 +712,7 @@
       cameraView?.setQuality(event.target.value);
     } catch (error) {
       event.target.value = cameraView.quality;
-      $("#cameraMessage").textContent = t("Não foi possível alterar a qualidade. Tente o perfil Baixa.");
+      setCameraMessage("Não foi possível alterar a qualidade. Tente o perfil Baixa.");
       console.error("Falha ao alterar a qualidade 3D:", error);
     }
   });
@@ -714,6 +741,7 @@
     tutorial.equip();
     appShell.inert = false;
     introOverlay.hidden = true;
+    suitAssistant.hide();
     engine.controls.enabled = true;
     engine.controls.movementEnabled = true;
     canvas.focus();
@@ -721,6 +749,7 @@
   }
 
   function openLaunchRoom() {
+    feedbackAssistant.hide();
     engine.closeInspection();
     engine.controls.enabled = false;
     engine.controls.movementEnabled = false;
@@ -735,8 +764,18 @@
     if (launchRoomOverlay.hidden) return;
     launchRoomOverlay.hidden = true;
     launchRoomFrame.src = "about:blank";
-    if (completed) tutorial.finishLaunch();
-    else tutorial.leaveLaunchRoom();
+    if (completed && (tutorial.finishLaunch() || tutorial.phase === "skipped")) {
+      try {
+        localStorage.setItem("opportunity.training.handoff.v1", JSON.stringify({
+          version: 1, name: cadetName, report: tutorial.report,
+          inventory: inventoryItems.map((item, index) => ({ id: `training-${index + 1}`, ...item }))
+        }));
+      } catch { console.warn("Não foi possível transferir os registros do treinamento para a campanha."); }
+      engine.stop();
+      window.location.href = "/mars-test/?arrival=1";
+      return;
+    }
+    tutorial.leaveLaunchRoom();
     Object.assign(engine.player, map.launchRoom.exit);
     appShell.inert = false;
     engine.controls.enabled = true;
@@ -750,6 +789,7 @@
     if (!cameraOverlay.hidden) closeCamera();
     window.clearTimeout(feedbackTimer);
     tutorialFeedback.hidden = true;
+    feedbackAssistant.hide();
     tutorial.reset();
     selectedTool = null;
     inventoryItems.length = 0;
@@ -784,13 +824,13 @@
       $("#wearSuit").setAttribute("aria-pressed", "true");
       $("#wearSuit").querySelector(".suit-step-state").textContent = t("CONCLUÍDO");
       $("#wearHelmet").disabled = false;
-      $("#suitFeedback").textContent = t("Agora coloque o capacete.");
+      setSuitFeedback("Agora coloque o capacete.");
       $("#wearHelmet").focus();
     } else if (activeEquipmentAnimation === "helmet") {
       helmetWorn = true;
       $("#wearHelmet").setAttribute("aria-pressed", "true");
       $("#wearHelmet").querySelector(".suit-step-state").textContent = t("CONCLUÍDO");
-      $("#suitFeedback").textContent = t("Equipamento pronto.");
+      setSuitFeedback("Equipamento pronto.");
       $("#confirmSuit").disabled = false;
       $("#confirmSuit").focus();
     }
@@ -808,7 +848,7 @@
     const button = isSuit ? $("#wearSuit") : $("#wearHelmet");
     button.disabled = true;
     button.querySelector(".suit-step-state").textContent = t("EM ANDAMENTO");
-    $("#suitFeedback").textContent = t(isSuit ? "Vestindo o traje..." : "Colocando o capacete...");
+    setSuitFeedback(isSuit ? "Vestindo o traje..." : "Colocando o capacete...");
     equipmentAnimationOverlay.hidden = false;
     const animationPath = isSuit
       ? "/assets/Animations/astronauta_traje_espacial_8bit.html"
@@ -863,7 +903,7 @@
       return;
     }
     if (!suitWorn || !helmetWorn) {
-      $("#suitFeedback").textContent = t("Conclua traje e capacete.");
+      setSuitFeedback("Conclua traje e capacete.");
       return;
     }
     cadetInput.setCustomValidity("");
@@ -871,7 +911,7 @@
       window.localStorage.setItem(profileStorageKey, JSON.stringify({ name: cadetName, character }));
     } catch (error) {
       console.error("Não foi possível salvar o perfil do cadete:", error);
-      $("#suitFeedback").textContent = t("Não foi possível salvar o perfil neste navegador.");
+      setSuitFeedback("Não foi possível salvar o perfil neste navegador.");
       return;
     }
     startTutorial();
@@ -961,7 +1001,7 @@
 
   canvas.addEventListener("click", event => {
     if (event.button !== 0) return;
-    if (engine.nearObject && (selectedTool || tutorial.phase === "gravity")) {
+    if (engine.nearObject && (selectedTool || tutorial.phase === "gravity" || tutorial.phase === "communication")) {
       engine.interact("mouse");
       return;
     }
@@ -1051,6 +1091,8 @@
   }
   translateMapLabels();
   window.addEventListener("languagechange", () => {
+    if (!tutorialCoach.hidden) showTutorialCoach();
+    if (!introOverlay.hidden) setSuitFeedback(suitMessage);
     renderToolControls();
     renderInventory();
     translateMapLabels();

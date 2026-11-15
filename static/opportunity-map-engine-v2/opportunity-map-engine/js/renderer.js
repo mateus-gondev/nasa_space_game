@@ -366,6 +366,7 @@ window.MapRenderer = class MapRenderer {
   }
 
   drawPlayer(player, time) {
+    if(player.explorerImage&&window.ExplorerSprite&&!player.manualAnimation){window.ExplorerSprite.draw(this.ctx,player.explorerImage,player,time,this.tile,player.config.spriteSize*1.3);return;}
     const ctx = this.ctx, tile = this.tile;
     const x = player.x * tile, y = player.y * tile + (player.moving ? Math.sin(time * 12) * 1.2 : 0);
     const frame = player.animator?.getFrame();

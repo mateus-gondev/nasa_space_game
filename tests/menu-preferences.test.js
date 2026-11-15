@@ -72,7 +72,7 @@ test('all guided tutorial briefings remain translated with the saved English set
   vm.runInContext(fs.readFileSync(path.join(__dirname, '../static/lab_training/js/tutorial.js'), 'utf8'), context);
   const tutorial = new context.window.LabTutorial();
   for (const phase of ['movement', 'map', 'gravity', 'gravityWalk', 'lab', 'camera', 'microscope',
-    'temperature', 'drill', 'inventory', 'ship', 'launch', 'complete']) {
+    'temperature', 'drill', 'inventory', 'communication', 'ship', 'launch', 'complete']) {
     tutorial.phase = phase;
     for (const field of ['title', 'description']) {
       assert.notEqual(context.window.GameI18n.t(tutorial.step[field]), tutorial.step[field], `${phase}: ${field}`);

@@ -9,7 +9,10 @@ window.LabCharacter = class LabCharacter {
     this.manualAnimation = false;
   }
 
-  async load() { await this.animator.load(); }
+  async load() {
+    await this.animator.load();
+    await new Promise(resolve=>{const image=new Image();image.onload=()=>{this.explorerImage=image;resolve();};image.onerror=()=>{console.warn('Astronauta novo indisponível; usando sprites originais.');resolve();};image.src='/assets/astronaut/explorer-v2.png';});
+  }
 
   updateAnimation(delta) {
     if (!this.manualAnimation) this.animator.play(this.moving ? "run" : "idle");

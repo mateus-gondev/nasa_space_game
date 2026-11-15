@@ -30,6 +30,7 @@ app.get('/life/:file', disableCache, (req, res) => {
   if (!allowed.includes(req.params.file)) return res.sendStatus(404);
   res.sendFile(path.join(__dirname, 'LIFE', req.params.file));
 });
+app.use('/mars-test', disableCache, express.static(path.join(__dirname, 'static/opportunity-mars-five-worlds')));
 app.use('/map-engine-v2', disableCache, express.static(path.join(__dirname, 'static/opportunity-map-engine-v2/opportunity-map-engine')));
 
 app.use(disableCache, express.static(path.join(__dirname, 'static/main_menu')));

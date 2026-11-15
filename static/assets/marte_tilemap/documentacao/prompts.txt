@@ -1,0 +1,26 @@
+Ferramenta: image_gen integrada (sem CLI/API externa).
+Referências locais: Mars.png; Decorations_tileset_atlas.png; runner-asset-sheet-with-grid.png.
+
+SPRITES INDIVIDUAIS — PROMPT
+
+Use case: stylized-concept. Asset type: individual transparent pixel-art game props prepared as a strict sprite atlas.
+Create exactly a 1024x1024 transparent PNG sprite sheet, a strict invisible 4-column by 4-row grid, each cell 256x256 output pixels. Exactly ONE separate complete object centered inside each cell, with at least 32 transparent pixels margin on all sides. Nothing may overlap a cell boundary. No grid lines, floor tiles, shadows cast onto any background, scenery, lettering or labels. The background must be completely transparent (actual alpha), not a checkerboard image.
+Input 1 Mars.png is the mandatory reference for flat top-down camera, simple chunky retro pixel style and circular scientific outpost forms. Input 2 Decorations atlas is a source of rock/crystal design shapes, adapt these to the same flat camera.
+Authentic low resolution pixel art drawn at a coherent logical 4x4 output pixel grid. Each object should be readable as 32x32 or 64x64 native game art. Crisp square pixel edges, hard areas, sparse checkerboard dithering as in Mars.png, no antialiasing, no gradients, no blur, no painterly detail, no isometric diamond bases. Bird's eye overhead with just the small front face used in the Mars.png reference. CONSISTENT scale, light upper-left.
+Use exactly five opaque colors and transparency: #220901 #621708 #941B0C #BC3908 #F6AA1C. No white, gray, blue, beige, green or other colors. Most surfaces red-orange, shadows maroon; amber highlights restrained. Transparent outside each object.
+Exact objects by cell, left-to-right:
+Row 1: (1) closed square cargo crate with X brace, (2) compact rectangular energy battery with three amber bars, (3) one vertical oxygen cylinder, (4) twin oxygen cylinders connected by a small pipe.
+Row 2: (1) compact rectangular solar panel array with 3x3 dark cells, (2) circular habitat dome with cross-shaped roof seams and small entrance, (3) small radio dish on a short support, (4) compact circular mining extractor with short pipe and box.
+Row 3: (1) small angular metallic ore outcrop, (2) cluster of three faceted mineral crystals, (3) flat cracked resource deposit with amber veins, (4) small overhead six-wheel exploration rover without driver.
+Row 4: (1) small trail beacon on a squat post, (2) three science sample canisters, (3) irregular cluster of three Mars rocks, (4) small rectangular equipment vent/grille.
+No extra objects in unused space. These are separate reusable sprites, NOT a map and NOT a mockup.
+
+NAVE — PROMPT
+
+Use case: style-transfer. Asset type: one isolated top-down pixel art spacecraft/exploration drilling vehicle game sprite on transparent background. Landscape composition 1536x1024.
+Input image 1 is Mars.png for mandatory coarse retro pixels and almost-flat top-down camera. Image 2 is the Space Runner asset sheet: isolate and faithfully adapt the distinctive red/orange cylindrical exploration vehicle in its top row, with ribbed hull, dark rectangular grilles, rounded closed rear at left, three conical drill heads at the front/right. This is the user's required spacecraft. Preserve that recognizable design rather than substituting a rocket or generic spaceship.
+Draw exactly ONE complete overhead horizontal ship, centered and filling around 75% image width, no ground, no stand, no debris, no exhaust, no text, no border, no UI. Everything outside the vehicle must be truly transparent alpha.
+Authentic hand-built 2D pixel game asset using coarse hard-edged square pixels with no antialiasing, approximately 96x64 underlying native pixels enlarged nearest-neighbor. Simplify into readable colored blocks, same camera/style as Mars.png. No perspective depth or isometric diamond platform. Lighting upper-left.
+Use ONLY opaque colors #220901 #621708 #941B0C #BC3908 #F6AA1C and transparency. Recolor all original blue drilling heads into amber/maroon with the given five colors. Cylindrical hull mainly #BC3908 and #941B0C, dark grilles, a few amber outline highlights. Need clear transparent margins all around. No other craft or objects.
+
+Exportação técnica: corte por célula, remoção de pixels com alfa inferior a 232, redução por vizinho mais próximo, quantização às cinco cores solicitadas, alfa 0/255. Terreno modular de 32px com combinação de cantos; crateras extraídas da referência Mars.png. Os três mapas são composições dos PNGs individuais em camadas Tiled.

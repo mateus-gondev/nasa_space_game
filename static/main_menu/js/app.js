@@ -14,6 +14,15 @@
   $("#playButton").addEventListener("click", () => {
     window.location.href = "/lab-training/";
   });
+  try {
+    const saved = JSON.parse(localStorage.getItem('opportunity.campaign.v1') || 'null');
+    if (saved?.version === 1 && saved.meta && saved.life) {
+      const resume = $('#continueCampaign');
+      resume.hidden = false;
+      resume.textContent = window.GameI18n?.t('Continuar expedição') || 'Continuar expedição';
+      resume.addEventListener('click', () => { window.location.href = '/mars-test/'; });
+    }
+  } catch { /* Menu continua disponível com armazenamento inválido. */ }
   for (const page of ["info", "credits"]) {
     $(`#${page}Button`).addEventListener("click", () => showMenuPage(page));
   }

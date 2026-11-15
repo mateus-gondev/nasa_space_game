@@ -1,0 +1,27 @@
+{
+  "type": "world",
+  "onlyShowAdjacentMaps": false,
+  "maps": [
+    {
+      "fileName": "mapas/mapa_01_pouso.tmx",
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 512
+    },
+    {
+      "fileName": "mapas/mapa_02_mineracao.tmx",
+      "x": 768,
+      "y": 0,
+      "width": 768,
+      "height": 512
+    },
+    {
+      "fileName": "mapas/mapa_03_pesquisa.tmx",
+      "x": 1536,
+      "y": 0,
+      "width": 768,
+      "height": 512
+    }
+  ]
+}

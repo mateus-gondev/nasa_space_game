@@ -6,7 +6,8 @@
   "scripts": {
     "start": "docker compose up --build",
     "server": "node server.js",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "assets:catalog": "node scripts/catalog-assets.cjs"
   },
   "dependencies": {
     "express": "^5.1.0",

@@ -1,7 +1,20 @@
 /* Textos do Lab Training. As chaves em português também são o idioma de fallback. */
 (() => {
   const english = {
-    "Jogar": "Play", "Info": "Info", "Créditos": "Credits", "← Voltar": "← Back",
+    "Siga a trilha até a antena. Pressione X para enviar os quatro registros à Terra.": "Follow the trail to the antenna. Press X to send the four records to Earth.",
+    "Rever dica da NOVA": "Show NOVA's tip", "Recolher dica": "Hide tip", "Ver missão": "View mission",
+    "Tudo pronto! Toque em Iniciar lançamento para decolar.": "All ready! Tap Start launch to lift off.",
+    "Conseguimos! Vamos para Marte!": "We did it! Let's go to Mars!",
+    "Lá vamos nós! Acompanhe a decolagem.": "Here we go! Watch the lift-off.",
+    "O foguete 3D não abriu. Aperte Esc para voltar e tentar de novo.": "The 3D rocket did not open. Press Esc to go back and try again.",
+    "Continuar expedição": "Continue expedition",
+    "RELATÓRIO · COMUNICAÇÃO": "REPORT · COMMUNICATIONS",
+    "Envie o relatório de treinamento": "Send the training report",
+    "Siga a trilha até o terminal de comunicação e pressione E. NOVA reunirá os quatro registros e enviará seu briefing: sustentar a base e recuperar arquivos históricos do Opportunity em uma expedição fictícia.": "Follow the trail to the communications terminal and press E. NOVA will combine the four records and send your briefing: sustain the base and recover historical Opportunity archives in a fictional expedition.",
+    "Centro de comunicação": "Communications center",
+    "Pressione E para reunir os quatro registros científicos, enviar o relatório e receber o briefing da expedição MER-B.": "Press E to combine the four science records, send the report and receive the MER-B expedition briefing.",
+    "Relatório enviado. Briefing MER-B recebido. Siga para o lançamento.": "Report sent. MER-B briefing received. Proceed to launch.",
+    "Iniciar": "Start", "Jogar": "Play", "Info": "Info", "Créditos": "Credits", "← Voltar": "← Back",
     "Configurações": "Settings", "Fechar configurações": "Close settings",
     "Categorias de configurações": "Settings categories", "Som": "Sound",
     "Volume da música": "Music Volume", "Volume do jogo": "Game Volume",
