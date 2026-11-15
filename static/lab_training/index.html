@@ -7,6 +7,7 @@
   <title>Opportunity — Lab Training</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">{"imports":{"three":"/vendor/three/three.module.js"}}</script>
 </head>
 <body>
   <main class="app-shell" id="appShell">
@@ -271,6 +272,7 @@
         <div class="camera-controls">
           <button id="cameraMouse" type="button" disabled>Capturar mouse</button>
           <button id="cameraCenter" type="button" disabled>Centralizar · R</button>
+          <label for="cameraQuality">Qualidade <select id="cameraQuality" disabled><option value="low">Baixa</option><option value="balanced" selected>Equilibrada</option><option value="high">Alta</option></select></label>
           <label for="cameraZoom">Zoom <input id="cameraZoom" type="range" min="1" max="4" step="0.1" value="1" disabled> <output id="cameraZoomValue">1.0×</output></label>
           <button id="cameraCapture" type="button" disabled>Fotografar · E</button>
         </div>

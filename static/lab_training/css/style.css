@@ -296,7 +296,7 @@ body { background: #05090d; }
 .camera-footer { padding: 10px 20px; border-top: 1px solid #294957; }
 .camera-footer p { margin: 0 0 10px; color: #abc3cd; font-size: 12px; }
 .camera-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
-.camera-header button, .camera-controls button { min-height: 40px; padding: 8px 12px; border: 1px solid #385b6d; background: #10232e; color: #def4fa; cursor: pointer; font: 11px var(--mono); }
+.camera-header button, .camera-controls button, .camera-controls select { min-height: 40px; padding: 8px 12px; border: 1px solid #385b6d; background: #10232e; color: #def4fa; cursor: pointer; font: 11px var(--mono); }
 .camera-controls button:disabled { opacity: .45; cursor: default; }
 .camera-controls label { display: flex; align-items: center; gap: 8px; font: 12px var(--mono); }
 #cameraZoom { width: 100px; accent-color: #8ce3c8; }

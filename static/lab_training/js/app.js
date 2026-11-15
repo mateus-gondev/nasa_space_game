@@ -451,6 +451,7 @@
       }
       const target = map.props.find(prop => prop.trainingId === "camera");
       cameraView.open(engine.player, engine.mood, isNearCameraTarget(target) ? target : null);
+      $("#cameraQuality").value = cameraView.quality;
       cameraControlsDisabled(false);
       $("#cameraMessage").textContent = "Arraste para explorar. Enquadre o terreno simulado na mira e fotografe com E.";
     } catch (error) {
@@ -463,7 +464,7 @@
   }
 
   function cameraControlsDisabled(disabled) {
-    for (const id of ["cameraMouse", "cameraCenter", "cameraZoom", "cameraCapture"]) $("#" + id).disabled = disabled;
+    for (const id of ["cameraMouse", "cameraCenter", "cameraQuality", "cameraZoom", "cameraCapture"]) $("#" + id).disabled = disabled;
   }
 
   function closeCamera() {
@@ -503,10 +504,19 @@
   $("#cameraCapture").addEventListener("click", captureCameraPhoto);
   $("#cameraCenter").addEventListener("click", () => cameraView?.controller.reset());
   $("#cameraZoom").addEventListener("input", event => cameraView?.controller.setZoom(event.target.value));
+  $("#cameraQuality").addEventListener("change", event => {
+    try {
+      cameraView?.setQuality(event.target.value);
+    } catch (error) {
+      event.target.value = cameraView.quality;
+      $("#cameraMessage").textContent = "Não foi possível alterar a qualidade. Tente o perfil Baixa.";
+      console.error("Falha ao alterar a qualidade 3D:", error);
+    }
+  });
   $("#cameraMouse").addEventListener("click", () => cameraView?.controller.enable());
   cameraOverlay.addEventListener("keydown", event => {
     if (event.key === "Tab") {
-      const targets = [...cameraOverlay.querySelectorAll('button:not(:disabled), input:not(:disabled), canvas')];
+      const targets = [...cameraOverlay.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), canvas')];
       const index = targets.indexOf(document.activeElement);
       event.preventDefault();
       targets[(index + (event.shiftKey ? targets.length - 1 : 1)) % targets.length].focus();

@@ -73,6 +73,10 @@ Arraste com mouse/toque ou use as setas para olhar. **Capturar mouse** ativa Poi
 
 O Three.js 0.180.0 é servido localmente em `/vendor/three`, sem CDN. A integração está em `js/camera-view.js` e reutiliza `CameraPOVController` em `static/assets/Animations/CameraPOV_arquivos`. A vista exige WebGL 2; falhas de inicialização exibem uma mensagem e permitem voltar ao mapa. `npm test` verifica o controller e a geometria/mira contra a planta real.
 
+A construção da cena usa `static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.js`: modelos procedurais, materiais PBR com texturas Canvas, teto, luminárias e sombras. O importmap resolve `three` para o mesmo vendor 0.180.0 da câmera. O seletor **Qualidade** permite escolher Baixa (`low`), Equilibrada (`balanced`) ou Alta (`high`) sem mudar posição, orientação, zoom ou progresso. O padrão fica em `camera.renderQuality` de `js/config.js`.
+
+Baixa desliga sombras e texturas de piso e limita o pixel ratio a 1; Equilibrada usa sombras de 1024 px e pixel ratio até 1,5; Alta usa sombras de 2048 px e até 1,85. Os números de `floorMap` conservam as cores de `config.colors.floors`. A mira aponta para a altura da nova amostra ao abrir perto do alvo. Ao fechar ou trocar de qualidade, `disposeEnvironment()` libera geometrias, materiais, texturas e recursos de sombras compartilhados uma única vez. A demonstração isolada está em `/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/` e também usa o vendor local.
+
 ## API
 
 Após carregar, use `window.labTraining`:

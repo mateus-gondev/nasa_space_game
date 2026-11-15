@@ -58,13 +58,19 @@ test('POV controller smooths look/zoom, clamps limits, resets heading and remove
   assert.equal(element.style.touchAction, 'pan-y');
 });
 
-test('3D scene uses the training map and raycasts the visible target without passing through walls', async () => {
+test('enhanced 3D scene uses the training map, preserves photographic targets and disposes shared resources once', async t => {
+  // Textures use Canvas in the browser. Geometry/raycast tests need only its drawing API.
+  const originalDocument = global.document;
+  global.document = { createElement: () => ({ getContext: () => new Proxy({}, { get: () => () => {} }) }) };
+  t.after(() => { global.document = originalDocument; });
   const threeURL = pathToFileURL(require.resolve('three').replace(/three\.cjs$/, 'three.module.js')).href;
   const THREE = await import(threeURL);
   const source = read('static/lab_training/js/camera-view.js')
     .replace('/vendor/three/three.module.js', threeURL)
-    .replace('/assets/Animations/CameraPOV_arquivos/CameraPOVController.js', dataModule(controllerSource));
-  const { createLabScene } = await import(dataModule(source));
+    .replace('/assets/Animations/CameraPOV_arquivos/CameraPOVController.js', dataModule(controllerSource))
+    .replace(/\/assets\/Animations\/Opportunity_Engine_3D_Enhanced\/engine\/(environment|quality)\.js/g,
+      (_, name) => pathToFileURL(path.join(root, 'static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine', name + '.js')).href);
+  const { createLabScene, LabCameraView } = await import(dataModule(source));
   const context = vm.createContext({ window: {} });
   for (const file of [
     'static/lab_training/js/config.js',
@@ -73,17 +79,21 @@ test('3D scene uses the training map and raycasts the visible target without pas
   ]) vm.runInContext(read(file), context);
   const { MAP_DATA: map, MAP_ENGINE_CONFIG: config } = context.window;
   const scene = createLabScene(map, config, config.atmosphere.presets.clean);
+  assert.equal(scene.userData.environment.quality, 'balanced');
+  assert.equal(scene.userData.environment.propCount, map.props.length);
+  assert(scene.children.some(object => object.isDirectionalLight && object.castShadow));
   const target = map.props.find(prop => prop.trainingId === 'camera');
   const model = scene.children.find(object => object.userData.prop === target);
   assert.equal(model.position.x, target.x + target.w / 2);
   assert.equal(model.position.z, target.y + target.h / 2);
   const instances = scene.children.filter(object => object.isInstancedMesh);
-  assert.equal(instances.reduce((total, mesh) => total + mesh.count, 0), map.grid.flat().filter(tile => tile >= 1).length);
+  assert.equal(instances.reduce((total, mesh) => total + mesh.count, 0), map.grid.flat().filter(tile => tile >= 1).length + map.grid.flat().filter(tile => tile === 3).length);
+  assert(instances.some(mesh => mesh.material.color.getHexString() === config.colors.floors[4].slice(1)), 'numeric floor types retain the project palette');
   const camera = new THREE.PerspectiveCamera(70, 16 / 9, .05, 100);
   const raycaster = new THREE.Raycaster();
   function aim(x, z) {
     camera.position.set(x, 1.6, z);
-    camera.lookAt(model.position.x, 1.4, model.position.z);
+    camera.lookAt(model.position.x, 1, model.position.z);
     camera.updateMatrixWorld(true);
     scene.updateMatrixWorld(true);
     raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
@@ -93,12 +103,36 @@ test('3D scene uses the training map and raycasts the visible target without pas
   }
   assert.equal(aim(target.x + .5, target.y + target.h + .5), target, 'nearby terrain can be photographed');
   assert.notEqual(aim(32.5, 7.5), target, 'wall occludes the terrain in the adjacent room');
-  const geometries = new Set(), materials = new Set();
+  const resources = new Set();
   scene.traverse(object => {
-    if (object.isInstancedMesh) object.dispose();
-    if (object.geometry) geometries.add(object.geometry);
-    if (object.material) materials.add(object.material);
+    if (object.isInstancedMesh) resources.add(object);
+    if (object.geometry) resources.add(object.geometry);
+    if (object.material) {
+      resources.add(object.material);
+      for (const value of Object.values(object.material)) if (value?.isTexture) resources.add(value);
+    }
   });
-  geometries.forEach(geometry => geometry.dispose());
-  materials.forEach(material => material.dispose());
+  assert([...resources].some(resource => resource.isCanvasTexture));
+  const counts = new Map();
+  resources.forEach(resource => resource.addEventListener('dispose', () => counts.set(resource, (counts.get(resource) || 0) + 1)));
+  const view = { scene };
+  LabCameraView.prototype.releaseScene.call(view);
+  scene.userData.disposeEnvironment();
+  assert.equal(view.scene, null);
+  for (const resource of resources) assert.equal(counts.get(resource), 1, `${resource.type} disposed exactly once`);
+
+  const lowScene = createLabScene(map, config, config.atmosphere.presets.clean, { quality: 'low' });
+  assert.equal(lowScene.fog, null);
+  assert(lowScene.children.every(object => !object.isDirectionalLight || !object.castShadow));
+  lowScene.userData.disposeEnvironment();
+
+  const { configureQualityRenderer, getRenderProfile } = await import(pathToFileURL(path.join(root, 'static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.js')).href);
+  const renderer = { shadowMap: {} };
+  configureQualityRenderer('high')(renderer);
+  assert.equal(renderer.shadowMap.enabled, true);
+  assert.equal(renderer.toneMapping, THREE.ACESFilmicToneMapping);
+  assert.equal(renderer.outputColorSpace, THREE.SRGBColorSpace);
+  assert.equal(getRenderProfile('high').maxPixelRatio, 1.85);
+  configureQualityRenderer('low')(renderer);
+  assert.equal(renderer.shadowMap.enabled, false);
 });
