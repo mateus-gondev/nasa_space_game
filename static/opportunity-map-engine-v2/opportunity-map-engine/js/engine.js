@@ -110,9 +110,9 @@ window.MapEngine = class MapEngine {
     this.onStateChange(this.getState());
   }
 
-  interact() {
+  interact(source = "keyboard") {
     if (!this.nearObject) return;
-    if (this.onInteract(this.nearObject) === true) return;
+    if (this.onInteract(this.nearObject, null, source) === true) return;
     this.inspectNearby();
   }
 

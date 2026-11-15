@@ -11,9 +11,15 @@ test('tool shortcuts stay available while the research selector blocks movement'
   });
   vm.runInContext(fs.readFileSync(path.join(__dirname, '../static/opportunity-map-engine-v2/opportunity-map-engine/js/controls.js'), 'utf8'), context);
   const selected = [];
-  const controls = new context.window.MapControls({ onToolSelect: key => selected.push(key) });
-  controls.movementEnabled = false;
+  const interactions = [];
+  const controls = new context.window.MapControls({
+    onToolSelect: key => selected.push(key),
+    interact: source => interactions.push(source)
+  });
   const event = key => ({ key, target: { tagName: 'BODY' }, preventDefault() {} });
+  controls.onKeyDown(event('e'));
+  assert.deepEqual(interactions, ['keyboard']);
+  controls.movementEnabled = false;
   controls.onKeyDown(event('3'));
   controls.onKeyDown(event('2'));
   controls.onKeyDown(event('w'));
@@ -22,6 +28,23 @@ test('tool shortcuts stay available while the research selector blocks movement'
   controls.enabled = false;
   controls.onKeyDown(event('4'));
   assert.deepEqual(selected, [3, 2]);
+});
+
+test('interaction source reaches the app callback without changing keyboard defaults', () => {
+  const { MapEngine } = loadTraining();
+  const interactions = [];
+  const engine = Object.create(MapEngine.prototype);
+  engine.nearObject = { trainingId: 'microscope' };
+  engine.onInteract = (...args) => { interactions.push(args); return true; };
+  engine.inspectNearby = () => assert.fail('handled interactions should not open inspection');
+
+  engine.interact('mouse');
+  engine.interact();
+
+  assert.deepEqual(interactions, [
+    [engine.nearObject, null, 'mouse'],
+    [engine.nearObject, null, 'keyboard']
+  ]);
 });
 
 function loadTraining() {

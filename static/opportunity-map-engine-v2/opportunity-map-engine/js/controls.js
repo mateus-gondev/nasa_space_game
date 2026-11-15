@@ -15,7 +15,7 @@ window.MapControls = class MapControls {
       button.addEventListener("pointerdown", event => { event.preventDefault(); this.keys.add(key); });
       ["pointerup", "pointerleave", "pointercancel"].forEach(type => button.addEventListener(type, () => this.keys.delete(key)));
     });
-    root.querySelector('[data-action="inspect"]')?.addEventListener("click", () => this.engine.interact());
+    root.querySelector('[data-action="inspect"]')?.addEventListener("click", () => this.engine.interact("button"));
   }
 
   onKeyDown(event) {
@@ -34,7 +34,7 @@ window.MapControls = class MapControls {
       if (!this.engine.onEscape?.()) this.engine.closeInspection();
       return;
     }
-    if (!event.repeat && key === "e") { this.engine.interact(); return; }
+    if (!event.repeat && key === "e") { this.engine.interact("keyboard"); return; }
     if (!event.repeat && key === " ") { this.engine.inspectNearby(); return; }
     this.keys.add(key);
   }

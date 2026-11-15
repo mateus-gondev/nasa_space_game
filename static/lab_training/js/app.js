@@ -216,7 +216,7 @@
       } else if (tutorial.phase === "ship") {
         interactionHint.textContent = t("ATRAVESSE A PORTA · SALA DE LANÇAMENTO");
       } else if (["camera", "microscope", "temperature", "drill"].includes(tutorial.phase) && selectedTool) {
-        interactionHint.textContent = t("E · USAR FERRAMENTA");
+        interactionHint.textContent = t("CLIQUE ESQUERDO · USAR FERRAMENTA");
       } else {
         interactionHint.textContent = t("SELECIONE {key}", { key: t(tutorial.step.key) });
       }
@@ -319,10 +319,12 @@
     selectTool(key);
   }
 
-  function handleInteraction(prop, photo = null) {
+  function handleInteraction(prop, photo = null, source = "keyboard") {
     if (!mapOverlay.hidden || !inventoryOverlay.hidden || !tutorialCoach.hidden) return true;
-    if (selectedTool === 1 && !photo) { openCamera(); return true; }
     const phase = tutorial.phase;
+    const toolPhases = ["camera", "microscope", "temperature", "drill"];
+    if (toolPhases.includes(phase) && !photo && source !== "mouse") return true;
+    if (selectedTool === 1 && !photo) { openCamera(); return true; }
     if (phase === "ship" && prop.trainingId === "ship") {
       showFeedback("Atravesse a porta para entrar na sala de lançamento.");
       return true;
@@ -530,7 +532,7 @@
       cameraView.open(engine.player, engine.mood, isNearCameraTarget(target) ? target : null);
       $("#cameraQuality").value = cameraView.quality;
       cameraControlsDisabled(false);
-      $("#cameraMessage").textContent = t("Arraste para explorar. Enquadre o terreno simulado na mira e fotografe com E.");
+      $("#cameraMessage").textContent = t("Arraste para explorar. Enquadre o terreno simulado na mira e clique em Fotografar.");
     } catch (error) {
       cameraView?.dispose();
       cameraView = null;
@@ -602,11 +604,10 @@
   // Captura antes dos handlers do controller para Esc sempre fechar a vista 3D.
   document.addEventListener("keydown", event => {
     if (cameraOverlay.hidden) return;
-    if (event.key === "Escape" || (!event.repeat && event.code === "KeyE")) {
+    if (event.key === "Escape") {
       event.preventDefault();
       event.stopImmediatePropagation();
-      if (event.key === "Escape") closeCamera();
-      else captureCameraPhoto();
+      closeCamera();
     }
   }, true);
   window.addEventListener("pagehide", () => cameraView?.dispose(), { once: true });
@@ -861,6 +862,11 @@
   $("#closeInventory").addEventListener("click", toggleInventory);
 
   canvas.addEventListener("click", event => {
+    if (event.button !== 0) return;
+    if (selectedTool && engine.nearObject) {
+      engine.interact("mouse");
+      return;
+    }
     const rect = canvas.getBoundingClientRect();
     const scale = Math.min(rect.width / canvas.width, rect.height / canvas.height);
     const renderedWidth = canvas.width * scale;

@@ -242,8 +242,8 @@ body { background: #05090d; }
 .quick-tools-panel .tool-button img { width: 42px; height: 42px; image-rendering: pixelated; shape-rendering: crispEdges; }
 .quick-tools-panel .tool-button kbd { color: #102044; background: #ffd23f; border: 0; font: 700 11px/1 var(--mono); }
 .quick-tools-panel .tool-progress { display: none; }
-.hint { z-index: 4; bottom: max(126px, calc(env(safe-area-inset-bottom) + 118px)); padding: 7px 11px; border-radius: 999px; font-size: 10px; }
-.tutorial-feedback { z-index: 5; bottom: max(174px, calc(env(safe-area-inset-bottom) + 164px)); width: auto; padding: 7px 12px; border-radius: 999px; font: 10px/1.35 var(--mono); }
+.hint { z-index: 4; bottom: max(158px, calc(env(safe-area-inset-bottom) + 150px)); padding: 7px 11px; border-radius: 999px; font-size: 10px; }
+.tutorial-feedback { z-index: 5; bottom: max(206px, calc(env(safe-area-inset-bottom) + 196px)); width: auto; padding: 7px 12px; border-radius: 999px; font: 10px/1.35 var(--mono); }
 .inspect-card { z-index: 6; top: auto; right: 12px; bottom: max(58px, calc(env(safe-area-inset-bottom) + 52px)); width: min(240px, calc(100% - 24px)); padding: 10px 12px; border-radius: 8px; }
 .inspect-card-heading .toolbar-label, .inspect-card p, .inspect-footnote { display: none; }
 .inspect-card h2 { margin: 0; padding-right: 30px; font-size: 13px; }
@@ -553,3 +553,45 @@ body { background: #05090d; }
   .camera-controls button { flex: 1; }
   .camera-controls label { flex: 1 1 100%; justify-content: center; }
 }
+
+.hint, .tutorial-feedback, .tutorial-objective {
+  color: #e8f6ff;
+  background: #101c2b;
+  border: 2px solid #7fdcff;
+  border-radius: 0;
+  box-shadow: 0 -3px 0 #a9edff, 0 3px 0 #1768db, -3px 0 0 #a9edff, 3px 0 0 #1768db, 4px 5px 0 #030b18, inset 0 0 0 2px #0a0f18;
+  backdrop-filter: none;
+}
+.hint, .tutorial-feedback {
+  color: #e8f6ff;
+  font-family: "Press Start 2P", var(--mono);
+  letter-spacing: 0;
+  text-shadow: 1px 1px 0 #071638;
+}
+.hint { padding: 8px 12px; font-size: 9px; line-height: 1.75; }
+.tutorial-feedback { padding: 8px 12px; font-size: 8px; line-height: 1.8; }
+.tutorial-objective { border-left: 2px solid #7fdcff; }
+.tutorial-objective .eyebrow { color: #7fdcff; font: 8px/1.8 "Press Start 2P", var(--mono); }
+.tutorial-objective h2 { color: #e8f6ff; font: 9px/1.7 "Press Start 2P", var(--mono); }
+.tutorial-objective p:last-of-type { color: #b9d1e5; font: 10px/1.6 var(--mono); }
+.tutorial-next kbd {
+  padding: 5px 8px;
+  color: #a9edff;
+  background: #0b2450;
+  border: 2px solid #7fdcff;
+  border-radius: 0;
+  box-shadow: 0 3px 0 #061638, inset 0 0 0 1px #0a0f18;
+  font: 8px/1.5 "Press Start 2P", var(--mono);
+}
+.tutorial-next span { color: #b9d1e5; font: 9px/1.5 var(--mono); }
+#showTutorialHelp {
+  padding: 6px 8px;
+  color: #a9edff;
+  background: #0b2450;
+  border: 2px solid #438fc8;
+  border-radius: 0;
+  box-shadow: 0 3px 0 #061638, inset 0 0 0 1px #0a0f18;
+  font: 8px/1.5 "Press Start 2P", var(--mono);
+  text-decoration: none;
+}
+#showTutorialHelp:hover, #showTutorialHelp:focus-visible { color: #fff; background: #17438b; }
