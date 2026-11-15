@@ -22,6 +22,7 @@ window.MapControls = class MapControls {
     if (!this.enabled) return;
     const key = event.key.toLowerCase();
     if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
+    if (key === "e") return;
     if (!this.movementEnabled && !["m", "tab", "escape"].includes(key)) return;
     if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "tab"].includes(key)) event.preventDefault();
     if (!event.repeat && ["1", "2", "3", "4"].includes(key)) {
@@ -34,7 +35,6 @@ window.MapControls = class MapControls {
       if (!this.engine.onEscape?.()) this.engine.closeInspection();
       return;
     }
-    if (!event.repeat && key === "e") { this.engine.interact(); return; }
     if (!event.repeat && key === " ") { this.engine.inspectNearby(); return; }
     this.keys.add(key);
   }

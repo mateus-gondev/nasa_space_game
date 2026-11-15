@@ -55,7 +55,7 @@ window.MapEngine = class MapEngine {
     this.player.moving = Boolean(movement.x || movement.y);
     if (this.player.moving) {
       const length = Math.hypot(movement.x, movement.y);
-      const velocity = this.config.player.speed * delta;
+      const velocity = this.config.player.speed * delta * Math.min(1, length);
       const dx = movement.x / length * velocity;
       const dy = movement.y / length * velocity;
       this.player.angle = Math.atan2(dy, dx);

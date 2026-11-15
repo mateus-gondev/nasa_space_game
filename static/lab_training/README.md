@@ -59,8 +59,8 @@ Durante a missão, o HUD usa os ícones pixelados do pacote `static/assets/visua
 ## Controles
 
 - `WASD` ou setas: mover pelo mapa top-down.
-- `E`: interações gerais, como calibrar a gravidade; espaço: inspecionar o objeto próximo.
-- Clique com o botão esquerdo: usar a ferramenta selecionada no alvo próximo.
+- Clique com o botão esquerdo: interagir com objetos próximos e usar a ferramenta selecionada; espaço: inspecionar o objeto próximo.
+- Gamepad USB: analógico esquerdo move e navega pelos slots; **X (Cross)** confirma telas e ações de interface; **R1** abre/fecha Pesquisa; **Quadrado** confirma a ferramenta e alterna mapa/mochila nas etapas correspondentes.
 - `3`: abrir Pesquisa científica; dentro do seletor, `1`–`4` escolhem uma ferramenta. Fora dele, `1`, `2` e `4` selecionam diretamente a ferramenta correspondente.
 - `M`: abrir/fechar o mapa; `Tab`: abrir/fechar a mochila.
 - Clique no slot de Pesquisa para abrir ou trocar a ferramenta; o slot mostra o ícone e o nome da ferramenta escolhida. Clique em Mapa/Mochila para abrir esses painéis.

@@ -65,6 +65,12 @@ window.LabTutorial = class LabTutorial {
     return true;
   }
 
+  skip() {
+    if (this.phase === "complete" || this.phase === "skipped") return false;
+    this.phase = "skipped";
+    return true;
+  }
+
   leaveLaunchRoom() {
     if (this.phase === "launch") this.phase = "ship";
   }
@@ -79,7 +85,7 @@ window.LabTutorial = class LabTutorial {
     const steps = {
       movement: ["01 / 10 · MOVIMENTO", "Primeiros passos", "Use W, A, S, D ou as setas para caminhar. Percorra 4 metros de treino para calibrar o traje.", "W A S D"],
       map: ["02 / 10 · NAVEGAÇÃO", "Localize a antena", "Pressione M ou toque em Mapa. O alvo âmbar indica a Antena de Alto Ganho. Feche o mapa para seguir.", "M"],
-      gravity: ["03 / 10 · GRAVIDADE", "Antena de Alto Ganho", "Siga a trilha luminosa até a antena. Aproxime-se do contorno âmbar e pressione E para ativar a simulação.", "E"],
+      gravity: ["03 / 10 · GRAVIDADE", "Antena de Alto Ganho", "Siga a trilha luminosa até a antena. Aproxime-se do contorno âmbar e clique com o botão esquerdo para ativar a simulação.", "CLIQUE ESQUERDO"],
       gravityWalk: ["03 / 10 · GRAVIDADE", "Sinta a gravidade de Marte", "Simulação de baixa gravidade ativada. Caminhe por 6 metros de treino e observe os passos flutuantes do traje.", "W A S D"],
       lab: ["04 / 10 · LABORATÓRIO", "Vá ao laboratório de treinamento", "Saia pela porta oeste e siga a trilha até a sala ao lado. Lá estão as quatro estações científicas. M mostra o percurso completo.", "W A S D · M"],
       camera: ["05 / 10 · CÂMERA CIENTÍFICA", "Fotografe terrenos e materiais", "Aproxime-se do alvo destacado e pressione 1 para abrir a visão 3D. Arraste para mirar no terreno simulado e clique em Fotografar para guardar a imagem. Esc volta ao mapa.", "1 → MIRAR → FOTOGRAFAR"],

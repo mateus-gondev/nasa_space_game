@@ -14,6 +14,7 @@
       console.error("Não foi possível ler o perfil salvo:", error);
       return null;
     }
+
     if (!serialized) return null;
     let profile;
     try {
@@ -47,6 +48,7 @@
   const miniMap = $("#miniMap");
   const hudMiniMap = $("#hudMiniMap");
   const tutorialObjective = $("#tutorialObjective");
+  const skipTutorialButton = $("#skipTutorial");
   const tutorialFeedback = $("#tutorialFeedback");
   const cadetInput = $("#cadetName");
   const appShell = $("#appShell");
@@ -61,10 +63,25 @@
     { key: 3, name: "Sensor de temperatura", icon: "temperature", detail: "Mede a temperatura de sólidos", target: "spec", targetName: "amostra no espectrômetro", result: "Leitura registrada: superfície sólida a -21,6 °C." },
     { key: 4, name: "Furadeira de amostras", icon: "drill", detail: "Extrai material do solo", target: "bench", targetName: "bancada de amostras", result: "Amostra de rególito extraída e guardada." }
   ];
+  const gamepadTutorialSteps = {
+    movement: ["Use o analógico esquerdo para caminhar. Percorra 4 metros de treino para calibrar o traje.", [{ symbol: "L", label: "Analógico esquerdo" }]],
+    gravity: ["Siga a trilha até a antena. Aproxime-se do contorno âmbar e clique com o botão esquerdo para ativar a simulação.", [{ symbol: "MOUSE_LEFT", label: "Botão esquerdo do mouse" }]],
+    gravityWalk: ["Simulação de baixa gravidade ativada. Caminhe por 6 metros de treino usando o analógico esquerdo.", [{ symbol: "L", label: "Analógico esquerdo" }]],
+    map: ["Pressione Quadrado para abrir o mapa, confira o objetivo e pressione Quadrado novamente para continuar.", [{ symbol: "□", label: "Botão Quadrado" }]],
+    lab: ["Use o analógico esquerdo para caminhar até o laboratório de treinamento. M mostra o percurso completo.", [{ symbol: "L", label: "Analógico esquerdo" }]],
+    camera: ["Use R1 para abrir os slots, navegue até Câmera com o analógico esquerdo e confirme com Quadrado. Na visão 3D, clique em Fotografar.", [{ symbol: "R1", label: "Botão R1" }, { symbol: "L", label: "Analógico esquerdo" }, { symbol: "□", label: "Botão Quadrado" }, { symbol: "MOUSE_LEFT", label: "Botão esquerdo do mouse" }]],
+    microscope: ["Aproxime-se da amostra. Use R1 para abrir os slots, selecione o microscópio com o analógico esquerdo e confirme com Quadrado. Clique com o botão esquerdo para analisar.", [{ symbol: "R1", label: "Botão R1" }, { symbol: "L", label: "Analógico esquerdo" }, { symbol: "□", label: "Botão Quadrado" }, { symbol: "MOUSE_LEFT", label: "Botão esquerdo do mouse" }]],
+    temperature: ["Aproxime-se da rocha. Use R1 para abrir os slots, selecione o sensor com o analógico esquerdo e confirme com Quadrado. Clique com o botão esquerdo para registrar a leitura.", [{ symbol: "R1", label: "Botão R1" }, { symbol: "L", label: "Analógico esquerdo" }, { symbol: "□", label: "Botão Quadrado" }, { symbol: "MOUSE_LEFT", label: "Botão esquerdo do mouse" }]],
+    drill: ["Aproxime-se da estação de solo. Use R1 para abrir os slots, selecione a furadeira com o analógico esquerdo e confirme com Quadrado. Clique com o botão esquerdo para extrair uma amostra.", [{ symbol: "R1", label: "Botão R1" }, { symbol: "L", label: "Analógico esquerdo" }, { symbol: "□", label: "Botão Quadrado" }, { symbol: "MOUSE_LEFT", label: "Botão esquerdo do mouse" }]],
+    inventory: ["Pressione Quadrado para abrir a mochila, confira os resultados e pressione Quadrado novamente para continuar.", [{ symbol: "□", label: "Botão Quadrado" }]],
+    ship: ["Use o analógico esquerdo para seguir a trilha e entrar na sala de lançamento.", [{ symbol: "L", label: "Analógico esquerdo" }]]
+  };
   const tutorial = new LabTutorial();
   const tutorialCoach = $("#tutorialCoach");
   let announcedPhase = null;
   let lastObjectivePhase = null;
+  let lastObjectiveInputMode = null;
+  let gamepadToolIndex = 0;
   let cadetName = savedProfile?.name || "";
   let character = savedProfile?.character || defaultCharacter;
   let selectedTool = null;
@@ -88,6 +105,36 @@
   engine.onMapToggle = toggleMap;
   engine.onInventoryToggle = toggleInventory;
   engine.onEscape = handleEscape;
+  engine.onInputModeChange = () => {
+    if (!tutorialCoach.hidden) showTutorialCoach();
+    else updateInterface();
+  };
+  engine.onGamepadInteract = () => {
+    if (!tutorialCoach.hidden) { closeTutorialCoach(); return; }
+    if (!cameraOverlay.hidden) return;
+    if (!launchRoomOverlay.hidden) {
+      launchRoomFrame.contentDocument?.querySelector("#launch")?.click();
+      return;
+    }
+    if (!introOverlay.hidden || !quickToolsPanel.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden) return;
+  };
+  engine.onToolPanelToggle = () => {
+    gamepadToolIndex = selectedTool ? selectedTool - 1 : 0;
+    toggleQuickTools();
+    if (!quickToolsPanel.hidden) highlightGamepadTool(gamepadToolIndex);
+  };
+  engine.onToolNavigate = direction => {
+    if (quickToolsPanel.hidden) return;
+    gamepadToolIndex = (gamepadToolIndex + direction + tools.length) % tools.length;
+    highlightGamepadTool(gamepadToolIndex);
+  };
+  engine.onToolConfirm = () => {
+    if (!quickToolsPanel.hidden) { selectTool(gamepadToolIndex + 1); return; }
+    if (!mapOverlay.hidden) { toggleMap(); return; }
+    if (!inventoryOverlay.hidden) { toggleInventory(); return; }
+    if (tutorial.phase === "map") toggleMap();
+    else if (tutorial.phase === "inventory") toggleInventory();
+  };
   engine.renderer.tutorial = tutorial;
   engine.renderer.engine = engine;
   const findNearbyObject = engine.findNearbyObject.bind(engine);
@@ -108,8 +155,8 @@
     if (engine.controls.enabled && engine.controls.movementEnabled && tutorialCoach.hidden) {
       tutorial.move(Math.hypot(engine.player.x - x, engine.player.y - y), engine.getRoomName());
       const room = map.launchRoom;
-      if (tutorial.phase === "ship" && engine.player.x >= room.x && engine.player.x < room.x + room.w && engine.player.y >= room.y && engine.player.y < room.y + room.h) {
-        tutorial.interact("ship");
+      if ((tutorial.phase === "ship" || tutorial.phase === "skipped") && engine.player.x >= room.x && engine.player.x < room.x + room.w && engine.player.y >= room.y && engine.player.y < room.y + room.h) {
+        if (tutorial.phase === "ship") tutorial.interact("ship");
         openLaunchRoom();
       }
       updateInterface();
@@ -141,12 +188,12 @@
   }
 
   function showTutorialCoach() {
-    const step = tutorial.step;
+    const step = getTutorialStep();
     if (!step || tutorial.phase === "launch") return;
     $("#coachStep").textContent = t(step.label);
     $("#coachTitle").textContent = t(step.title);
     $("#coachDescription").textContent = t(step.description);
-    $("#coachKey").textContent = t(step.key);
+    renderTutorialShortcut($("#coachKey"), step);
     $("#continueTutorial").textContent = t(tutorial.phase === "complete" ? "Explorar a instalação" : "Entendido, vamos lá");
     $("#tutorialMenuLink").hidden = tutorial.phase !== "complete";
     tutorialCoach.hidden = false;
@@ -166,6 +213,42 @@
     canvas.focus();
   }
 
+  function skipTutorial() {
+    if (!tutorial.skip()) return;
+    document.querySelectorAll(".tutorial-highlight").forEach(element => element.classList.remove("tutorial-highlight"));
+    lastObjectivePhase = null;
+    lastObjectiveInputMode = null;
+    closeTutorialCoach();
+  }
+
+  function getTutorialStep() {
+    const step = tutorial.step;
+    if (!step || engine.controls.inputMode !== "gamepad") return step;
+    const controllerStep = gamepadTutorialSteps[tutorial.phase];
+    return controllerStep ? { ...step, description: controllerStep[0], gamepadControls: controllerStep[1] } : step;
+  }
+
+  function renderTutorialShortcut(element, step) {
+    if (engine.controls.inputMode !== "gamepad" || !step.gamepadControls) {
+      element.textContent = t(step.key);
+      element.removeAttribute("aria-label");
+      element.classList.remove("gamepad-shortcut");
+      return;
+    }
+    element.replaceChildren();
+    element.classList.add("gamepad-shortcut");
+    for (const control of step.gamepadControls) {
+      const icon = document.createElement("span");
+      icon.className = "gamepad-shortcut-icon";
+      if (control.symbol === "MOUSE_LEFT") icon.classList.add("gamepad-mouse-icon");
+      else icon.textContent = control.symbol;
+      icon.setAttribute("aria-label", t(control.label));
+      icon.title = t(control.label);
+      element.append(icon);
+    }
+    element.setAttribute("aria-label", step.gamepadControls.map(control => t(control.label)).join(" · "));
+  }
+
   function updateInterface(state = engine.getState()) {
     drawMinimap(hudMiniMap);
     $("#telemetryRoom").textContent = t(state.room);
@@ -182,18 +265,20 @@
     pauseButton.setAttribute("aria-label", t(state.paused ? "Continuar" : "Pausar"));
     pauseButton.title = t(state.paused ? "Continuar" : "Pausar");
 
-    const objective = tutorial.step;
+    const objective = getTutorialStep();
     tutorialObjective.hidden = !objective;
+    skipTutorialButton.hidden = !objective || tutorial.phase === "complete" || tutorial.phase === "skipped";
     if (objective) {
-      if (lastObjectivePhase !== tutorial.phase) {
+      if (lastObjectivePhase !== tutorial.phase || lastObjectiveInputMode !== engine.controls.inputMode) {
         document.querySelectorAll(".tutorial-highlight").forEach(element => element.classList.remove("tutorial-highlight"));
         const highlight = tutorial.phase === "map" ? $("#mapAction") : tutorial.phase === "inventory" ? $("#inventoryAction") : ["camera", "microscope", "temperature", "drill"].includes(tutorial.phase) ? $("#researchAction") : null;
         highlight?.classList.add("tutorial-highlight");
         $("#tutorialTitle").textContent = t(objective.title);
         $("#tutorialDescription").textContent = t(objective.description);
         $("#tutorialStepLabel").textContent = t(objective.label);
-        $("#tutorialKey").textContent = t(objective.key);
+        renderTutorialShortcut($("#tutorialKey"), objective);
         lastObjectivePhase = tutorial.phase;
+        lastObjectiveInputMode = engine.controls.inputMode;
       }
       const walking = ["movement", "gravityWalk"].includes(tutorial.phase);
       $("#tutorialProgress").hidden = !walking;
@@ -212,7 +297,7 @@
     interactionHint.hidden = !nearbyObjective || Boolean(engine.inspectedObject) || !mapOverlay.hidden || !inventoryOverlay.hidden;
     if (!interactionHint.hidden) {
       if (tutorial.phase === "gravity") {
-        interactionHint.textContent = t("E · CALIBRAR");
+        interactionHint.textContent = t("CLIQUE ESQUERDO · CALIBRAR");
       } else if (tutorial.phase === "ship") {
         interactionHint.textContent = t("ATRAVESSE A PORTA · SALA DE LANÇAMENTO");
       } else if (["camera", "microscope", "temperature", "drill"].includes(tutorial.phase) && selectedTool) {
@@ -296,6 +381,12 @@
     });
   }
 
+  function highlightGamepadTool(index) {
+    const buttons = [...document.querySelectorAll("#toolControls .tool-button")];
+    buttons.forEach((button, buttonIndex) => button.classList.toggle("gamepad-highlight", buttonIndex === index));
+    buttons[index]?.scrollIntoView?.({ block: "nearest" });
+  }
+
   function selectTool(key) {
     if (!tools.some(tool => tool.key === key) || !introOverlay.hidden || !tutorialCoach.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden) return;
     selectedTool = key;
@@ -320,24 +411,28 @@
   }
 
   function handleInteraction(prop, photo = null, source = "keyboard") {
-    if (!mapOverlay.hidden || !inventoryOverlay.hidden || !tutorialCoach.hidden) return true;
+    if (!introOverlay.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden || !quickToolsPanel.hidden || !tutorialCoach.hidden || !launchRoomOverlay.hidden || (!cameraOverlay.hidden && !photo)) return true;
+    if (!photo && source !== "mouse") return true;
     const phase = tutorial.phase;
     const toolPhases = ["camera", "microscope", "temperature", "drill"];
-    if (toolPhases.includes(phase) && !photo && source !== "mouse") return true;
     if (selectedTool === 1 && !photo) { openCamera(); return true; }
     if (phase === "ship" && prop.trainingId === "ship") {
       showFeedback("Atravesse a porta para entrar na sala de lançamento.");
       return true;
     }
     if (phase === "complete") return false;
-    if (!tutorial.interact(prop.trainingId, selectedTool)) {
+    if (phase === "skipped") {
+      const tool = tools.find(item => item.key === selectedTool);
+      if (!tool || prop.type !== tool.target) return false;
+      completedTests.add(selectedTool);
+    } else if (!tutorial.interact(prop.trainingId, selectedTool)) {
       showFeedback(tutorial.targetId === prop.trainingId
         ? t("Selecione a ferramenta indicada: {key}.", { key: t(tutorial.step.key) })
         : "Siga o objetivo destacado para concluir esta etapa.");
       return true;
     }
     window.GamePreferences.playEffect(phase === "gravity" ? 740 : 880, .12);
-    if (completedTests.has(selectedTool) && ["camera", "microscope", "temperature", "drill"].includes(phase)) {
+    if (completedTests.has(selectedTool) && (toolPhases.includes(phase) || phase === "skipped")) {
       const tool = tools[selectedTool - 1];
       inventoryItems.push({ title: tool.name, result: tool.result, photo });
       showFeedback(tool.result);
@@ -455,12 +550,14 @@
   }
 
   function toggleQuickTools() {
-    if (!introOverlay.hidden || !tutorialCoach.hidden) return;
+    if (!introOverlay.hidden || !tutorialCoach.hidden || !cameraOverlay.hidden || !launchRoomOverlay.hidden) return;
     const opening = quickToolsPanel.hidden;
     quickToolsPanel.hidden = !opening;
     if (opening) {
       mapOverlay.hidden = true;
       inventoryOverlay.hidden = true;
+      gamepadToolIndex = selectedTool ? selectedTool - 1 : 0;
+      highlightGamepadTool(gamepadToolIndex);
     }
     $("#researchAction").setAttribute("aria-expanded", String(opening));
     if (opening) $("#toolControls button")?.focus();
@@ -567,7 +664,7 @@
   function captureCameraPhoto() {
     if (cameraOverlay.hidden || !cameraView?.active) return;
     const photo = cameraView.capture();
-    if (tutorial.phase !== "camera" || selectedTool !== 1) {
+    if ((tutorial.phase !== "camera" && tutorial.phase !== "skipped") || selectedTool !== 1) {
       $("#cameraMessage").textContent = t("Explore o ambiente. O registro estará disponível na etapa Câmera científica do treinamento.");
       return;
     }
@@ -825,6 +922,7 @@
   $("#inventoryAction").addEventListener("click", toggleInventory);
   $("#backToMenu").addEventListener("click", () => { window.location.href = "/"; });
   $("#showTutorialHelp").addEventListener("click", showTutorialCoach);
+  skipTutorialButton.addEventListener("click", skipTutorial);
   $("#continueTutorial").addEventListener("click", closeTutorialCoach);
   tutorialCoach.addEventListener("keydown", event => {
     if (event.key === "Escape") { event.preventDefault(); closeTutorialCoach(); }
@@ -863,7 +961,7 @@
 
   canvas.addEventListener("click", event => {
     if (event.button !== 0) return;
-    if (selectedTool && engine.nearObject) {
+    if (engine.nearObject && (selectedTool || tutorial.phase === "gravity")) {
       engine.interact("mouse");
       return;
     }

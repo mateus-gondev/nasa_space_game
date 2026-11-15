@@ -239,6 +239,7 @@ body { background: #05090d; }
 .quick-tools-panel .tool-controls { gap: 6px; }
 .quick-tools-panel .tool-button { grid-template-columns: 48px minmax(0, 1fr) 28px; min-height: 66px; padding: 5px; color: #e7efff; background: #0a1c3e; border: 3px solid #173b78; font: 700 11px/1.4 "Press Start 2P", var(--mono); }
 .quick-tools-panel .tool-button.active, .quick-tools-panel .tool-button:hover, .quick-tools-panel .tool-button:focus-visible { color: #fff; border-color: #f0f6ff; background: #17438b; outline: none; }
+.quick-tools-panel .tool-button.gamepad-highlight { border-color: #ffd23f; background: #17438b; box-shadow: 0 0 0 2px #ffd23f, 0 3px 0 #071638; }
 .quick-tools-panel .tool-button img { width: 42px; height: 42px; image-rendering: pixelated; shape-rendering: crispEdges; }
 .quick-tools-panel .tool-button kbd { color: #102044; background: #ffd23f; border: 0; font: 700 11px/1 var(--mono); }
 .quick-tools-panel .tool-progress { display: none; }
@@ -500,8 +501,17 @@ body { background: #05090d; }
 .tutorial-objective p:last-of-type { color: #c4d6db; font-size: 12px; }
 .tutorial-next { display: flex; align-items: center; gap: 10px; margin-top: 12px; }
 .tutorial-next kbd { flex-shrink: 0; padding: 5px 8px; border: 1px solid #ffca7080; color: #ffca70; background: #ffb55212; font: 11px var(--mono); }
+.tutorial-next kbd.gamepad-shortcut, .coach-shortcut.gamepad-shortcut { display: inline-flex; align-items: center; gap: 5px; padding: 0; border: 0; background: transparent; }
+.gamepad-shortcut-icon { display: inline-grid; min-width: 24px; height: 24px; padding: 0 4px; place-items: center; border: 2px solid #78edff; color: #e7fbff; background: #102044; box-shadow: 0 3px 0 #071638; font: 700 11px/1 var(--mono); }
+.gamepad-shortcut-icon.gamepad-mouse-icon { position: relative; width: 18px; min-width: 18px; padding: 0; }
+.gamepad-shortcut-icon.gamepad-mouse-icon::before { content: ""; position: absolute; inset: 3px 4px; border: 1px solid #78edff; background: #dffaff; }
+.gamepad-shortcut-icon.gamepad-mouse-icon::after { content: ""; position: absolute; top: 4px; left: 5px; width: 3px; height: 5px; border-right: 1px solid #102044; background: #ffca70; }
+.coach-shortcut .gamepad-shortcut-icon { min-width: 32px; height: 32px; font-size: 15px; }
 .tutorial-next span { color: #abc3cd; font: 10px/1.5 var(--mono); }
 .tutorial-objective progress { width: 100%; height: 7px; margin-top: 12px; accent-color: #35c4d8; }
+.skip-tutorial-button { display: block; width: 100%; margin-top: 10px; padding: 8px 10px; border: 1px solid #536a7d; border-bottom: 3px solid #30475b; color: #c4d6db; background: #102044; cursor: pointer; font: 10px var(--mono); text-align: left; }
+.skip-tutorial-button:hover { border-color: #ffca70; color: #ffca70; background: #172b4b; }
+.skip-tutorial-button:focus-visible { outline: 2px solid #ffca70; outline-offset: 3px; }
 #showTutorialHelp { margin-top: 10px; padding: 4px 0; color: #8ed8e6; background: none; border: 0; text-decoration: underline; cursor: pointer; font: 10px var(--mono); }
 #tutorialCoach { z-index: 25; }
 .tutorial-coach-card { width: min(480px, 100%); border-top: 3px solid #ffca70; }

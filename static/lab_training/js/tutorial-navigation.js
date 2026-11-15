@@ -84,10 +84,27 @@ window.MapRenderer = class TrainingRenderer extends window.MapRenderer {
       ctx.shadowBlur = 0; ctx.font = "bold 13px monospace"; ctx.textAlign = "center";
       const labelX = (target.x + target.w / 2) * tile;
       const labelY = target.y * tile - 22;
-      const source = target.type === "launchEntrance" ? "ENTRE NA SALA" : this.engine.nearObject === target ? "▼ E · INTERAGIR" : "▼ OBJETIVO";
+      const source = target.type === "launchEntrance" ? "ENTRE NA SALA" : this.engine.nearObject === target ? "INTERAGIR" : "▼ OBJETIVO";
       const label = window.GameI18n?.t(source) || source;
       ctx.fillStyle = "#07121bee"; ctx.fillRect(labelX - 80, labelY - 16, 160, 24);
-      ctx.fillStyle = "#ffca70"; ctx.fillText(label, labelX, labelY);
+      ctx.fillStyle = "#ffca70";
+      if (target.type !== "launchEntrance" && this.engine.nearObject === target) {
+        ctx.fillText("▼", labelX - 62, labelY);
+        const mouseX = labelX - 35;
+        ctx.fillStyle = "#dffaff";
+        ctx.fillRect(mouseX - 5, labelY - 13, 10, 15);
+        ctx.fillStyle = "#ffca70";
+        ctx.fillRect(mouseX - 4, labelY - 12, 3, 5);
+        ctx.fillStyle = "#07121b";
+        ctx.fillRect(mouseX, labelY - 12, 1, 4);
+        ctx.strokeStyle = "#dffaff";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(mouseX - 5, labelY - 13, 10, 15);
+        ctx.fillStyle = "#ffca70";
+        ctx.fillText(label, labelX + 23, labelY);
+      } else {
+        ctx.fillText(label, labelX, labelY);
+      }
     }
     if (this.tutorial.phase === "gravityWalk") {
       ctx.strokeStyle = "#74dfff"; ctx.lineWidth = 3;

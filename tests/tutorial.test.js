@@ -39,12 +39,125 @@ test('interaction source reaches the app callback without changing keyboard defa
   engine.inspectNearby = () => assert.fail('handled interactions should not open inspection');
 
   engine.interact('mouse');
+  engine.interact('gamepad');
   engine.interact();
 
   assert.deepEqual(interactions, [
     [engine.nearObject, null, 'mouse'],
+    [engine.nearObject, null, 'gamepad'],
     [engine.nearObject, null, 'keyboard']
   ]);
+});
+
+test('gamepad axes preserve analog intensity and buttons trigger once per press', () => {
+  const listeners = {};
+  const frames = [];
+  let gamepads = [];
+  const context = vm.createContext({
+    window: {
+      navigator: { getGamepads: () => gamepads },
+      addEventListener: (type, callback) => { listeners[type] = callback; },
+      requestAnimationFrame: callback => { frames.push(callback); return frames.length; },
+      cancelAnimationFrame() {},
+    },
+    document: { querySelectorAll: () => [], querySelector: () => null },
+  });
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../static/opportunity-map-engine-v2/opportunity-map-engine/js/controls.js'), 'utf8'), context);
+  const actions = [];
+  const connectionChanges = [];
+  const controls = new context.window.MapControls({
+    onGamepadInteract: () => actions.push('cross'),
+    onToolPanelToggle: () => actions.push('r1'),
+    onToolConfirm: () => actions.push('square'),
+    onToolNavigate: direction => actions.push(direction),
+  });
+  controls.engine.onGamepadChange = connected => connectionChanges.push(connected);
+  const pad = {
+    index: 0, connected: true, mapping: 'standard', axes: [0, 0],
+    buttons: Array.from({ length: 16 }, () => ({ pressed: false, value: 0 })),
+  };
+  gamepads = [pad];
+  listeners.gamepadconnected({ gamepad: pad });
+  assert.equal(controls.gamepadConnected, true);
+  assert.deepEqual(connectionChanges, [true]);
+  assert.equal(controls.inputMode, 'gamepad');
+
+  pad.axes[0] = 0.1;
+  assert.equal(controls.getMovement().x, 0, 'deadzone prevents drift');
+  pad.axes[0] = 0.59;
+  assert.ok(Math.abs(controls.getMovement().x - 0.5) < 1e-9, 'stick magnitude is rescaled after the deadzone');
+  pad.axes[0] = 0;
+  const frame = timestamp => frames.shift()(timestamp);
+  frame(0);
+  pad.buttons[0].pressed = true;
+  frame(16);
+  frame(32);
+  assert.deepEqual(actions, ['cross'], 'holding X does not repeat the action');
+  pad.buttons[0].pressed = false;
+  frame(48);
+  pad.buttons[0].pressed = true;
+  frame(64);
+  assert.deepEqual(actions, ['cross', 'cross'], 'a release allows another press');
+
+  pad.buttons[0].pressed = false;
+  frame(80);
+  pad.buttons[5].pressed = true;
+  frame(96);
+  pad.buttons[5].pressed = false;
+  frame(112);
+  pad.buttons[2].pressed = true;
+  frame(128);
+  assert.deepEqual(actions, ['cross', 'cross', 'r1', 'square']);
+
+  pad.buttons[2].pressed = false;
+  pad.axes[1] = -0.8;
+  frame(144);
+  assert.equal(actions.at(-1), -1, 'left-stick navigation reports the up direction');
+
+  gamepads = [];
+  listeners.gamepaddisconnected({ gamepad: pad });
+  assert.equal(controls.gamepadConnected, false);
+  assert.equal(controls.inputMode, 'keyboard');
+  assert.deepEqual(connectionChanges, [true, false]);
+});
+
+test('engine scales movement speed by analog intensity while keeping digital input full speed', () => {
+  const { MapEngine } = loadTraining();
+  const engine = Object.create(MapEngine.prototype);
+  engine.config = { player: { speed: 4 } };
+  engine.controls = { getMovement: () => ({ x: 0.5, y: 0 }) };
+  engine.player = { x: 1, y: 1, moving: false, updateAnimation() {} };
+  engine.map = { doors: [] };
+  engine.nearObject = null;
+  engine.findNearbyObject = () => null;
+  engine.collides = () => false;
+  engine.onStateChange = () => {};
+  engine.getState = () => ({});
+
+  engine.update(0.5);
+  assert.equal(engine.player.x, 2, 'half tilt produces half the full-speed displacement');
+  engine.controls.getMovement = () => ({ x: 1, y: 0 });
+  engine.update(0.5);
+  assert.equal(engine.player.x, 4, 'digital input retains full speed');
+});
+
+test('gamepad tutorial prompts and button labels are translated', () => {
+  const context = vm.createContext({
+    window: { dispatchEvent() {} },
+    document: { documentElement: {}, querySelectorAll: () => [] },
+    CustomEvent: class CustomEvent {},
+  });
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../static/lab_training/js/i18n.js'), 'utf8'), context);
+  context.window.GameI18n.setLanguage('en');
+  assert.equal(context.window.GameI18n.t('Pular tutorial'), 'Skip tutorial');
+  assert.equal(context.window.GameI18n.t('Botão X (Cross)'), 'X (Cross) button');
+  assert.equal(context.window.GameI18n.t('Botão esquerdo do mouse'), 'Left mouse button');
+  assert.equal(context.window.GameI18n.t('Botão R1'), 'R1 button');
+  assert.equal(context.window.GameI18n.t('Botão Quadrado'), 'Square button');
+  assert.equal(
+    context.window.GameI18n.t('Use R1 para abrir os slots, navegue até Câmera com o analógico esquerdo e confirme com Quadrado. Na visão 3D, clique em Fotografar.'),
+    'Press R1 to open the slots, navigate to Camera with the left stick, and confirm with Square. In the 3D view, click Take Photo.'
+  );
 });
 
 function loadTraining() {
@@ -109,6 +222,20 @@ test('tutorial equips once, then requires movement, map, gravity, tools and inve
   assert.equal(tutorial.phase, 'intro');
   assert.equal(completed, tutorial.completedTools, 'UI retains the same progress set after reset');
   assert.equal(completed.size, 0);
+});
+
+test('tutorial can be skipped without simulating completion or retaining an objective', () => {
+  const { LabTutorial } = loadTraining();
+  const tutorial = new LabTutorial();
+  tutorial.equip();
+  tutorial.move(1, 'Instrument Lab');
+
+  assert.equal(tutorial.skip(), true);
+  assert.equal(tutorial.phase, 'skipped');
+  assert.equal(tutorial.targetId, null);
+  assert.equal(tutorial.step, undefined);
+  assert.equal(tutorial.skip(), false);
+  assert.equal(tutorial.finishLaunch(), false);
 });
 
 test('launch room replaces the flat rocket with walls, a walkable doorway and a reachable interior', () => {
