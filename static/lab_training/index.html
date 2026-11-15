@@ -74,7 +74,7 @@
             </div>
           </div>
 
-          <div class="quick-tools-panel hud-panel" id="quickToolsPanel" role="region" aria-labelledby="quickToolsTitle" hidden>
+          <div class="quick-tools-panel hud-panel" id="quickToolsPanel" role="dialog" aria-modal="true" aria-labelledby="quickToolsTitle" hidden>
             <div class="quick-tools-heading">
               <div><span class="hud-kicker">AÇÃO 03</span><strong id="quickToolsTitle">Pesquisa científica</strong></div>
               <button class="hud-close" id="closeQuickTools" type="button" aria-label="Fechar ferramentas">×</button>
@@ -83,18 +83,20 @@
           </div>
 
           <nav class="hud-action-dock" aria-label="Ações da missão">
-            <button class="hud-action unavailable" type="button" disabled title="Construção indisponível neste treinamento">
-              <img src="/assets/visuals/hud_assets/svg/acao_1_obra.svg" alt="">
-              <span>OBRA</span><small>FUTURO</small>
-            </button>
-            <button class="hud-action unavailable" type="button" disabled title="Reparo indisponível neste treinamento">
-              <img src="/assets/visuals/hud_assets/svg/acao_2_reparo.svg" alt="">
-              <span>REPARO</span><small>FUTURO</small>
-            </button>
-            <button class="hud-action" id="researchAction" type="button" aria-expanded="false" aria-controls="quickToolsPanel" title="Abrir ferramentas científicas">
-              <img src="/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg" alt="">
-              <span>PESQUISA</span><small>1–4</small>
-            </button>
+            <div class="hud-action-group" aria-label="Atalhos de ação">
+              <button class="hud-action unavailable" type="button" disabled title="Construção indisponível neste treinamento">
+                <img src="/assets/visuals/hud_assets/svg/acao_1_obra.svg" alt="">
+                <span>OBRA</span><small>FUTURO</small>
+              </button>
+              <button class="hud-action unavailable" type="button" disabled title="Reparo indisponível neste treinamento">
+                <img src="/assets/visuals/hud_assets/svg/acao_2_reparo.svg" alt="">
+                <span>REPARO</span><small>FUTURO</small>
+              </button>
+              <button class="hud-action" id="researchAction" type="button" aria-expanded="false" aria-controls="quickToolsPanel" title="Abrir ferramentas científicas">
+                <img id="researchActionIcon" src="/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg" alt="">
+                <span id="researchActionName">PESQUISA</span><small id="researchActionShortcut">1–4</small>
+              </button>
+            </div>
             <button class="hud-action hud-action-orange" id="mapAction" type="button" title="Abrir mapa (M)">
               <svg class="hud-pixel-icon hud-compass-icon" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
                 <path fill="#10245a" d="M2 0h3v1h1v1h1v3H6v1H5v1H2V6H1V5H0V2h1V1h1z"/>

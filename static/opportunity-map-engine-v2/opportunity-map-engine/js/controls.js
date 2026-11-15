@@ -22,7 +22,7 @@ window.MapControls = class MapControls {
     if (!this.enabled) return;
     const key = event.key.toLowerCase();
     if (["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
-    if (!this.movementEnabled && !["m", "tab", "escape"].includes(key)) return;
+    if (!this.movementEnabled && !["m", "tab", "escape", "1", "2", "3", "4"].includes(key)) return;
     if (["arrowup", "arrowdown", "arrowleft", "arrowright", " ", "tab"].includes(key)) event.preventDefault();
     if (!event.repeat && ["1", "2", "3", "4"].includes(key)) {
       this.engine.onToolSelect?.(Number(key));

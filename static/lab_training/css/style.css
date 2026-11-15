@@ -206,33 +206,38 @@ body { background: #05090d; }
 .hud-system-controls { display: flex; align-items: center; gap: 6px; }
 .hud-button { display: grid; width: 38px; height: 38px; place-items: center; padding: 0; color: #dce7e9; background: #07121bd9; border: 1px solid #26414b; border-radius: 6px; cursor: pointer; font: 19px/1 var(--mono); pointer-events: auto; backdrop-filter: blur(8px); }
 .hud-button:hover, .hud-button:focus-visible { color: white; border-color: var(--cyan); outline: none; }
-.hud-action-dock { position: absolute; z-index: 8; right: 50%; bottom: max(18px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, minmax(58px, 74px)); gap: 8px; padding: 12px; background: #071638f2; border: 2px solid #1258c8; box-shadow: 0 -4px 0 #28dfff, 0 4px 0 #28dfff, -4px 0 0 #28dfff, 4px 0 0 #28dfff, inset 0 0 0 3px #03102c; transform: translateX(50%); image-rendering: pixelated; }
-.hud-action { position: relative; display: grid; min-height: 82px; place-items: center; align-content: center; gap: 3px; padding: 5px 3px; color: #eef7ff; background: #0876e8; border: 2px solid #39caff; box-shadow: 0 -2px 0 #86edff, 0 3px 0 #063b9c, -2px 0 0 #86edff, 2px 0 0 #063b9c, inset 0 0 0 2px #0b4eb2; cursor: pointer; font: 8px/1.1 var(--mono); letter-spacing: .03em; image-rendering: pixelated; }
+.hud-action-dock { position: absolute; z-index: 8; right: 50%; bottom: max(18px, env(safe-area-inset-bottom)); display: flex; align-items: end; gap: 8px; transform: translateX(50%); image-rendering: pixelated; }
+.hud-action-group { display: grid; grid-template-columns: repeat(3, 82px); gap: 4px; padding: 8px; background: #071638f2; border: 2px solid #1258c8; box-shadow: 0 -4px 0 #7fdcff, 0 4px 0 #7fdcff, -4px 0 0 #7fdcff, 4px 0 0 #7fdcff, inset 0 0 0 3px #03102c; }
+.hud-action { position: relative; display: grid; min-width: 0; min-height: 94px; place-items: center; align-content: center; gap: 4px; padding: 6px 3px; color: #eef7ff; background: #1f6fe0; border: 2px solid #4d9eff; box-shadow: 0 -2px 0 #a9d8ff, 0 3px 0 #102c66, -2px 0 0 #a9d8ff, 2px 0 0 #102c66, inset 0 0 0 2px #1955ae; cursor: pointer; font: 8px/1.1 var(--mono); letter-spacing: .03em; image-rendering: pixelated; }
 .hud-action img, .hud-pixel-icon { width: 28px; height: 28px; image-rendering: pixelated; shape-rendering: crispEdges; }
-.hud-action img { filter: brightness(0) invert(1); }
-.hud-action small { color: #ffdc52; font: 8px var(--mono); }
-.hud-action:hover:not(:disabled), .hud-action:focus-visible, .hud-action[aria-expanded="true"] { background: #1596ff; outline: 2px solid #c4f8ff; outline-offset: 2px; }
-.hud-action-orange { color: #301b20; background: #f89b24; border-color: #ffd464; box-shadow: 0 -2px 0 #fff0a0, 0 3px 0 #ad4b12, -2px 0 0 #fff0a0, 2px 0 0 #ad4b12, inset 0 0 0 2px #d66b19; }
+.hud-action small { color: #d3e6ff; font: 8px var(--mono); }
+.hud-action:hover:not(:disabled), .hud-action:focus-visible, .hud-action[aria-expanded="true"] { background: #2b82ef; outline: 2px solid #fff; outline-offset: 1px; }
+.hud-action[aria-pressed="true"] { outline: 2px solid #fff; outline-offset: 1px; }
+.hud-action.unavailable { color: #a7b0bd; background: #344356; border-color: #566579; box-shadow: 0 -2px 0 #718093, 0 3px 0 #172239, -2px 0 0 #718093, 2px 0 0 #172239, inset 0 0 0 2px #2b384a; opacity: .68; filter: grayscale(1); }
+.hud-action.unavailable small { color: #c0c6ce; }
+.hud-action-orange { min-width: 88px; color: #301b20; background: #f09a35; border-color: #592c17; box-shadow: 0 -2px 0 #ffd17a, 0 3px 0 #462315, -2px 0 0 #ffd17a, 2px 0 0 #462315, inset 0 0 0 2px #d87924; }
 .hud-action-orange small { color: #193568; }
 .hud-action-orange:hover:not(:disabled), .hud-action-orange:focus-visible { background: #ffb53c; outline-color: #fff0a0; }
-.hud-action:disabled { color: #b6c8df; border-color: #3881c3; background: #124a91; opacity: .7; cursor: not-allowed; }
-.hud-action.unavailable small { color: #c1d9f4; }
-.hud-inventory { display: grid; min-width: 58px; min-height: 82px; grid-template-rows: 28px auto; place-items: center; align-content: center; gap: 2px; padding: 5px 3px; color: #301b20; background: #f89b24; border: 2px solid #ffd464; box-shadow: 0 -2px 0 #fff0a0, 0 3px 0 #ad4b12, -2px 0 0 #fff0a0, 2px 0 0 #ad4b12, inset 0 0 0 2px #d66b19; cursor: pointer; font: 8px var(--mono); image-rendering: pixelated; }
+.hud-action:disabled { cursor: not-allowed; }
+.hud-inventory { display: grid; min-width: 88px; min-height: 94px; grid-template-rows: 28px auto; place-items: center; align-content: center; gap: 4px; padding: 6px 3px; color: #301b20; background: #f09a35; border: 2px solid #592c17; box-shadow: 0 -2px 0 #ffd17a, 0 3px 0 #462315, -2px 0 0 #ffd17a, 2px 0 0 #462315, inset 0 0 0 2px #d87924; cursor: pointer; font: 8px var(--mono); image-rendering: pixelated; }
 .hud-inventory .backpack-icon { width: 28px; height: 28px; }
 .inventory-copy { display: grid; justify-items: center; gap: 2px; }
 .inventory-copy kbd { color: #16356e; background: transparent; font: 8px var(--mono); }
 .inventory-copy b { color: #301b20; font: 8px var(--mono); }
 .hud-inventory:hover, .hud-inventory:focus-visible { outline: 2px solid #fff0a0; outline-offset: 2px; background: #ffb53c; }
-.quick-tools-panel { position: absolute; z-index: 11; right: 50%; bottom: max(112px, calc(env(safe-area-inset-bottom) + 104px)); width: min(340px, calc(100vw - 28px)); max-height: min(55dvh, 360px); overflow-y: auto; padding: 10px; transform: translateX(50%); }
-.quick-tools-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.quick-tools-panel { position: absolute; z-index: 11; right: 50%; bottom: max(126px, calc(env(safe-area-inset-bottom) + 118px)); width: min(410px, calc(100vw - 28px)); max-height: min(74dvh, 430px); overflow-y: auto; padding: 14px; color: #eff5ff; background: #102750; border: 3px solid #287de5; box-shadow: 0 -3px 0 #56aaff, 0 4px 0 #071638, -3px 0 0 #56aaff, 3px 0 0 #071638, inset 0 0 0 3px #0a1c3d, 0 12px 35px #0009; transform: translateX(50%); }
+.quick-tools-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 11px; }
 .quick-tools-heading > div { display: grid; gap: 3px; }
-.quick-tools-heading strong { color: #e8f6ff; font: 600 13px var(--sans); }
-.hud-close { display: grid; width: 26px; height: 26px; place-items: center; color: #ffd23f; background: #1b2740; border: 1px solid #ff8f9b; cursor: pointer; font: 18px/1 var(--mono); }
-.hud-close:hover, .hud-close:focus-visible { outline: 1px solid #ff8f9b; }
-.quick-tools-panel .tool-controls { gap: 5px; }
-.quick-tools-panel .tool-button { grid-template-columns: 24px minmax(0, 1fr) auto; min-height: 38px; padding: 5px 7px; background: #1b2740; border-color: #3a4a68; }
-.quick-tools-panel .tool-button.active, .quick-tools-panel .tool-button:hover { border-color: #7fdcff; background: #22304a; }
-.quick-tools-panel .tool-button kbd { color: #ffd23f; background: #141c2b; border-color: #3a4a68; }
+.quick-tools-heading .hud-kicker { color: #ffd23f; font: 700 9px/1.3 "Press Start 2P", var(--mono); }
+.quick-tools-heading strong { color: #f0f6ff; font: 700 clamp(14px, 2.4vw, 18px)/1.25 "Press Start 2P", var(--mono); }
+.hud-close { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; color: #fff; background: #c83c3b; border: 2px solid #ff9696; box-shadow: 0 3px 0 #802625, inset 0 0 0 2px #e75a50; cursor: pointer; font: 20px/1 var(--mono); }
+.hud-close:hover, .hud-close:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.quick-tools-panel .tool-controls { gap: 6px; }
+.quick-tools-panel .tool-button { grid-template-columns: 48px minmax(0, 1fr) 28px; min-height: 66px; padding: 5px; color: #e7efff; background: #0a1c3e; border: 3px solid #173b78; font: 700 11px/1.4 "Press Start 2P", var(--mono); }
+.quick-tools-panel .tool-button.active, .quick-tools-panel .tool-button:hover, .quick-tools-panel .tool-button:focus-visible { color: #fff; border-color: #f0f6ff; background: #17438b; outline: none; }
+.quick-tools-panel .tool-button img { width: 42px; height: 42px; image-rendering: pixelated; shape-rendering: crispEdges; }
+.quick-tools-panel .tool-button kbd { color: #102044; background: #ffd23f; border: 0; font: 700 11px/1 var(--mono); }
+.quick-tools-panel .tool-progress { display: none; }
 .hint { z-index: 4; bottom: max(126px, calc(env(safe-area-inset-bottom) + 118px)); padding: 7px 11px; border-radius: 999px; font-size: 10px; }
 .tutorial-feedback { z-index: 5; bottom: max(174px, calc(env(safe-area-inset-bottom) + 164px)); width: auto; padding: 7px 12px; border-radius: 999px; font: 10px/1.35 var(--mono); }
 .inspect-card { z-index: 6; top: auto; right: 12px; bottom: max(58px, calc(env(safe-area-inset-bottom) + 52px)); width: min(240px, calc(100% - 24px)); padding: 10px 12px; border-radius: 8px; }
@@ -437,15 +442,16 @@ body { background: #05090d; }
   .vital-track { height: 6px; }
   .hud-system-controls { position: absolute; top: calc(100% + 8px); right: 0; gap: 4px; }
   .hud-button { width: 32px; height: 32px; font-size: 16px; }
-  .hud-action-dock { right: max(10px, env(safe-area-inset-right)); bottom: max(10px, env(safe-area-inset-bottom)); grid-template-columns: repeat(2, 58px); gap: 7px; padding: 10px; }
-  .hud-action { min-height: 60px; font-size: 7px; }
-  .hud-action img, .hud-pixel-icon { width: 23px; height: 23px; }
+  .hud-action-dock { right: max(10px, env(safe-area-inset-right)); bottom: max(10px, env(safe-area-inset-bottom)); gap: 6px; transform: none; }
+  .hud-action-group { grid-template-columns: repeat(3, 54px); gap: 3px; padding: 6px; }
+  .hud-action { min-height: 68px; font-size: 7px; }
+  .hud-action img, .hud-pixel-icon { width: 21px; height: 21px; }
   .hud-action small { font-size: 7px; }
-  .hud-inventory { grid-column: span 2; min-height: 34px; grid-template-columns: 24px auto; grid-template-rows: 1fr; justify-content: center; gap: 5px; }
-  .hud-inventory .backpack-icon { width: 23px; height: 23px; }
-  .inventory-copy { display: flex; align-items: center; gap: 5px; }
+  .hud-action-orange, .hud-inventory { min-width: 52px; min-height: 68px; }
+  .hud-inventory { grid-template-rows: 21px auto; }
+  .hud-inventory .backpack-icon { width: 21px; height: 21px; }
   .inventory-copy kbd, .inventory-copy b { font-size: 7px; }
-  .quick-tools-panel { right: max(10px, env(safe-area-inset-right)); bottom: max(192px, calc(env(safe-area-inset-bottom) + 184px)); width: min(300px, calc(100vw - 20px)); transform: none; }
+  .quick-tools-panel { right: max(10px, env(safe-area-inset-right)); bottom: max(164px, calc(env(safe-area-inset-bottom) + 154px)); width: min(360px, calc(100vw - 20px)); transform: none; }
   .hint { bottom: max(178px, calc(env(safe-area-inset-bottom) + 168px)); max-width: calc(100% - 24px); font-size: 8px; white-space: normal; text-align: center; }
   .tutorial-feedback { bottom: max(200px, calc(env(safe-area-inset-bottom) + 190px)); }
   .inspect-card { right: 10px; bottom: max(190px, calc(env(safe-area-inset-bottom) + 180px)); }
@@ -457,4 +463,11 @@ body { background: #05090d; }
   .hud-vitals { padding: 5px; }
   .vital-grid { column-gap: 5px; }
   .vital-label { font-size: 6px; }
+  .hud-action-dock { gap: 4px; }
+  .hud-action-group { grid-template-columns: repeat(3, 48px); padding: 5px; }
+  .hud-action-orange, .hud-inventory { min-width: 46px; }
+  .hud-action { padding-inline: 1px; }
+  .hud-action span, .hud-inventory b { font-size: 6px; }
+  .quick-tools-panel .tool-button { grid-template-columns: 35px minmax(0, 1fr) 24px; min-height: 58px; font-size: 9px; }
+  .quick-tools-panel .tool-button img { width: 35px; height: 35px; }
 }

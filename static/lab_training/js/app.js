@@ -51,10 +51,10 @@
   const fullscreenButton = $("#fullscreenButton");
 
   const tools = [
-    { key: 1, name: "Câmera científica", detail: "Fotografa terrenos e materiais", target: "telescope", targetName: "Pancam", result: "Imagem panorâmica registrada na mochila." },
-    { key: 2, name: "Microscópio portátil", detail: "Analisa amostras de perto", target: "micro", targetName: "Microscopic Imager", result: "Análise microscópica da amostra registrada." },
-    { key: 3, name: "Sensor de temperatura", detail: "Mede a temperatura de sólidos", target: "spec", targetName: "amostra no espectrômetro", result: "Leitura registrada: superfície sólida a -21,6 °C." },
-    { key: 4, name: "Furadeira de amostras", detail: "Extrai material do solo", target: "bench", targetName: "bancada de amostras", result: "Amostra de rególito extraída e guardada." }
+    { key: 1, name: "Câmera científica", icon: "camera", detail: "Fotografa terrenos e materiais", target: "telescope", targetName: "Pancam", result: "Imagem panorâmica registrada na mochila." },
+    { key: 2, name: "Microscópio portátil", icon: "microscope", detail: "Analisa amostras de perto", target: "micro", targetName: "Microscopic Imager", result: "Análise microscópica da amostra registrada." },
+    { key: 3, name: "Sensor de temperatura", icon: "temperature", detail: "Mede a temperatura de sólidos", target: "spec", targetName: "amostra no espectrômetro", result: "Leitura registrada: superfície sólida a -21,6 °C." },
+    { key: 4, name: "Furadeira de amostras", icon: "drill", detail: "Extrai material do solo", target: "bench", targetName: "bancada de amostras", result: "Amostra de rególito extraída e guardada." }
   ];
   let tutorialPhase = savedProfile ? "gravity" : "intro";
   let cadetName = savedProfile?.name || "";
@@ -76,7 +76,7 @@
   appShell.inert = true;
   engine.controls.enabled = false;
   engine.controls.movementEnabled = false;
-  engine.onToolSelect = selectTool;
+  engine.onToolSelect = handleToolShortcut;
   engine.onMapToggle = toggleMap;
   engine.onInventoryToggle = toggleInventory;
   engine.onEscape = handleEscape;
@@ -146,6 +146,26 @@
       const progress = button.querySelector(".tool-progress");
       progress.textContent = completedTests.has(key) ? "OK" : selectedTool === key ? "ATIVA" : "";
     });
+    const researchAction = $("#researchAction");
+    const researchActionIcon = $("#researchActionIcon");
+    const researchActionName = $("#researchActionName");
+    const researchActionShortcut = $("#researchActionShortcut");
+    const activeTool = tools.find(tool => tool.key === selectedTool);
+    researchAction.setAttribute("aria-pressed", String(Boolean(activeTool)));
+    if (activeTool) {
+      researchActionIcon.src = `/assets/visuals/hud_assets/svg/tool_${activeTool.icon}.svg`;
+      researchActionIcon.alt = "";
+      researchActionName.textContent = activeTool.name;
+      researchActionShortcut.hidden = true;
+      researchAction.title = `${activeTool.name} · clicar para trocar`;
+      researchAction.setAttribute("aria-label", `${activeTool.name}. Abrir ferramentas científicas`);
+    } else {
+      researchActionIcon.src = "/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg";
+      researchActionName.textContent = "PESQUISA";
+      researchActionShortcut.hidden = false;
+      researchAction.title = "Abrir ferramentas científicas";
+      researchAction.setAttribute("aria-label", "Pesquisa científica (1–4)");
+    }
 
   }
 
@@ -174,13 +194,16 @@
       button.className = "tool-button";
       button.dataset.tool = String(tool.key);
       button.setAttribute("aria-pressed", "false");
+      const icon = document.createElement("img");
+      icon.src = `/assets/visuals/hud_assets/svg/tool_${tool.icon}.svg`;
+      icon.alt = "";
       const key = document.createElement("kbd");
       key.textContent = String(tool.key);
       const name = document.createElement("span");
       name.textContent = tool.name;
       const progress = document.createElement("span");
       progress.className = "tool-progress";
-      button.append(key, name, progress);
+      button.append(icon, name, key, progress);
       button.title = tool.detail;
       button.addEventListener("click", () => selectTool(tool.key));
       container.append(button);
@@ -195,6 +218,18 @@
     engine.closeInspection();
     showFeedback(`${tools[key - 1].name} ativa`);
     setModalState();
+  }
+
+  function handleToolShortcut(key) {
+    if (!quickToolsPanel.hidden) {
+      selectTool(key);
+      return;
+    }
+    if (key === 3) {
+      toggleQuickTools();
+      return;
+    }
+    selectTool(key);
   }
 
   function handleInteraction(prop) {
