@@ -10,10 +10,11 @@ export function createLabScene(map, config, mood, { quality = 'balanced' } = {})
 }
 
 export class LabCameraView {
-  constructor({ container, map, config, onChange }) {
+  constructor({ container, map, config, onChange, createScene = createLabScene }) {
     this.container = container;
     this.map = map;
     this.config = config;
+    this.createScene = createScene;
     this.quality = Object.hasOwn(RENDER_PROFILES, config.camera?.renderQuality) ? config.camera.renderQuality : 'balanced';
     this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'low-power' });
     this.configureRenderer();
@@ -35,7 +36,7 @@ export class LabCameraView {
   open(player, mood, target) {
     this.releaseScene();
     this.mood = mood;
-    this.scene = createLabScene(this.map, this.config, mood, { quality: this.quality });
+    this.scene = this.createScene(this.map, this.config, mood, { quality: this.quality });
     this.camera.position.set(player.x, 1.6, player.y);
     let yaw = -player.angle - Math.PI / 2;
     let pitch = 0;
@@ -77,7 +78,7 @@ export class LabCameraView {
   setQuality(quality) {
     if (!Object.hasOwn(RENDER_PROFILES, quality)) throw new RangeError('Qualidade deve ser low, balanced ou high.');
     if (quality === this.quality) return;
-    const scene = this.active ? createLabScene(this.map, this.config, this.mood, { quality }) : null;
+    const scene = this.active ? this.createScene(this.map, this.config, this.mood, { quality }) : null;
     this.releaseScene();
     this.scene = scene;
     this.quality = quality;

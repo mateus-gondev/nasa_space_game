@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="css/campaign.css">
   <link rel="stylesheet" href="css/pixel-ui.css">
   <link rel="stylesheet" href="/assets/assistant/nova.css">
+  <link rel="stylesheet" href="css/camera.css">
+  <script type="importmap">{"imports":{"three":"/vendor/three/three.module.js"}}</script>
 </head>
 <body>
   <main class="stage" id="stage" aria-label="Exploração de Marte">
@@ -50,6 +52,15 @@
     </section>
     <div class="toast" id="toast" hidden role="status"></div>
   </main>
+  <dialog class="mars-camera" id="marsCamera" aria-labelledby="cameraTitle">
+    <header><div><strong id="cameraTitle">PANCAM · VISÃO 3D</strong><small id="cameraLocation"></small></div><button id="cameraClose" type="button">Voltar · Esc</button></header>
+    <div class="mars-camera-viewport" id="cameraViewport"><span class="camera-reticle" aria-hidden="true">+</span><p id="cameraMessage" role="status">Carregando ambiente 3D…</p></div>
+    <footer>
+      <p>Arraste ou use as setas para olhar · Role para aproximar</p>
+      <div class="camera-tools"><button id="cameraReset" type="button">Centralizar · R</button><label>Zoom <input id="cameraZoom" type="range" min="1" max="4" step="0.1" value="1"></label><button id="cameraCapture" type="button">Fotografar</button></div>
+      <a id="cameraPhoto" download="opportunity-marte.png" hidden><img id="cameraPreview" alt="Última fotografia da câmera"><span>Baixar fotografia</span></a>
+    </footer>
+  </dialog>
   <div class="atlas-backdrop" id="atlasModal" hidden>
     <section class="atlas-dialog" role="dialog" aria-modal="true" aria-labelledby="atlasTitle">
       <header>
@@ -73,6 +84,7 @@
   <script src="js/ui-components.js"></script>
   <script src="/assets/assistant/nova.js"></script>
   <script src="js/campaign-ui.js"></script>
+  <script src="js/camera-ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

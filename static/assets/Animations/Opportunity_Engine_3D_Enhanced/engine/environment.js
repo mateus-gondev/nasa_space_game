@@ -210,8 +210,10 @@ export function createEnhancedLabScene(map,config={},mood={},options={}){
  }
  scene.add(sun);
  if(!outdoors)distributeLighting(scene,model,kit,library.materials,quality);
- decorateWalls(scene,model,kit,quality);
- addInfrastructure(scene,model,kit,quality);
+ if(!outdoors){
+  decorateWalls(scene,model,kit,quality);
+  addInfrastructure(scene,model,kit,quality);
+ }
  addAtmosphere(scene,model,kit,quality);
  for(const prop of props){
   if(!prop || !Number.isFinite(Number(prop.x))||!Number.isFinite(Number(prop.y)))continue;
@@ -220,10 +222,10 @@ export function createEnhancedLabScene(map,config={},mood={},options={}){
  scene.userData.environment={quality,tiles:{width,height},propCount:props.length,instanceCount:meshes.length};
  // The existing camera raycaster climbs parents until it finds userData.prop.
  let disposed=false;
- scene.userData.disposeEnvironment=()=>{
+ scene.userData.disposeEnvironment=(extra=[])=>{
   if(disposed)return;
   disposed=true;
-  disposeScene(scene,[...Object.values(kit.geometry),...Object.values(library.materials),...Object.values(library.textures),cube]);
+  disposeScene(scene,[...Object.values(kit.geometry),...Object.values(library.materials),...Object.values(library.textures),cube,...extra]);
  };
  return scene;
 }

@@ -1,0 +1,18 @@
+.mars-action-dock{position:fixed;z-index:9;bottom:max(16px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;gap:6px;padding:7px;background:#06132ef2;border:2px solid #7fdcff;max-width:calc(100% - 24px)}
+.mars-action-dock .pixel-slot{width:76px;min-height:76px;padding:6px;gap:3px}
+.mars-action-dock .pixel-icon{width:25px;height:25px}.mars-action-dock .slot-name{font-size:11px}.mars-action-dock .slot-detail{font-size:10px}
+.hint{bottom:116px}
+.mars-camera{position:fixed;inset:0;width:100%;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#07152a;color:#dcefff;overflow:auto}
+.mars-camera[open]{display:grid;grid-template-rows:auto minmax(140px,1fr) auto}.mars-camera::backdrop{background:#030810}
+.mars-camera header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px max(16px,env(safe-area-inset-right)) 12px max(16px,env(safe-area-inset-left));border-bottom:2px solid #7fdcff}
+.mars-camera header strong{font:700 16px Consolas,monospace}.mars-camera header small{display:block;color:#9fc7e9;font-size:12px}
+.mars-camera button{min-height:42px;padding:8px 12px;color:#e9f5ff;background:#0b4b96;border:1px solid #7fdcff}.mars-camera button:disabled{opacity:.45;cursor:wait}
+.mars-camera-viewport{position:relative;min-height:0;overflow:hidden;background:#101d30;touch-action:none}.mars-camera-viewport canvas{display:block;width:100%;height:100%}
+.camera-reticle{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;color:#e8ffff;font:30px monospace;text-shadow:0 1px 3px #000}
+#cameraMessage{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);max-width:90%;margin:0;padding:8px 12px;background:#07152ae8;text-align:center;pointer-events:none}
+.mars-camera footer{padding:10px 16px max(10px,env(safe-area-inset-bottom));border-top:2px solid #7fdcff}.mars-camera footer p{margin:0 0 8px;color:#9fc7e9;font-size:12px}.camera-tools{display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}.camera-tools label{display:flex;align-items:center;gap:8px}.camera-tools input{width:110px}
+#cameraPhoto{display:flex;align-items:center;justify-content:center;gap:10px;color:#a7e9ff;margin-top:8px;font-size:12px}#cameraPreview{width:90px;height:50px;object-fit:contain}
+#novaGuide{bottom:116px}
+@media(pointer:coarse){.mars-action-dock{bottom:max(130px,calc(env(safe-area-inset-bottom) + 130px))}.hint{bottom:225px}#novaGuide{bottom:225px;max-width:calc(100% - 24px)}.touch-menu{display:none}.mobile-controls{z-index:8}}
+@media(max-width:520px){.mars-action-dock{gap:3px;padding:4px;width:calc(100% - 24px)}.mars-action-dock .pixel-slot{width:auto;flex:1;min-width:0;min-height:67px;padding:5px 2px}.mars-action-dock .slot-name{font-size:9px}.mars-action-dock .slot-detail{font-size:8px}.mars-camera header strong{font-size:13px}.mars-camera header small{font-size:10px}.camera-tools{gap:6px}.mars-camera footer{padding:8px}.mars-camera button{font-size:12px}}
+@media(max-height:540px) and (pointer:coarse){.mars-action-dock{bottom:12px;max-width:calc(100% - 320px)}.mars-action-dock .pixel-slot{min-height:55px}.mars-action-dock .pixel-icon{width:20px;height:20px}.mars-action-dock .slot-detail{display:none}#novaGuide{bottom:85px;max-width:260px}.hint{bottom:80px}.survival-hud{top:65px;right:12px}.touch-menu{display:none}.mars-camera footer p{display:none}}

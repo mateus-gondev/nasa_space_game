@@ -1,5 +1,5 @@
 /* Interface sob demanda, terminais do mapa e persistência da jornada. */
-window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld}){
+window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld,openAtlas,openCamera}){
   const {Campaign,createScenario,CROPS,LABELS,KEY}=window.OpportunityCampaign;
   const UI=window.MarsUI;
   const TASKS={activateBase:['Ligar base','energy'],buildGreenhouse:['Estufa','lettuce'],buildLab:['Laboratório','science'],buildComms:['Antena','antenna'],buildDormitory:['Dormitório','shelter'],buildShelter:['Abrigo','shelter'],transferToShelter:['Entrar no abrigo','shelter'],repairFilter:['Consertar filtro','repair'],cleanPanels:['Limpar painéis','solar'],collectSample:['Pegar amostra','sample'],analyzeSample:['Analisar','science'],recoverRover:['Salvar arquivos','rover'],recycleWater:['Reciclar água','waterClean'],rest:['Descansar','avatar'],plant:['Plantar','seeds'],harvest:['Colher','food'],connectComms:['Ligar antena','antenna']};
@@ -64,11 +64,18 @@ window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld}){
     item.append(img,label,amount,track);hud.append(item);hudMeters[key]={item,amount,track};
   }
   const liveClock=element('span','survival-clock');liveClock.id='survivalClock';hud.append(liveClock);document.body.append(hud);
+  const dock=element('nav','mars-action-dock');dock.id='marsActionDock';dock.setAttribute('aria-label','Comandos da expedição');
+  for(const [id,label,art,key,fn]of [
+    ['base','Base','build','',()=>open('base')],['inventory','Mochila','science','Tab',()=>open('science')],
+    ['messages','Mensagens','antenna','',()=>open('journal')],['map','Mapa','map','M',openAtlas],
+    ['camera','Câmera 3D','camera','1',openCamera],['pause','Pausa','pause','P',()=>engine.setPaused()]
+  ]){const control=UI.tile({label,icon:art,detail:key,onClick:fn});control.id='hud-'+id;dock.append(control);}
+  document.body.append(dock);
   const guide=window.NovaAssistant.create({floating:true,compact:true,dismissible:true,onDismiss:()=>$('#gameCanvas').focus(),onInteract:()=>$('#gameCanvas').focus()});
   guide.element.id='novaGuide';guide.text.id='novaHint';document.body.append(guide.element);
   let speechTimer=null,eventSpeech=null;
   function goalSpeech(){
-    if(dialog.open||engine.inspectedObject){guide.hide();return;}
+    if(dialog.open||engine.inspectedObject||engine.cameraOpen||engine.paused){guide.hide();return;}
     if(eventSpeech){guide.say(eventSpeech.message,eventSpeech.settings);return;}
     const goal=nextGoal(),message=goal.target==='ship-exit'?'Vamos explorar Marte! Vá até a porta verde e aperte E.':goal.title+'. '+goal.hint+'.';
     guide.say(message,{key:goal.title+goal.hint,mood:['sample','science'].includes(goal.icon)?'science':'guide',onAction:()=>open(goal.section||'mission',goal.view)});
@@ -102,7 +109,8 @@ window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld}){
   function run(fn){try{const message=fn();campaign.sync();const badge=refresh();save();render();const text=badge?'Você ganhou a medalha '+badge.label+'! +50 estrelas':typeof message==='string'?message:'Pronto! Vamos para a próxima etapa.';if(dialog.open)setFeedback(text,badge?'success':undefined);else announce(text,{mood:badge?'success':undefined});}catch(error){announce(error.message,{mood:'warning'});}}
   function open(section='mission',view){
     tab=section;if(view)baseView=view;special=null;
-    if(!dialog.open){wasPaused=engine.paused;engine.closeInspection();engine.controls.keys.clear();engine.setPaused(true);dialog.showModal();}
+    if(engine.cameraOpen)return;
+    if(!dialog.open){wasPaused=engine.paused;engine.closeInspection();engine.controls.keys.clear();dialog.showModal();engine.setPaused(true);}
     guide.hide();
     render();dialog.querySelector('.mission-close').focus();
   }
@@ -110,7 +118,14 @@ window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld}){
   launcher.onclick=()=>open();dialog.querySelector('.mission-close').onclick=close;
   dialog.addEventListener('cancel',event=>{event.preventDefault();close();});
   dialog.addEventListener('keydown',event=>event.stopPropagation());dialog.addEventListener('keyup',event=>event.stopPropagation());
-  window.addEventListener('keydown',event=>{if(event.key.toLowerCase()==='b'&&!event.repeat&&!['INPUT','TEXTAREA','SELECT'].includes(event.target.tagName)){event.preventDefault();event.stopImmediatePropagation();if(dialog.open)close();else open();}},true);
+  window.addEventListener('keydown',event=>{
+    if(engine.cameraOpen||event.repeat||['INPUT','TEXTAREA','SELECT'].includes(event.target.tagName))return;
+    const key=event.key.toLowerCase();
+    if(key==='b'){event.preventDefault();event.stopImmediatePropagation();if(dialog.open)close();else open();}
+    else if(!dialog.open&&!engine.paused&&$('#atlasModal').hidden&&['tab','1','c'].includes(key)){
+      event.preventDefault();event.stopImmediatePropagation();if(key==='tab')open('science');else openCamera();
+    }
+  },true);
   const atBase=()=>engine.map.id==='mapa_01_pouso'||engine.map.interior;
   function available(type){const a=campaign.engine.availableActions()[type],habitat=engine.map.props.find(p=>p.sprite==='habitat_circular');return campaign.meta.result==='active'&&a?.enabled&&atBase()&&(type!=='transferToShelter'||habitat&&engine.canAct(habitat));}
   function action(parent,type,payload={}){
@@ -400,6 +415,8 @@ window.MarsCampaignUI={async mount({engine,worlds,notify,switchWorld}){
     else Object.assign(engine.player,{x:world.spawn[0],y:world.spawn[1]});
   }
   function updateClock(){liveClock.textContent=campaign.meta.result!=='active'?'FIM DA MISSÃO':engine.paused||dialog.open||engine.inspectedObject?'Ⅱ PAUSA':'▶ VIDA ATIVA · '+Math.ceil(20-campaign.meta.liveSeconds)+'s';}
+  const originalStateChange=engine.onStateChange;
+  engine.onStateChange=state=>{originalStateChange(state);updateClock();goalSpeech();};
   function syncLocation(){
     if(engine.map.interior)campaign.setLocation('ship');
     else if(campaign.engine.state.team.location==='ship')campaign.setLocation('outside');

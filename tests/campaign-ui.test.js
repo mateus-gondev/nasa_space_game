@@ -3,13 +3,13 @@ const {test}=require('node:test'),assert=require('node:assert/strict');
 const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.join(__dirname,'..');
 const {Element}=require('./helpers/dom.cjs');
-async function mount(initialStorage=new Map()){
+async function mount(initialStorage=new Map(),cameraLoader){
   const document=new Element('document');document.createElement=tag=>new Element(tag);document.body=new Element('body');document.append(document.body);
   document.body.innerHTML=fs.readFileSync(path.join(root,'static/opportunity-mars-five-worlds/index.html'),'utf8');
-  const errors=[],storage=initialStorage,images=[];
+  const errors=[],storage=initialStorage,images=[],listeners={};
   const context=vm.createContext({document,console:{info(){},warn(){},error:e=>errors.push(e)},URLSearchParams,
     location:{search:''},localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>storage.set(key,value)},
-    setTimeout(){},clearTimeout(){},setInterval(){},requestAnimationFrame(){},addEventListener(){},
+    setTimeout(){},clearTimeout(){},setInterval(){},requestAnimationFrame(){},addEventListener(type,fn){(listeners[type]??=[]).push(fn);},
     ResizeObserver:class{observe(){}},
     Image:class{set src(url){images.push(url);const file=path.join(root,'static',decodeURIComponent(url).slice(1));queueMicrotask(()=>fs.existsSync(file)?this.onload?.():this.onerror?.());}},
     MapRenderer:class{constructor(canvas){this.canvas=canvas;this.staticCanvas={width:1,height:1};this.assets=new Map();}setAsset(key,img){this.assets.set(key,img);}render(){}},
@@ -17,14 +17,58 @@ async function mount(initialStorage=new Map()){
     Option:function(text,value){const o=new Element('option');o.textContent=text;o.value=value;return o;}
   });
   context.window=context;context.globalThis=context;
+  vm.runInContext(fs.readFileSync(path.join(root,'static/opportunity-mars-five-worlds/js/camera-ui.js'),'utf8'),context);
+  if(cameraLoader){const mountCamera=context.MarsCameraUI.mount;context.MarsCameraUI.mount=options=>mountCamera({...options,loadView:options.loadView||cameraLoader});}
   for(const file of ['static/opportunity-mars-five-worlds/js/config.js','static/opportunity-mars-five-worlds/js/map-data.js','static/opportunity-mars-five-worlds/js/tilemap-data.js','static/opportunity-mars-five-worlds/js/ship-data.js','static/opportunity-mars-five-worlds/js/controls.js','static/opportunity-mars-five-worlds/js/engine.js','LIFE/engine.js','static/opportunity-mars-five-worlds/js/campaign.js','static/opportunity-mars-five-worlds/js/ui-components.js','static/assets/assistant/nova.js','static/opportunity-mars-five-worlds/js/campaign-ui.js'])vm.runInContext(fs.readFileSync(path.join(root,file),'utf8'),context,{filename:file});
   await vm.runInContext(fs.readFileSync(path.join(root,'static/opportunity-mars-five-worlds/js/app.js'),'utf8'),context);
   assert.equal(errors.length,0,errors.map(String).join('\n'));
   assert(context.marsCampaign,'campaign mounted');
-  return {context,document,storage,images};
+  return {context,document,storage,images,listeners};
 }
 function click(parent,text){const aliases={'Ciência e mochila':'Mochila','Relatórios':'Mensagens','Avançar 1 passo':parent.querySelectorAll('button').some(b=>b.getAttribute('aria-label')==='Ajudar na próxima etapa')?'Ajudar na próxima etapa':'Esperar um pouquinho'};const label=aliases[text]||text,b=parent.querySelectorAll('button').find(b=>b.textContent===label||b.getAttribute('aria-label')===label);assert(b,`button: ${text}`);assert(!b.disabled,`enabled: ${text}`);b.click();}
 function readingWords(node){return [node._text||'',...node.children.map(child=>readingWords(child).join(' '))].join(' ').split(/\s+/).filter(Boolean);}
+
+test('HUD buttons open their panels and pause updates immediately; camera restores the exact pause state',async()=>{
+  const views=[];
+  class MarsCameraView{
+    constructor(options){this.options=options;this.controller={reset(){},setZoom(value){assert.equal(value,2);}};views.push(this);}
+    open(player){this.player={...player};}
+    capture(){return {image:'data:image/png;base64,photo',prop:{name:'Marte'}};}
+    dispose(){this.disposed=true;}
+  }
+  const {context,document,listeners}=await mount(new Map(),async()=>({MarsCameraView})),engine=context.opportunityMap.engine,dialog=document.querySelector('#missionDialog');
+  const $=s=>document.querySelector(s),close=()=>$('.mission-close').click();
+  close();$('#hud-base').click();assert(dialog.open);assert(dialog.textContent.includes('Minha base'));close();
+  $('#hud-inventory').click();assert(dialog.textContent.includes('Minha mochila'));close();
+  $('#hud-messages').click();assert(dialog.textContent.includes('Falar com a Terra'));close();
+  $('#hud-map').click();assert(!$('#atlasModal').hidden);$('#closeAtlas').click();assert(!engine.paused);
+  $('#hud-pause').click();assert(engine.paused);assert.equal($('#survivalClock').textContent,'Ⅱ PAUSA');$('#pauseButton').click();assert(!engine.paused);assert($('#survivalClock').textContent.includes('VIDA ATIVA'));
+  for(const world of ['mars01_ship_interior','mapa_01_pouso','meridiani']){
+    context.opportunityMap.goToWorld(world);const position={x:engine.player.x,y:engine.player.y},tick=context.marsCampaign.campaign.engine.state.tick;
+    await context.opportunityMap.openCamera();assert($('#marsCamera').open);assert($('#pausedOverlay').hidden);assert(engine.paused);assert(!engine.controls.enabled);
+    assert.equal(views.at(-1).options.map.id,world);assert.equal(views.at(-1).player.x,position.x);
+    engine.update(40);assert.equal(context.marsCampaign.campaign.engine.state.tick,tick);
+    $('#cameraCapture').click();assert(!$('#cameraPhoto').hidden);assert.equal($('#cameraPreview').src,'data:image/png;base64,photo');
+    $('#cameraClose').click();assert(views.at(-1).disposed);assert(!engine.paused);assert(engine.controls.enabled);assert.equal(engine.player.x,position.x);assert.equal(engine.player.y,position.y);
+  }
+  engine.setPaused(true);await context.opportunityMap.openCamera();context.opportunityMap.closeCamera();assert(engine.paused);assert(!$('#pausedOverlay').hidden);
+  engine.setPaused(false);
+  function press(key){let stopped=false;const event={key,repeat:false,target:$('#gameCanvas'),preventDefault(){},stopImmediatePropagation(){stopped=true;}};for(const fn of listeners.keydown){fn(event);if(stopped)break;}}
+  press('Tab');assert(dialog.open);assert(dialog.textContent.includes('Minha mochila'));close();
+  press('1');await Promise.resolve();assert($('#marsCamera').open);press('Escape');assert(!$('#marsCamera').open);assert(!engine.paused);
+});
+
+test('closing while the camera loads cancels opening and a failed renderer leaves a working map',async()=>{
+  let resolve,constructed=0;
+  const {context,document}=await mount(new Map(),()=>new Promise(done=>{resolve=done;}));
+  document.querySelector('.mission-close').click();const engine=context.opportunityMap.engine;
+  const pending=context.opportunityMap.openCamera();context.opportunityMap.closeCamera();
+  resolve({MarsCameraView:class{constructor(){constructed++;}}});await pending;
+  assert.equal(constructed,0);assert(!engine.paused);assert(!engine.cameraOpen);
+  const camera=context.MarsCameraUI.mount({engine,updateInterface:()=>{},loadView:async()=>{throw Error('No WebGL');}});
+  await camera.open();assert(!engine.controls.enabled);assert(document.querySelector('#cameraMessage').textContent.includes('WebGL 2'));
+  camera.close();assert(!engine.paused);assert(engine.controls.enabled);
+});
 
 test('NOVA delivers Mars guidance and events without moving the survival clock',async()=>{
   const {context,document}=await mount(),dialog=document.querySelector('#missionDialog'),c=context.marsCampaign.campaign;
