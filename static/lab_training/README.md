@@ -22,6 +22,9 @@ static/lab_training/
 ├── css/style.css       # Layout fullscreen, HUD e menu
 └── js/
     ├── config.js       # Parâmetros v2, início no Instrument Lab e sprites
+    ├── i18n.js         # Textos em português e inglês
+    ├── preferences.js  # Configurações salvas, modal, música e efeitos
+    ├── animation-preferences.js # Idioma, legendas e áudio das animações de preparação
     ├── map-data-training.js # Ajustes do mapa para o treinamento, sem logos NASA
     ├── animation.js    # Carregamento e reprodução dos spritesheets
     ├── character.js    # Estado e animações do astronauta
@@ -32,7 +35,9 @@ static/lab_training/
 
 ## Menu inicial
 
-O menu com Play, Settings, Info e Créditos aparece antes de cada nova sessão. Settings altera a ambientação e permite alternar a tela cheia; Info resume os controles. Play inicia a missão com o perfil salvo ou abre o cadastro e a preparação do traje no primeiro acesso.
+O menu com Jogar, Configurações, Info e Créditos aparece antes de cada nova sessão. Configurações fica entre Jogar e Info e abre o modal com abas de áudio e legendas/idioma. Os volumes de música e efeitos são independentes; o idioma pode ser português ou inglês. As preferências ficam em `localStorage`, na chave `opportunity.labTraining.settings`. Info resume os controles. Jogar inicia a missão com o perfil salvo ou abre o cadastro e a preparação do traje no primeiro acesso.
+
+A trilha Stellar Rift (`static/assets/audio/stellar-rift.mp3`) toca em loop apenas no menu e é pausada ao iniciar a missão ou ocultar a aba. Se o navegador bloquear autoplay, a primeira interação libera o áudio. Os efeitos da interface e da preparação usam o volume do jogo. O controle de legendas afeta os textos de narração das animações de preparação; instruções e indicadores do jogo continuam visíveis.
 
 Na preparação, selecionar traje e capacete reproduz as animações 8-bit correspondentes. Cada etapa avança ao terminar a sequência e também pode ser pulada.
 

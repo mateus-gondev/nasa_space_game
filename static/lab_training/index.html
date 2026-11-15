@@ -32,77 +32,77 @@
     <section class="game-layout">
       <div class="game-column">
         <div class="stage" id="stage">
-          <canvas id="gameCanvas" tabindex="0" aria-label="Mapa top-down da instalação Opportunity com um astronauta"></canvas>
+          <canvas id="gameCanvas" tabindex="0" aria-label="Mapa top-down da instalação Opportunity com um astronauta" data-i18n-aria-label="Mapa top-down da instalação Opportunity com um astronauta"></canvas>
           <div class="stage-vignette" aria-hidden="true"></div>
           <div class="stage-status" id="stageStatus">CARREGANDO ASTRONAUTA <span></span></div>
-          <div class="game-hud" aria-label="Interface da missão">
-            <section class="hud-panel hud-profile" aria-label="Cadete e localização">
+          <div class="game-hud" aria-label="Interface da missão" data-i18n-aria-label="Interface da missão">
+            <section class="hud-panel hud-profile" aria-label="Cadete e localização" data-i18n-aria-label="Cadete e localização">
               <img src="/assets/visuals/hud_assets/svg/avatar_astronauta.svg" alt="" class="hud-avatar">
               <div class="hud-profile-copy">
-                <span class="hud-kicker">CADETE · OPPORTUNITY</span>
+                <span class="hud-kicker" data-i18n="CADETE · OPPORTUNITY">CADETE · OPPORTUNITY</span>
                 <strong id="hudCadetName">Astronauta</strong>
                 <span id="hudLocation">Instrument Lab</span>
               </div>
             </section>
 
-            <section class="hud-panel hud-vitals" aria-label="Suporte vital da missão">
-              <div class="vitals-heading"><span>SUPORTE VITAL</span><span><i></i>NOMINAL</span></div>
+            <section class="hud-panel hud-vitals" aria-label="Suporte vital da missão" data-i18n-aria-label="Suporte vital da missão">
+              <div class="vitals-heading"><span data-i18n="SUPORTE VITAL">SUPORTE VITAL</span><span><i></i>NOMINAL</span></div>
               <div class="vital-grid">
                 <div class="vital-item" style="--vital-color:#4fd1ff">
                   <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_oxigenio.svg" alt=""><span>O₂</span><strong>100%</strong></div>
-                  <div class="vital-track" role="meter" aria-label="Oxigênio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                  <div class="vital-track" role="meter" aria-label="Oxigênio" data-i18n-aria-label="Oxigênio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
                 </div>
                 <div class="vital-item" style="--vital-color:#4a86ff">
-                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_agua.svg" alt=""><span>ÁGUA</span><strong>100%</strong></div>
-                  <div class="vital-track" role="meter" aria-label="Água" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_agua.svg" alt=""><span data-i18n="ÁGUA">ÁGUA</span><strong>100%</strong></div>
+                  <div class="vital-track" role="meter" aria-label="Água" data-i18n-aria-label="Água" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
                 </div>
                 <div class="vital-item" style="--vital-color:#ff9a3c">
-                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_alimentacao.svg" alt=""><span>ALIMENTO</span><strong>100%</strong></div>
-                  <div class="vital-track" role="meter" aria-label="Alimentação" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_alimentacao.svg" alt=""><span data-i18n="ALIMENTO">ALIMENTO</span><strong>100%</strong></div>
+                  <div class="vital-track" role="meter" aria-label="Alimentação" data-i18n-aria-label="Alimentação" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
                 </div>
                 <div class="vital-item" style="--vital-color:#ffe45e">
-                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_energia.svg" alt=""><span>ENERGIA</span><strong>100%</strong></div>
-                  <div class="vital-track" role="meter" aria-label="Energia" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
+                  <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_energia.svg" alt=""><span data-i18n="ENERGIA">ENERGIA</span><strong>100%</strong></div>
+                  <div class="vital-track" role="meter" aria-label="Energia" data-i18n-aria-label="Energia" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span></span></div>
                 </div>
               </div>
             </section>
 
-            <div class="hud-system-controls" aria-label="Controles da simulação">
-              <button class="hud-button" id="pauseButton" type="button" aria-label="Pausar" title="Pausar">Ⅱ</button>
-              <button class="hud-button" id="resetButton" type="button" aria-label="Reiniciar" title="Reiniciar">↻</button>
-              <button class="hud-button" id="fullscreenButton" type="button" aria-label="Tela cheia" title="Tela cheia">⛶</button>
+            <div class="hud-system-controls" aria-label="Controles da simulação" data-i18n-aria-label="Controles da simulação">
+              <button class="hud-button" id="pauseButton" type="button" aria-label="Pausar" data-i18n-aria-label="Pausar" title="Pausar" data-i18n-title="Pausar">Ⅱ</button>
+              <button class="hud-button" id="resetButton" type="button" aria-label="Reiniciar" data-i18n-aria-label="Reiniciar" title="Reiniciar" data-i18n-title="Reiniciar">↻</button>
+              <button class="hud-button" id="fullscreenButton" type="button" aria-label="Tela cheia" data-i18n-aria-label="Tela cheia" title="Tela cheia" data-i18n-title="Tela cheia">⛶</button>
             </div>
           </div>
 
           <div class="quick-tools-panel hud-panel" id="quickToolsPanel" role="region" aria-labelledby="quickToolsTitle" hidden>
             <div class="quick-tools-heading">
-              <div><span class="hud-kicker">AÇÃO 03</span><strong id="quickToolsTitle">Pesquisa científica</strong></div>
-              <button class="hud-close" id="closeQuickTools" type="button" aria-label="Fechar ferramentas">×</button>
+              <div><span class="hud-kicker" data-i18n="AÇÃO 03">AÇÃO 03</span><strong id="quickToolsTitle" data-i18n="Pesquisa científica">Pesquisa científica</strong></div>
+              <button class="hud-close" id="closeQuickTools" type="button" aria-label="Fechar ferramentas" data-i18n-aria-label="Fechar ferramentas">×</button>
             </div>
             <div class="tool-controls" id="toolControls"></div>
           </div>
 
-          <nav class="hud-action-dock" aria-label="Ações da missão">
-            <button class="hud-action unavailable" type="button" disabled title="Construção indisponível neste treinamento">
+          <nav class="hud-action-dock" aria-label="Ações da missão" data-i18n-aria-label="Ações da missão">
+            <button class="hud-action unavailable" type="button" disabled title="Construção indisponível neste treinamento" data-i18n-title="Construção indisponível neste treinamento">
               <img src="/assets/visuals/hud_assets/svg/acao_1_obra.svg" alt="">
-              <span>OBRA</span><small>FUTURO</small>
+              <span data-i18n="OBRA">OBRA</span><small data-i18n="FUTURO">FUTURO</small>
             </button>
-            <button class="hud-action unavailable" type="button" disabled title="Reparo indisponível neste treinamento">
+            <button class="hud-action unavailable" type="button" disabled title="Reparo indisponível neste treinamento" data-i18n-title="Reparo indisponível neste treinamento">
               <img src="/assets/visuals/hud_assets/svg/acao_2_reparo.svg" alt="">
-              <span>REPARO</span><small>FUTURO</small>
+              <span data-i18n="REPARO">REPARO</span><small data-i18n="FUTURO">FUTURO</small>
             </button>
-            <button class="hud-action" id="researchAction" type="button" aria-expanded="false" aria-controls="quickToolsPanel" title="Abrir ferramentas científicas">
+            <button class="hud-action" id="researchAction" type="button" aria-expanded="false" aria-controls="quickToolsPanel" title="Abrir ferramentas científicas" data-i18n-title="Abrir ferramentas científicas">
               <img src="/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg" alt="">
-              <span>PESQUISA</span><small>1–4</small>
+              <span data-i18n="PESQUISA">PESQUISA</span><small>1–4</small>
             </button>
-            <button class="hud-action" id="mapAction" type="button" title="Abrir mapa (M)">
+            <button class="hud-action" id="mapAction" type="button" title="Abrir mapa (M)" data-i18n-title="Abrir mapa (M)">
               <img src="/assets/visuals/hud_assets/svg/acao_4_mapa.svg" alt="">
-              <span>MAPA</span><small>M</small>
+              <span data-i18n="MAPA">MAPA</span><small>M</small>
             </button>
-            <button class="hud-inventory" id="inventoryAction" type="button" aria-label="Abrir mochila (Tab)">TAB <span>MOCHILA</span></button>
+            <button class="hud-inventory" id="inventoryAction" type="button" aria-label="Abrir mochila (Tab)" data-i18n-aria-label="Abrir mochila (Tab)">TAB <span data-i18n="MOCHILA">MOCHILA</span></button>
           </nav>
           <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
-            <p class="eyebrow">OBJETIVO DO TREINAMENTO</p>
+            <p class="eyebrow" data-i18n="OBJETIVO DO TREINAMENTO">OBJETIVO DO TREINAMENTO</p>
             <h2 id="tutorialTitle"></h2>
             <p id="tutorialDescription"></p>
           </section>
@@ -110,8 +110,8 @@
           <div class="hint" id="interactionHint" hidden></div>
           <aside class="inspect-card" id="inspectCard" hidden>
             <div class="inspect-card-heading">
-              <span class="toolbar-label">REGISTRO DO OBJETO</span>
-              <button class="icon-button" id="closeInspect" type="button" aria-label="Fechar">×</button>
+              <span class="toolbar-label" data-i18n="REGISTRO DO OBJETO">REGISTRO DO OBJETO</span>
+              <button class="icon-button" id="closeInspect" type="button" aria-label="Fechar" data-i18n-aria-label="Fechar">×</button>
             </div>
             <h2 id="inspectTitle"></h2>
             <p id="inspectDescription"></p>
@@ -120,32 +120,32 @@
           <div class="stage-modal" id="mapOverlay" hidden>
             <section class="modal-card map-card" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
               <div class="modal-heading">
-                <div><p class="eyebrow">M · MAPA</p><h2 id="mapTitle">Mapa da instalação</h2></div>
-                <button class="icon-button" id="closeMap" type="button" aria-label="Fechar mapa">×</button>
+                <div><p class="eyebrow" data-i18n="M · MAPA">M · MAPA</p><h2 id="mapTitle" data-i18n="Mapa da instalação">Mapa da instalação</h2></div>
+                <button class="icon-button" id="closeMap" type="button" aria-label="Fechar mapa" data-i18n-aria-label="Fechar mapa">×</button>
               </div>
-              <canvas id="miniMap" width="280" height="180" aria-label="Minimapa da instalação"></canvas>
-              <p class="modal-footnote">PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL</p>
+              <canvas id="miniMap" width="280" height="180" aria-label="Minimapa da instalação" data-i18n-aria-label="Minimapa da instalação"></canvas>
+              <p class="modal-footnote" data-i18n="PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL">PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL</p>
             </section>
           </div>
           <div class="stage-modal" id="inventoryOverlay" hidden>
             <section class="modal-card inventory-card" role="dialog" aria-modal="true" aria-labelledby="inventoryTitle">
               <div class="modal-heading">
-                <div><p class="eyebrow">TAB · MOCHILA</p><h2 id="inventoryTitle">Inventário de missão</h2></div>
-                <button class="icon-button" id="closeInventory" type="button" aria-label="Fechar mochila">×</button>
+                <div><p class="eyebrow" data-i18n="TAB · MOCHILA">TAB · MOCHILA</p><h2 id="inventoryTitle" data-i18n="Inventário de missão">Inventário de missão</h2></div>
+                <button class="icon-button" id="closeInventory" type="button" aria-label="Fechar mochila" data-i18n-aria-label="Fechar mochila">×</button>
               </div>
               <p class="modal-description" id="inventoryCount">Quatro slots disponíveis para os resultados do treinamento.</p>
               <div class="inventory-slots" id="inventorySlots"></div>
             </section>
           </div>
-          <div class="paused-overlay" id="pausedOverlay" hidden>SIMULAÇÃO PAUSADA</div>
-          <div class="mobile-controls" aria-label="Controles de movimento">
-            <button type="button" data-key="ArrowUp" aria-label="Cima">▲</button>
+          <div class="paused-overlay" id="pausedOverlay" hidden data-i18n="SIMULAÇÃO PAUSADA">SIMULAÇÃO PAUSADA</div>
+          <div class="mobile-controls" aria-label="Controles de movimento" data-i18n-aria-label="Controles de movimento">
+            <button type="button" data-key="ArrowUp" aria-label="Cima" data-i18n-aria-label="Cima">▲</button>
             <div class="mobile-controls-row">
-              <button type="button" data-key="ArrowLeft" aria-label="Esquerda">◀</button>
-              <button type="button" data-key="ArrowDown" aria-label="Baixo">▼</button>
-              <button type="button" data-key="ArrowRight" aria-label="Direita">▶</button>
+              <button type="button" data-key="ArrowLeft" aria-label="Esquerda" data-i18n-aria-label="Esquerda">◀</button>
+              <button type="button" data-key="ArrowDown" aria-label="Baixo" data-i18n-aria-label="Baixo">▼</button>
+              <button type="button" data-key="ArrowRight" aria-label="Direita" data-i18n-aria-label="Direita">▶</button>
             </div>
-            <button type="button" data-action="inspect">E · USAR</button>
+            <button type="button" data-action="inspect" data-i18n="E · USAR">E · USAR</button>
           </div>
         </div>
       </div>
@@ -201,94 +201,117 @@
   </main>
 
   <div class="main-menu" id="mainMenuOverlay">
-    <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Menu principal">
+    <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
       <img class="menu-logo" src="assets/title.png" alt="Surviving in Mars">
-      <nav class="menu-frame" aria-label="Menu principal">
+      <nav class="menu-frame" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
         <span class="menu-corner menu-corner-tl" aria-hidden="true"></span>
         <span class="menu-corner menu-corner-tr" aria-hidden="true"></span>
         <span class="menu-corner menu-corner-bl" aria-hidden="true"></span>
         <span class="menu-corner menu-corner-br" aria-hidden="true"></span>
-        <button class="menu-option selected" id="playButton" type="button">Play</button>
-        <button class="menu-option" id="settingsButton" type="button">Settings</button>
-        <button class="menu-option" id="infoButton" type="button">Info</button>
+        <button class="menu-option selected" id="playButton" type="button" data-i18n="Jogar">Jogar</button>
+        <button class="menu-option" id="openSettings" type="button" data-i18n="Configurações" aria-haspopup="dialog">Configurações</button>
+        <button class="menu-option" id="infoButton" type="button" data-i18n="Info">Info</button>
       </nav>
-      <button class="credits-button" id="creditsButton" type="button">Créditos</button>
-    </section>
-
-    <section class="menu-subpage" id="settingsPage" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
-      <p class="menu-eyebrow">SURVIVING IN MARS</p>
-      <h2 id="settingsTitle">Settings</h2>
-      <div class="menu-setting">
-        <span>Ambiente</span>
-        <div class="menu-atmospheres">
-          <button type="button" data-atmosphere="clean">Operacional</button>
-          <button type="button" data-atmosphere="emergency">Emergência</button>
-          <button type="button" data-atmosphere="abandoned">Abandonada</button>
-          <button type="button" data-atmosphere="horror">Suspense</button>
-        </div>
-      </div>
-      <div class="menu-setting menu-profile-setting">
-        <span>Personagem</span>
-        <strong id="menuCharacter">Astronauta</strong>
-      </div>
-      <button class="menu-secondary-button" id="settingsFullscreenButton" type="button">Alternar tela cheia</button>
+      <button class="credits-button" id="creditsButton" type="button" data-i18n="Créditos">Créditos</button>
     </section>
 
     <section class="menu-subpage" id="infoPage" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
-      <p class="menu-eyebrow">OPPORTUNITY · MARTE</p>
-      <h2 id="infoTitle">Info</h2>
-      <p>Explore a instalação e treine os instrumentos antes da missão em Marte.</p>
+      <button class="menu-back" type="button" data-menu-home data-i18n="← Voltar">← Voltar</button>
+      <p class="menu-eyebrow" data-i18n="OPPORTUNITY · MARTE">OPPORTUNITY · MARTE</p>
+      <h2 id="infoTitle" data-i18n="Info">Info</h2>
+      <p data-i18n="Explore a instalação e treine os instrumentos antes da missão em Marte.">Explore a instalação e treine os instrumentos antes da missão em Marte.</p>
       <ul class="menu-info-list">
-        <li><kbd>W A S D</kbd> mover</li>
-        <li><kbd>E</kbd> interagir</li>
-        <li><kbd>1–4</kbd> ferramentas</li>
-        <li><kbd>M</kbd> mapa <kbd>Tab</kbd> mochila</li>
+        <li><kbd>W A S D</kbd> <span data-i18n="mover">mover</span></li>
+        <li><kbd>E</kbd> <span data-i18n="interagir">interagir</span></li>
+        <li><kbd>1–4</kbd> <span data-i18n="ferramentas">ferramentas</span></li>
+        <li><kbd>M</kbd> <span data-i18n="mapa">mapa</span> <kbd>Tab</kbd> <span data-i18n="mochila">mochila</span></li>
       </ul>
     </section>
 
     <section class="menu-subpage" id="creditsPage" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home>← Voltar</button>
+      <button class="menu-back" type="button" data-menu-home data-i18n="← Voltar">← Voltar</button>
       <p class="menu-eyebrow">SURVIVING IN MARS</p>
-      <h2 id="creditsTitle">Créditos</h2>
-      <p>Sprites do astronauta: Space Runner Assets, Matt Walkden (CC0).</p>
-      <p>Mapa de treinamento inspirado na missão Opportunity.</p>
-      <p>Cenário e logo: imagens fornecidas pelo usuário.</p>
+      <h2 id="creditsTitle" data-i18n="Créditos">Créditos</h2>
+      <p data-i18n="Sprites do astronauta: Space Runner Assets, Matt Walkden (CC0).">Sprites do astronauta: Space Runner Assets, Matt Walkden (CC0).</p>
+      <p data-i18n="Mapa de treinamento inspirado na missão Opportunity.">Mapa de treinamento inspirado na missão Opportunity.</p>
+      <p data-i18n="Cenário e logo: imagens fornecidas pelo usuário.">Cenário e logo: imagens fornecidas pelo usuário.</p>
+      <p data-i18n="Trilha do menu: Stellar Rift, fornecida pelo usuário.">Trilha do menu: Stellar Rift, fornecida pelo usuário.</p>
     </section>
   </div>
 
+  <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+    <header class="settings-heading">
+      <h2 id="settingsTitle" data-i18n="Configurações">Configurações</h2>
+      <button class="settings-close" id="closeSettings" type="button" aria-label="Fechar configurações" data-i18n-aria-label="Fechar configurações" title="Fechar configurações" data-i18n-title="Fechar configurações">×</button>
+    </header>
+    <div class="settings-layout">
+      <section class="settings-panel" id="audioSettings" role="tabpanel" aria-labelledby="audioSettingsTab">
+        <h3 data-i18n="Som">Som</h3>
+        <div class="volume-setting">
+          <label for="musicVolume" data-i18n="Volume da música">Volume da música</label>
+          <div class="volume-control"><input id="musicVolume" type="range" min="0" max="100" step="1" value="65"><output for="musicVolume" id="musicVolumeValue">65%</output></div>
+        </div>
+        <div class="volume-setting">
+          <label for="gameVolume" data-i18n="Volume do jogo">Volume do jogo</label>
+          <div class="volume-control"><input id="gameVolume" type="range" min="0" max="100" step="1" value="80"><output for="gameVolume" id="gameVolumeValue">80%</output></div>
+        </div>
+      </section>
+      <section class="settings-panel" id="languageSettings" role="tabpanel" aria-labelledby="languageSettingsTab" hidden>
+        <h3 data-i18n="Legendas">Legendas</h3>
+        <label class="subtitle-setting" for="subtitlesEnabled">
+          <span data-i18n="Ligadas / desligadas">Ligadas / desligadas</span>
+          <input class="settings-switch" id="subtitlesEnabled" type="checkbox" role="switch" checked>
+        </label>
+        <div class="language-setting">
+          <label for="gameLanguage" data-i18n="Idioma">Idioma</label>
+          <select id="gameLanguage"><option value="pt-BR" lang="pt-BR">Português</option><option value="en" lang="en">English</option></select>
+        </div>
+      </section>
+      <nav class="settings-tabs" role="tablist" aria-label="Categorias de configurações" data-i18n-aria-label="Categorias de configurações" aria-orientation="vertical">
+        <button class="settings-tab" id="audioSettingsTab" type="button" role="tab" aria-selected="true" aria-controls="audioSettings" aria-label="Som" data-i18n-aria-label="Som" title="Som" data-i18n-title="Som">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 9l12-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="18" cy="16" rx="3" ry="2"/></svg>
+        </button>
+        <button class="settings-tab" id="languageSettingsTab" type="button" role="tab" aria-selected="false" aria-controls="languageSettings" aria-label="Legendas e idioma" data-i18n-aria-label="Legendas e idioma" title="Legendas e idioma" data-i18n-title="Legendas e idioma" tabindex="-1">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M6 11h4m3 0h5M6 15h7m3 0h2"/></svg>
+        </button>
+      </nav>
+    </div>
+  </dialog>
+  <audio id="menuMusic" src="/assets/audio/stellar-rift.mp3" preload="metadata" loop></audio>
+
   <div class="story-overlay" id="introOverlay" hidden>
     <section class="story-card" id="welcomeScreen" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
-      <p class="eyebrow">OPPORTUNITY · TREINAMENTO EM MARTE</p>
-      <h2 id="welcomeTitle">Preparação da missão</h2>
-      <p class="story-copy">Informe seu nome e confirme o equipamento para começar.</p>
-      <p class="profile-character">PERSONAGEM · ASTRONAUTA</p>
+      <p class="eyebrow" data-i18n="OPPORTUNITY · TREINAMENTO EM MARTE">OPPORTUNITY · TREINAMENTO EM MARTE</p>
+      <h2 id="welcomeTitle" data-i18n="Preparação da missão">Preparação da missão</h2>
+      <p class="story-copy" data-i18n="Informe seu nome e confirme o equipamento para começar.">Informe seu nome e confirme o equipamento para começar.</p>
+      <p class="profile-character" data-i18n="PERSONAGEM · ASTRONAUTA">PERSONAGEM · ASTRONAUTA</p>
       <form id="welcomeForm">
-        <label for="cadetName">Identificação do cadete</label>
-        <input id="cadetName" name="cadetName" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome" required>
+        <label for="cadetName" data-i18n="Identificação do cadete">Identificação do cadete</label>
+        <input id="cadetName" name="cadetName" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome" data-i18n-placeholder="Digite seu nome" required>
         <div class="suit-steps">
           <button class="suit-step" id="wearSuit" type="button" aria-pressed="false">
-            <kbd>01</kbd><span>Traje e botas</span><span class="suit-step-state">PENDENTE</span>
+            <kbd>01</kbd><span data-i18n="Traje e botas">Traje e botas</span><span class="suit-step-state" data-i18n="PENDENTE">PENDENTE</span>
           </button>
           <button class="suit-step" id="wearHelmet" type="button" aria-pressed="false" disabled>
-            <kbd>02</kbd><span>Capacete</span><span class="suit-step-state">PENDENTE</span>
+            <kbd>02</kbd><span data-i18n="Capacete">Capacete</span><span class="suit-step-state" data-i18n="PENDENTE">PENDENTE</span>
           </button>
         </div>
-        <p class="suit-feedback" id="suitFeedback" role="status">Conclua as duas etapas.</p>
-        <button class="story-button" id="confirmSuit" type="submit" disabled>Iniciar missão</button>
+        <p class="suit-feedback" id="suitFeedback" role="status" data-i18n="Conclua as duas etapas.">Conclua as duas etapas.</p>
+        <button class="story-button" id="confirmSuit" type="submit" disabled data-i18n="Iniciar missão">Iniciar missão</button>
       </form>
     </section>
   </div>
 
   <div class="equipment-animation-overlay" id="equipmentAnimationOverlay" hidden>
     <section class="equipment-animation-dialog" role="dialog" aria-modal="true" aria-labelledby="equipmentAnimationTitle">
-      <h2 id="equipmentAnimationTitle" class="visually-hidden">Animação de preparação do astronauta</h2>
-      <iframe id="equipmentAnimationFrame" title="Animação de preparação do astronauta" allow="autoplay"></iframe>
-      <button class="equipment-animation-skip" id="skipEquipmentAnimation" type="button">Pular animação</button>
+      <h2 id="equipmentAnimationTitle" class="visually-hidden" data-i18n="Animação de preparação do astronauta">Animação de preparação do astronauta</h2>
+      <iframe id="equipmentAnimationFrame" title="Animação de preparação do astronauta" data-i18n-title="Animação de preparação do astronauta" allow="autoplay"></iframe>
+      <button class="equipment-animation-skip" id="skipEquipmentAnimation" type="button" data-i18n="Pular animação">Pular animação</button>
     </section>
   </div>
 
+  <script src="js/i18n.js"></script>
+  <script src="js/preferences.js"></script>
   <script src="js/config.js"></script>
   <script src="/map-engine-v2/js/map-data.js"></script>
   <script src="js/map-data-training.js"></script>

@@ -6,6 +6,7 @@
 <title>Capacete – POV 8-bit</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
+[hidden]{display:none!important}
 :root{--bg:#07080f;--fg:#9dffb0;--btn:#e8ecf4;--btnbg:#2a3350;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#07080f}}
 :root[data-theme="dark"]{--bg:#07080f}
@@ -38,6 +39,8 @@ button:focus-visible{outline:3px solid #ffb04d;outline-offset:2px}
   <button id="rep">REINICIAR</button>
   <button id="snd">SOM: OFF</button>
 </div>
+<script src="/lab-training/js/i18n.js"></script>
+<script src="/lab-training/js/animation-preferences.js"></script>
 <script>
 const W=192,H=108,c=document.getElementById('c'),x=c.getContext('2d'),cap=document.getElementById('cap');
 const R=(a,b,w,h,col)=>{x.fillStyle=col;x.fillRect(Math.round(a),Math.round(b),Math.round(w),Math.round(h))};
@@ -133,7 +136,7 @@ function frame(t){
 const caps=[[0,'VOCE PEGA O CAPACETE'],[1.8,'LEVANTANDO...'],[4.2,'ENCAIXANDO'],[5.4,''],[6.5,'']];
 let ctx=null,sound=false,fired={},t0=performance.now();
 const beeps=[[1.0,330,.1],[4.2,220,.1],[5.4,90,.25],[6.5,880,.08],[7.5,880,.08],[8.4,880,.08],[9.4,1320,.2]];
-function beep(f,d,type){if(!sound||!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+d)}
+function beep(f,d,type){if(window.AnimationPreferences.playEffect(f,d))return;if(!sound||!ctx)return;const o=ctx.createOscillator(),g=ctx.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+d)}
 function loop(now){
   const elapsed=(now-t0)/1000;
   let t=embedded?Math.min(elapsed,LOOP):elapsed%LOOP;
@@ -141,7 +144,7 @@ function loop(now){
   if(t<.1)fired={};
   frame(t);
   document.querySelectorAll('#hud div').forEach(d=>d.classList.toggle('on',t>=+d.dataset.t));
-  let ct='';for(const k of caps)if(t>=k[0])ct=k[1];cap.textContent=ct;
+  let ct='';for(const k of caps)if(t>=k[0])ct=k[1];cap.textContent=window.AnimationPreferences.t(ct);
   beeps.forEach((b,i)=>{if(t>=b[0]&&!fired[i]){fired[i]=1;beep(b[1],b[2])}});
   if(embedded&&elapsed>=LOOP){window.parent.postMessage('helmet-animation-complete',location.origin);return}
   requestAnimationFrame(loop);

@@ -7,6 +7,7 @@
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.dataset.embed='true'</script>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
+[hidden]{display:none!important}
 :root{
   --bg:#07080f; --fg:#9dffb0; --btn:#e8ecf4; --btnbg:#2a3350;
   color-scheme:dark;
@@ -68,6 +69,8 @@ html[data-embed="true"] .controls{display:none}
   <button id="restart">REINICIAR</button>
   <button id="sound">SOM: OFF</button>
 </div>
+<script src="/lab-training/js/i18n.js"></script>
+<script src="/lab-training/js/animation-preferences.js"></script>
 <script>
 /*
   ANIMAÇÃO: ASTRONAUTA VESTINDO O TRAJE
@@ -319,6 +322,7 @@ html[data-embed="true"] .controls{display:none}
   let soundOn=false, audio=null, played={};
   const soundEvents=[[1.0,420],[3.0,520],[5.4,620],[7.5,360],[9.0,740],[10.8,880],[12.0,1040]];
   function beep(freq){
+    if(window.AnimationPreferences.playEffect(freq,.12))return;
     if(!soundOn||!audio)return;
     const osc=audio.createOscillator(), gain=audio.createGain();
     osc.type='square';osc.frequency.value=freq;gain.gain.value=.035;
@@ -335,7 +339,7 @@ html[data-embed="true"] .controls{display:none}
     hudLines.forEach(line=>line.classList.toggle('on',t>=Number(line.dataset.time)));
     let text='';
     for(const [time,label] of captions)if(t>=time)text=label;
-    caption.textContent=text;
+    caption.textContent=window.AnimationPreferences.t(text);
     soundEvents.forEach(([time,freq],i)=>{
       if(t>=time&&!played[i]){played[i]=true;beep(freq);}
     });

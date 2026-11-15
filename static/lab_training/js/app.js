@@ -1,5 +1,6 @@
 /* Inicialização da interface. A engine também pode ser controlada pelo console. */
 (() => {
+  const t = window.GameI18n.t;
   const config = window.MAP_ENGINE_CONFIG;
   const map = window.MAP_DATA;
   const $ = selector => document.querySelector(selector);
@@ -84,39 +85,39 @@
   function objectiveForPhase() {
     if (tutorialPhase === "gravity") {
       return {
-        title: "Teste de gravidade marciana",
-        description: "Vá até a Antena de Alto Ganho e pressione E para iniciar a calibração."
+        title: t("Teste de gravidade marciana"),
+        description: t("Vá até a Antena de Alto Ganho e pressione E para iniciar a calibração.")
       };
     }
     if (tutorialPhase === "tools") {
       return {
-        title: `Treino de ferramentas · ${completedTests.size}/4`,
-        description: "Caminhe pelo laboratório; aproxime-se do equipamento indicado, selecione a ferramenta com 1–4 e pressione E."
+        title: t("Treino de ferramentas · {count}/4", { count: completedTests.size }),
+        description: t("Caminhe pelo laboratório; aproxime-se do equipamento indicado, selecione a ferramenta com 1–4 e pressione E.")
       };
     }
     if (tutorialPhase === "complete") {
       return {
-        title: "Treinamento inicial concluído",
-        description: "As quatro ferramentas foram testadas. Continue explorando a instalação e consulte o mapa com M."
+        title: t("Treinamento inicial concluído"),
+        description: t("As quatro ferramentas foram testadas. Continue explorando a instalação e consulte o mapa com M.")
       };
     }
     return null;
   }
 
   function updateInterface(state = engine.getState()) {
-    $("#telemetryRoom").textContent = state.room;
-    $("#telemetryMood").textContent = state.mood;
+    $("#telemetryRoom").textContent = t(state.room);
+    $("#telemetryMood").textContent = t(state.mood);
     $("#telemetryPosition").textContent = state.position;
-    $("#telemetryTarget").textContent = state.target;
+    $("#telemetryTarget").textContent = t(state.target);
     $("#telemetryAnimation").textContent = state.animation;
-    $("#telemetryCadet").textContent = cadetName || "Astronauta";
-    $("#hudCadetName").textContent = cadetName || "Astronauta";
-    $("#hudLocation").textContent = state.room;
+    $("#telemetryCadet").textContent = cadetName || t("Astronauta");
+    $("#hudCadetName").textContent = cadetName || t("Astronauta");
+    $("#hudLocation").textContent = t(state.room);
     $("#pausedOverlay").hidden = !state.paused;
     const pauseButton = $("#pauseButton");
     pauseButton.textContent = state.paused ? "▶" : "Ⅱ";
-    pauseButton.setAttribute("aria-label", state.paused ? "Continuar" : "Pausar");
-    pauseButton.title = state.paused ? "Continuar" : "Pausar";
+    pauseButton.setAttribute("aria-label", t(state.paused ? "Continuar" : "Pausar"));
+    pauseButton.title = t(state.paused ? "Continuar" : "Pausar");
 
     const objective = objectiveForPhase();
     tutorialObjective.hidden = !objective;
@@ -129,11 +130,11 @@
     interactionHint.hidden = !activeTutorial || !engine.nearObject || Boolean(engine.inspectedObject) || !mapOverlay.hidden || !inventoryOverlay.hidden;
     if (!interactionHint.hidden) {
       if (tutorialPhase === "gravity") {
-        interactionHint.textContent = "E · CALIBRAR";
+        interactionHint.textContent = t("E · CALIBRAR");
       } else if (tutorialPhase === "tools" && selectedTool) {
-        interactionHint.textContent = "E · USAR FERRAMENTA";
+        interactionHint.textContent = t("E · USAR FERRAMENTA");
       } else {
-        interactionHint.textContent = "E · ANALISAR";
+        interactionHint.textContent = t("E · ANALISAR");
       }
     }
 
@@ -144,7 +145,7 @@
       button.classList.toggle("active", selectedTool === key);
       button.setAttribute("aria-pressed", String(selectedTool === key));
       const progress = button.querySelector(".tool-progress");
-      progress.textContent = completedTests.has(key) ? "OK" : selectedTool === key ? "ATIVA" : "";
+      progress.textContent = completedTests.has(key) ? "OK" : selectedTool === key ? t("ATIVA") : "";
     });
 
   }
@@ -152,22 +153,23 @@
   function showInspection(prop) {
     inspectCard.hidden = !prop;
     if (!prop) return;
-    $("#inspectTitle").textContent = prop.name;
-    $("#inspectDescription").textContent = prop.description;
+    $("#inspectTitle").textContent = t(prop.name);
+    $("#inspectDescription").textContent = t(prop.description);
     if (tutorialPhase === "tools" && !selectedTool) {
       showFeedback("Escolha uma ferramenta · 1–4");
     }
   }
 
-  function showFeedback(message) {
+  function showFeedback(message, values = {}) {
     window.clearTimeout(feedbackTimer);
-    tutorialFeedback.textContent = message;
+    tutorialFeedback.textContent = t(message, values);
     tutorialFeedback.hidden = false;
     feedbackTimer = window.setTimeout(() => { tutorialFeedback.hidden = true; }, 2200);
   }
 
   function renderToolControls() {
     const container = $("#toolControls");
+    container.replaceChildren();
     tools.forEach(tool => {
       const button = document.createElement("button");
       button.type = "button";
@@ -177,11 +179,11 @@
       const key = document.createElement("kbd");
       key.textContent = String(tool.key);
       const name = document.createElement("span");
-      name.textContent = tool.name;
+      name.textContent = t(tool.name);
       const progress = document.createElement("span");
       progress.className = "tool-progress";
       button.append(key, name, progress);
-      button.title = tool.detail;
+      button.title = t(tool.detail);
       button.addEventListener("click", () => selectTool(tool.key));
       container.append(button);
     });
@@ -193,7 +195,7 @@
     quickToolsPanel.hidden = true;
     $("#researchAction").setAttribute("aria-expanded", "false");
     engine.closeInspection();
-    showFeedback(`${tools[key - 1].name} ativa`);
+    showFeedback("{tool} ativa", { tool: t(tools[key - 1].name) });
     setModalState();
   }
 
@@ -204,6 +206,7 @@
         showFeedback("Encontre a antena.");
         return true;
       }
+      window.GamePreferences.playEffect(740, .12);
       tutorialPhase = "tools";
       selectedTool = null;
       engine.closeInspection();
@@ -215,7 +218,7 @@
 
     const tool = tools[selectedTool - 1];
     if (prop.type !== tool.target) {
-      showFeedback(`Use em ${tool.targetName}.`);
+      showFeedback("Use em {target}.", { target: t(tool.targetName) });
       return true;
     }
     if (completedTests.has(tool.key)) {
@@ -223,6 +226,7 @@
       return true;
     }
 
+    window.GamePreferences.playEffect(880, .12);
     completedTests.add(tool.key);
     inventoryItems.push({ title: tool.name, result: tool.result });
     engine.closeInspection();
@@ -244,15 +248,15 @@
       number.className = "inventory-slot-index";
       number.textContent = `SLOT 0${index + 1}`;
       const label = document.createElement("span");
-      label.textContent = item ? item.title : "Vazio";
+      label.textContent = item ? t(item.title) : t("Vazio");
       const detail = document.createElement("span");
-      detail.textContent = item ? item.result : "Sem registro";
+      detail.textContent = item ? t(item.result) : t("Sem registro");
       slot.append(number, label, detail);
       slots.append(slot);
     }
     $("#inventoryCount").textContent = inventoryItems.length
-      ? `${inventoryItems.length}/4 resultados do treinamento guardados.`
-      : "Quatro slots disponíveis para os resultados do treinamento.";
+      ? t("{count}/4 resultados do treinamento guardados.", { count: inventoryItems.length })
+      : t("Quatro slots disponíveis para os resultados do treinamento.");
   }
 
   function drawMinimap() {
@@ -354,11 +358,11 @@
     cadetInput.value = cadetName;
     $("#wearSuit").disabled = true;
     $("#wearSuit").setAttribute("aria-pressed", "true");
-    $("#wearSuit").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
+    $("#wearSuit").querySelector(".suit-step-state").textContent = t("CONCLUÍDO");
     $("#wearHelmet").disabled = true;
     $("#wearHelmet").setAttribute("aria-pressed", "true");
-    $("#wearHelmet").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
-    $("#suitFeedback").textContent = "Equipamento pronto.";
+    $("#wearHelmet").querySelector(".suit-step-state").textContent = t("CONCLUÍDO");
+    $("#suitFeedback").textContent = t("Equipamento pronto.");
     $("#confirmSuit").disabled = false;
     introOverlay.hidden = true;
     appShell.inert = false;
@@ -398,15 +402,15 @@
     if (activeEquipmentAnimation === "suit") {
       suitWorn = true;
       $("#wearSuit").setAttribute("aria-pressed", "true");
-      $("#wearSuit").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
+      $("#wearSuit").querySelector(".suit-step-state").textContent = t("CONCLUÍDO");
       $("#wearHelmet").disabled = false;
-      $("#suitFeedback").textContent = "Agora coloque o capacete.";
+      $("#suitFeedback").textContent = t("Agora coloque o capacete.");
       $("#wearHelmet").focus();
     } else if (activeEquipmentAnimation === "helmet") {
       helmetWorn = true;
       $("#wearHelmet").setAttribute("aria-pressed", "true");
-      $("#wearHelmet").querySelector(".suit-step-state").textContent = "CONCLUÍDO";
-      $("#suitFeedback").textContent = "Equipamento pronto.";
+      $("#wearHelmet").querySelector(".suit-step-state").textContent = t("CONCLUÍDO");
+      $("#suitFeedback").textContent = t("Equipamento pronto.");
       $("#confirmSuit").disabled = false;
       $("#confirmSuit").focus();
     }
@@ -418,18 +422,21 @@
     const isSuit = equipment === "suit";
     const button = isSuit ? $("#wearSuit") : $("#wearHelmet");
     button.disabled = true;
-    button.querySelector(".suit-step-state").textContent = "EM ANDAMENTO";
-    $("#suitFeedback").textContent = isSuit ? "Vestindo o traje..." : "Colocando o capacete...";
+    button.querySelector(".suit-step-state").textContent = t("EM ANDAMENTO");
+    $("#suitFeedback").textContent = t(isSuit ? "Vestindo o traje..." : "Colocando o capacete...");
     equipmentAnimationOverlay.hidden = false;
-    equipmentAnimationFrame.src = isSuit
-      ? "/assets/Animations/astronauta_vestindo_traje_8bit.html?embed=1"
-      : "/assets/Animations/Capacete%20%E2%80%93%20POV%208-bit.html?embed=1";
+    const preferences = window.GamePreferences.get();
+    const params = new URLSearchParams({ embed: "1", lang: preferences.language, subtitles: preferences.subtitles ? "1" : "0" });
+    const animationPath = isSuit
+      ? "/assets/Animations/astronauta_vestindo_traje_8bit.html"
+      : "/assets/Animations/Capacete%20%E2%80%93%20POV%208-bit.html";
+    equipmentAnimationFrame.src = `${animationPath}?${params}`;
     $("#skipEquipmentAnimation").focus();
   }
 
   Object.entries(config.atmosphere.presets).forEach(([key, preset]) => {
     const button = document.createElement("button");
-    button.type = "button"; button.className = "mood-button"; button.dataset.mood = key; button.textContent = preset.label;
+    button.type = "button"; button.className = "mood-button"; button.dataset.mood = key; button.textContent = t(preset.label);
     button.addEventListener("click", () => selectAtmosphere(key));
     $("#moodControls").append(button);
   });
@@ -440,7 +447,7 @@
 
   map.destinations.forEach(destination => {
     const button = document.createElement("button");
-    button.type = "button"; button.className = "room-button"; button.textContent = destination.name;
+    button.type = "button"; button.className = "room-button"; button.textContent = t(destination.name);
     button.addEventListener("click", () => engine.goToRoom(destination.name));
     $("#roomControls").append(button);
   });
@@ -453,12 +460,12 @@
     button.className = "room-button animation-button";
     button.dataset.animation = name;
     button.textContent = name;
-    button.title = `${animation.frames} quadros`;
+    button.title = t("{frames} quadros", { frames: animation.frames });
     button.addEventListener("click", () => {
-      animationFeedback.textContent = `Reproduzindo ${name} (${animation.frames} quadros).`;
+      animationFeedback.textContent = t("Reproduzindo {name} ({frames} quadros).", { name, frames: animation.frames });
       engine.player.playAnimation(name, {
         loop: false,
-        onComplete: () => { animationFeedback.textContent = "Idle e corrida acompanham o movimento no mapa."; }
+        onComplete: () => { animationFeedback.textContent = t("Idle e corrida acompanham o movimento no mapa."); }
       });
       updateInterface();
     });
@@ -469,12 +476,12 @@
     event.preventDefault();
     cadetName = cadetInput.value.trim();
     if (!cadetName) {
-      cadetInput.setCustomValidity("Informe o nome do cadete.");
+      cadetInput.setCustomValidity(t("Informe o nome do cadete."));
       cadetInput.reportValidity();
       return;
     }
     if (!suitWorn || !helmetWorn) {
-      $("#suitFeedback").textContent = "Conclua traje e capacete.";
+      $("#suitFeedback").textContent = t("Conclua traje e capacete.");
       return;
     }
     cadetInput.setCustomValidity("");
@@ -482,7 +489,7 @@
       window.localStorage.setItem(profileStorageKey, JSON.stringify({ name: cadetName, character }));
     } catch (error) {
       console.error("Não foi possível salvar o perfil do cadete:", error);
-      $("#suitFeedback").textContent = "Não foi possível salvar o perfil neste navegador.";
+      $("#suitFeedback").textContent = t("Não foi possível salvar o perfil neste navegador.");
       return;
     }
     startTutorial();
@@ -501,6 +508,9 @@
   window.addEventListener("message", event => {
     if (event.source !== equipmentAnimationFrame.contentWindow || event.origin !== window.location.origin) return;
     if (event.data === `${activeEquipmentAnimation}-animation-complete`) finishEquipmentAnimation();
+    if (activeEquipmentAnimation && event.data?.type === "equipment-sound") {
+      window.GamePreferences.playEffect(event.data.frequency, event.data.duration);
+    }
   });
   document.addEventListener("keydown", event => {
     if (!equipmentAnimationOverlay.hidden && event.key === "Escape") {
@@ -526,13 +536,12 @@
     introOverlay.hidden = false;
     cadetInput.focus();
   });
-  $("#settingsButton").addEventListener("click", () => showMenuPage("settings"));
+
   $("#infoButton").addEventListener("click", () => showMenuPage("info"));
   $("#creditsButton").addEventListener("click", () => showMenuPage("credits"));
   document.querySelectorAll("[data-menu-home]").forEach(button => {
     button.addEventListener("click", () => showMenuPage("home"));
   });
-  $("#settingsFullscreenButton").addEventListener("click", () => toggleFullscreen());
   document.addEventListener("keydown", event => {
     if (mainMenuOverlay.hidden || event.key !== "Escape") return;
     const activePage = document.querySelector(".menu-subpage:not([hidden])");
@@ -556,8 +565,8 @@
   fullscreenButton.addEventListener("click", toggleFullscreen);
   document.addEventListener("fullscreenchange", () => {
     const isFullscreen = Boolean(document.fullscreenElement);
-    fullscreenButton.setAttribute("aria-label", isFullscreen ? "Sair da tela cheia" : "Tela cheia");
-    fullscreenButton.title = isFullscreen ? "Sair da tela cheia" : "Tela cheia";
+    fullscreenButton.setAttribute("aria-label", t(isFullscreen ? "Sair da tela cheia" : "Tela cheia"));
+    fullscreenButton.title = t(isFullscreen ? "Sair da tela cheia" : "Tela cheia");
   });
   $("#closeInspect").addEventListener("click", () => engine.closeInspection());
   $("#closeMap").addEventListener("click", toggleMap);
@@ -586,12 +595,12 @@
       image.onload = () => {
         engine.loadAsset(name, image);
         loaded += 1;
-        $("#assetFeedback").textContent = `${loaded} imagem(ns) carregada(s).`;
+        $("#assetFeedback").textContent = t("{count} imagem(ns) carregada(s).", { count: loaded });
       };
-      image.onerror = () => { $("#assetFeedback").textContent = `Não foi possível carregar ${file.name}.`; };
+      image.onerror = () => { $("#assetFeedback").textContent = t("Não foi possível carregar {file}.", { file: file.name }); };
       image.src = URL.createObjectURL(file);
     });
-    if (!files.length) $("#assetFeedback").textContent = "Nenhum pacote carregado.";
+    if (!files.length) $("#assetFeedback").textContent = t("Nenhum pacote carregado.");
   });
 
   // API pública: window.opportunityMap.setAtmosphere("emergency"), por exemplo.
@@ -639,15 +648,31 @@
     }
   });
 
+  const mapLabels = [
+    ...map.roomLabels.map(label => ({ label, key: "text", source: label.text })),
+    ...map.floorDecals.filter(label => label.k === "text").map(label => ({ label, key: "s", source: label.s }))
+  ];
+  function translateMapLabels() {
+    mapLabels.forEach(({ label, key, source }) => { label[key] = t(source); });
+    engine.renderer.drawStaticMap();
+  }
+  translateMapLabels();
+  window.addEventListener("languagechange", () => {
+    renderToolControls();
+    renderInventory();
+    translateMapLabels();
+    updateInterface();
+    if (engine.inspectedObject) showInspection(engine.inspectedObject);
+  });
+
   cadetInput.value = cadetName;
-  $("#menuCharacter").textContent = character === defaultCharacter ? "Astronauta" : character;
   updateInterface();
   showMenuPage("home");
   engine.start().then(() => {
-    $("#stageStatus").innerHTML = "SISTEMA ONLINE <span></span>";
+    $("#stageStatus").replaceChildren(document.createTextNode(t("SISTEMA ONLINE") + " "), document.createElement("span"));
     console.info("Opportunity Lab Engine pronta. APIs disponíveis em window.labTraining e window.opportunityMap.");
   }).catch(error => {
-    $("#stageStatus").textContent = "ERRO AO CARREGAR ASSETS";
+    $("#stageStatus").textContent = t("ERRO AO CARREGAR ASSETS");
     console.error("Falha ao iniciar a engine Opportunity Lab:", error);
   });
 })();
