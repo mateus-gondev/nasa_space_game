@@ -1,7 +1,7 @@
 /* Textos do Lab Training. As chaves em português também são o idioma de fallback. */
 (() => {
   const english = {
-    "Jogar": "Play", "Info": "Info", "Créditos": "Credits", "← Voltar": "← Back",
+    "Iniciar": "Start", "Jogar": "Play", "Info": "Info", "Créditos": "Credits", "← Voltar": "← Back",
     "Configurações": "Settings", "Fechar configurações": "Close settings",
     "Categorias de configurações": "Settings categories", "Som": "Sound",
     "Volume da música": "Music Volume", "Volume do jogo": "Game Volume",

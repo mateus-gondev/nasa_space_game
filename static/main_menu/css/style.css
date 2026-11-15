@@ -6,9 +6,9 @@ button { color: inherit; font: inherit; }
 [hidden] { display: none !important; }
 .main-menu { position: fixed; z-index: 30; inset: 0; overflow: hidden; color: #f7f3f1; background: #160b0b url("../assets/mars-menu-background.png") center / cover no-repeat; }
 .main-menu::before { position: absolute; inset: 0; background: linear-gradient(90deg, #18090bc9 0%, #1a0b0b75 42%, #15090a30 100%), linear-gradient(0deg, #10090a72, transparent 40%); content: ""; pointer-events: none; }
-.menu-home { position: absolute; inset: 0; }
-.menu-logo { position: absolute; top: 15%; left: 5%; width: min(640px, 54vw); height: auto; filter: drop-shadow(0 5px 16px #13090baa); }
-.menu-frame { position: absolute; top: 44%; left: 5%; display: grid; width: min(340px, calc(100vw - 48px)); gap: 5px; padding: 14px; border: 1px solid #eee6e36b; background: #100d10a8; box-shadow: 0 16px 38px #14080947; }
+.menu-home { --menu-left: 5%; position: absolute; inset: 0; }
+.menu-logo { position: absolute; top: 15%; left: var(--menu-left); width: min(640px, 54vw); height: auto; filter: drop-shadow(0 5px 16px #13090baa); }
+.menu-frame { position: absolute; top: 44%; left: var(--menu-left); display: grid; width: min(340px, calc(100vw - 48px)); gap: 5px; padding: 14px; border: 1px solid #eee6e36b; background: #100d10a8; box-shadow: 0 16px 38px #14080947; }
 .menu-corner { position: absolute; width: 23px; height: 23px; border-color: #fff; border-style: solid; }
 .menu-corner-tl { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
 .menu-corner-tr { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
@@ -28,8 +28,9 @@ button { color: inherit; font: inherit; }
 .menu-info-list li { display: flex; align-items: center; gap: 8px; color: #e4d8d5; }
 .menu-info-list kbd { padding: 3px 6px; border: 1px solid #eee6e35c; color: #fff; background: #fff1; font: 11px var(--mono); }
 @media (max-width: 640px) {
-  .menu-logo { top: 10%; left: 4%; width: min(520px, 92vw); }
-  .menu-frame { top: auto; bottom: 14%; left: 6%; width: min(340px, 88vw); padding: 10px; }
+  .menu-home { --menu-left: 6%; }
+  .menu-logo { top: 10%; width: min(520px, 88vw); }
+  .menu-frame { top: auto; bottom: 14%; width: min(340px, 88vw); padding: 10px; }
   .menu-option { min-height: 44px; font-size: 16px; }
   .credits-button { right: max(14px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); }
 }
@@ -58,7 +59,8 @@ button { color: inherit; font: inherit; }
 .volume-setting { display: grid; justify-items: start; gap: 4px; margin-bottom: 20px; }
 .volume-control { display: flex; align-items: center; gap: 14px; }
 .volume-control output { min-width: 4ch; color: #a6a6a6; font-size: 11px; font-variant-numeric: tabular-nums; }
-.volume-control input { --volume: 65%; width: 150px; height: 18px; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; cursor: pointer; }
+.volume-control input { --volume: 50%; width: 150px; height: 18px; margin: 0; appearance: none; -webkit-appearance: none; background: transparent; cursor: pointer; }
+#gameVolume { --volume: 100%; }
 .volume-control input::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, #c84a24 var(--volume), #bcbcbc var(--volume)); }
 .volume-control input::-moz-range-track { height: 2px; background: #bcbcbc; }
 .volume-control input::-moz-range-progress { height: 2px; background: #c84a24; }
@@ -71,6 +73,16 @@ button { color: inherit; font: inherit; }
 .settings-switch:checked::after { transform: translateX(21px); }
 .language-setting { display: grid; justify-items: start; gap: 9px; }
 .language-setting select { min-width: 172px; max-width: 100%; padding: 6px 28px 6px 10px; border: 1px solid #2c2c2c; border-radius: 5px; color: #f5f5f5; background: #151515; font: 12px var(--mono); cursor: pointer; }
+.language-picker { position: relative; width: 190px; max-width: 100%; font: 12px/1.4 var(--mono); }
+.language-picker-button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 8px 10px; border: 1px solid #2c2c2c; border-radius: 5px; color: #f5f5f5; background: #151515; font: inherit; cursor: pointer; text-align: left; }
+.language-picker-button:hover, .language-picker-button[aria-expanded="true"] { border-color: #777; }
+.language-picker-button svg { width: 16px; height: 16px; margin-left: auto; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.language-flag { display: block; width: 23px; height: 16px; flex: 0 0 auto; object-fit: contain; }
+.language-options { position: absolute; z-index: 2; top: calc(100% + 5px); left: 0; width: 100%; margin: 0; padding: 4px; list-style: none; border: 1px solid #414141; border-radius: 5px; background: #151515; box-shadow: 0 8px 20px #0006; }
+.language-picker.opens-up .language-options { top: auto; bottom: calc(100% + 5px); }
+.language-option { display: flex; align-items: center; gap: 10px; min-height: 32px; padding: 6px; border-radius: 3px; cursor: pointer; }
+.language-option[aria-selected="true"] { color: #f3c3a9; }
+.language-option:hover, .language-option.is-active { background: #303030; }
 .settings-dialog :focus-visible { outline: 2px solid #e7aa8d; outline-offset: 4px; }
 @media (max-width: 520px) {
   .settings-dialog { padding: 16px 12px; }

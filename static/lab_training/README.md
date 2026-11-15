@@ -10,7 +10,7 @@ Na raiz do projeto, use `npm run server` ou `npm run start` e abra:
 http://localhost:3000/lab-training/
 ```
 
-O atalho `http://localhost:3000/game` redireciona para o menu em `/`. Play abre o treinamento em `/lab-training/`. O servidor entrega os sprites em `/assets` e o código da engine v2 em `/map-engine-v2`. A engine é carregada de `static/opportunity-map-engine-v2/opportunity-map-engine`; mantenha essa pasta junto ao projeto. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
+O atalho `http://localhost:3000/game` redireciona para o menu em `/`. Iniciar (Start em inglês) abre o treinamento em `/lab-training/`. O servidor entrega os sprites em `/assets` e o código da engine v2 em `/map-engine-v2`. A engine é carregada de `static/opportunity-map-engine-v2/opportunity-map-engine`; mantenha essa pasta junto ao projeto. Se estiver usando Docker, reconstrua a imagem após alterações com `docker compose up --build -d`.
 
 ## Estrutura
 
@@ -36,7 +36,7 @@ static/lab_training/
 
 ## Menu inicial
 
-O menu com Jogar, Configurações, Info e Créditos fica em `static/main_menu/`, com logo ampliada e arquivos próprios. Acesse `http://localhost:3000/` ou `/game`. Configurações fica entre Jogar e Info e abre o modal com abas de áudio e legendas/idioma. Os volumes de música e efeitos são independentes; o idioma pode ser português ou inglês. As preferências ficam em `localStorage`, na chave `opportunity.labTraining.settings`, e são compartilhadas com o treinamento. A trilha Stellar Rift (`static/assets/audio/stellar-rift.mp3`) toca em loop apenas no menu; se o navegador bloquear autoplay, a primeira interação libera o áudio. Info resume os controles. Jogar abre a preparação do treinamento, preenchendo o nome salvo; o acesso direto a `/lab-training/` também funciona.
+O menu com Iniciar, Configurações, Info e Créditos fica em `static/main_menu/`, com logo ampliada e alinhada ao menu. Acesse `http://localhost:3000/` ou `/game`. Configurações fica entre Iniciar e Info e abre o modal com abas de áudio e legendas/idioma. Os volumes padrão são 50% para música e 100% para efeitos, preservando valores já salvos. O seletor de idioma mostra as bandeiras do Brasil e dos Estados Unidos, fornecidas pelo usuário, para português e inglês; aceita mouse e teclado. As preferências ficam em `localStorage`, na chave `opportunity.labTraining.settings`, e são compartilhadas com o treinamento. A trilha Stellar Rift (`static/assets/audio/stellar-rift.mp3`) toca em loop apenas no menu; se o navegador bloquear autoplay, a primeira interação libera o áudio. Info resume os controles. Iniciar abre a preparação do treinamento, preenchendo o nome salvo; o acesso direto a `/lab-training/` também funciona.
 
 Na preparação, selecionar traje e capacete reproduz as animações 8-bit correspondentes. Cada etapa avança ao terminar a sequência e também pode ser pulada.
 
