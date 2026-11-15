@@ -7,8 +7,8 @@ button { color: inherit; font: inherit; }
 .main-menu { position: fixed; z-index: 30; inset: 0; overflow: hidden; color: #f7f3f1; background: #160b0b url("../assets/mars-menu-background.png") center / cover no-repeat; }
 .main-menu::before { position: absolute; inset: 0; background: linear-gradient(90deg, #18090bc9 0%, #1a0b0b75 42%, #15090a30 100%), linear-gradient(0deg, #10090a72, transparent 40%); content: ""; pointer-events: none; }
 .menu-home { position: absolute; inset: 0; }
-.menu-logo { position: absolute; top: 8%; left: 5%; width: min(640px, 54vw); height: auto; filter: drop-shadow(0 5px 16px #13090baa); }
-.menu-frame { position: absolute; top: 44%; left: 6.5%; display: grid; width: min(340px, calc(100vw - 48px)); gap: 5px; padding: 14px; border: 1px solid #eee6e36b; background: #100d10a8; box-shadow: 0 16px 38px #14080947; }
+.menu-logo { position: absolute; top: 15%; left: 5%; width: min(640px, 54vw); height: auto; filter: drop-shadow(0 5px 16px #13090baa); }
+.menu-frame { position: absolute; top: 44%; left: 5%; display: grid; width: min(340px, calc(100vw - 48px)); gap: 5px; padding: 14px; border: 1px solid #eee6e36b; background: #100d10a8; box-shadow: 0 16px 38px #14080947; }
 .menu-corner { position: absolute; width: 23px; height: 23px; border-color: #fff; border-style: solid; }
 .menu-corner-tl { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
 .menu-corner-tr { top: -2px; right: -2px; border-width: 2px 2px 0 0; }
