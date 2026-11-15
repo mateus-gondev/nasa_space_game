@@ -7,6 +7,7 @@
   <title>Opportunity — Lab Training</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">{"imports":{"three":"/vendor/three/three.module.js"}}</script>
 </head>
 <body>
   <main class="app-shell" id="appShell">
@@ -102,9 +103,12 @@
             <button class="hud-inventory" id="inventoryAction" type="button" aria-label="Abrir mochila (Tab)" data-i18n-aria-label="Abrir mochila (Tab)">TAB <span data-i18n="MOCHILA">MOCHILA</span></button>
           </nav>
           <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
-            <p class="eyebrow" data-i18n="OBJETIVO DO TREINAMENTO">OBJETIVO DO TREINAMENTO</p>
+            <p class="eyebrow" id="tutorialStepLabel">OBJETIVO DO TREINAMENTO</p>
             <h2 id="tutorialTitle"></h2>
             <p id="tutorialDescription"></p>
+            <div class="tutorial-next"><kbd id="tutorialKey"></kbd><span id="tutorialDistance"></span></div>
+            <progress id="tutorialProgress" max="100" value="0" aria-label="Progresso da etapa" data-i18n-aria-label="Progresso da etapa" hidden></progress>
+            <button id="showTutorialHelp" type="button" data-i18n="Rever instrução">Rever instrução</button>
           </section>
           <div class="tutorial-feedback" id="tutorialFeedback" role="status" aria-live="polite" hidden></div>
           <div class="hint" id="interactionHint" hidden></div>
@@ -124,7 +128,8 @@
                 <button class="icon-button" id="closeMap" type="button" aria-label="Fechar mapa" data-i18n-aria-label="Fechar mapa">×</button>
               </div>
               <canvas id="miniMap" width="280" height="180" aria-label="Minimapa da instalação" data-i18n-aria-label="Minimapa da instalação"></canvas>
-              <p class="modal-footnote" data-i18n="PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL">PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL</p>
+              <p class="modal-footnote" data-i18n="CIANO: VOCÊ · ÂMBAR: OBJETIVO E PERCURSO · M / ESC: FECHAR">CIANO: VOCÊ · ÂMBAR: OBJETIVO E PERCURSO · M / ESC: FECHAR</p>
+              <p id="mapObjective" class="modal-description"></p>
             </section>
           </div>
           <div class="stage-modal" id="inventoryOverlay" hidden>
@@ -200,89 +205,21 @@
     <footer class="footer"><span>OPPORTUNITY · MAP ENGINE</span><span>Explorar. Aprender. Viver.</span><span>v2.0.0</span></footer>
   </main>
 
-  <div class="main-menu" id="mainMenuOverlay">
-    <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
-      <img class="menu-logo" src="assets/title.png" alt="Surviving in Mars">
-      <nav class="menu-frame" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
-        <span class="menu-corner menu-corner-tl" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-tr" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-bl" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-br" aria-hidden="true"></span>
-        <button class="menu-option selected" id="playButton" type="button" data-i18n="Jogar">Jogar</button>
-        <button class="menu-option" id="openSettings" type="button" data-i18n="Configurações" aria-haspopup="dialog">Configurações</button>
-        <button class="menu-option" id="infoButton" type="button" data-i18n="Info">Info</button>
-      </nav>
-      <button class="credits-button" id="creditsButton" type="button" data-i18n="Créditos">Créditos</button>
-    </section>
-
-    <section class="menu-subpage" id="infoPage" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home data-i18n="← Voltar">← Voltar</button>
-      <p class="menu-eyebrow" data-i18n="OPPORTUNITY · MARTE">OPPORTUNITY · MARTE</p>
-      <h2 id="infoTitle" data-i18n="Info">Info</h2>
-      <p data-i18n="Explore a instalação e treine os instrumentos antes da missão em Marte.">Explore a instalação e treine os instrumentos antes da missão em Marte.</p>
-      <ul class="menu-info-list">
-        <li><kbd>W A S D</kbd> <span data-i18n="mover">mover</span></li>
-        <li><kbd>E</kbd> <span data-i18n="interagir">interagir</span></li>
-        <li><kbd>1–4</kbd> <span data-i18n="ferramentas">ferramentas</span></li>
-        <li><kbd>M</kbd> <span data-i18n="mapa">mapa</span> <kbd>Tab</kbd> <span data-i18n="mochila">mochila</span></li>
-      </ul>
-    </section>
-
-    <section class="menu-subpage" id="creditsPage" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home data-i18n="← Voltar">← Voltar</button>
-      <p class="menu-eyebrow">SURVIVING IN MARS</p>
-      <h2 id="creditsTitle" data-i18n="Créditos">Créditos</h2>
-      <p data-i18n="Sprites do astronauta: Space Runner Assets, Matt Walkden (CC0).">Sprites do astronauta: Space Runner Assets, Matt Walkden (CC0).</p>
-      <p data-i18n="Mapa de treinamento inspirado na missão Opportunity.">Mapa de treinamento inspirado na missão Opportunity.</p>
-      <p data-i18n="Cenário e logo: imagens fornecidas pelo usuário.">Cenário e logo: imagens fornecidas pelo usuário.</p>
-      <p data-i18n="Trilha do menu: Stellar Rift, fornecida pelo usuário.">Trilha do menu: Stellar Rift, fornecida pelo usuário.</p>
+  <div class="story-overlay" id="tutorialCoach" hidden>
+    <section class="story-card tutorial-coach-card" role="dialog" aria-modal="true" aria-labelledby="coachTitle" aria-describedby="coachDescription" tabindex="-1">
+      <p class="eyebrow" id="coachStep"></p>
+      <h2 id="coachTitle"></h2>
+      <p class="story-copy" id="coachDescription"></p>
+      <div class="coach-shortcut" id="coachKey"></div>
+      <button class="story-button" id="continueTutorial" type="button">Entendido, vamos lá</button>
+      <a class="tutorial-menu-link" id="tutorialMenuLink" href="/" hidden data-i18n="Voltar ao menu">Voltar ao menu</a>
     </section>
   </div>
-
-  <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
-    <header class="settings-heading">
-      <h2 id="settingsTitle" data-i18n="Configurações">Configurações</h2>
-      <button class="settings-close" id="closeSettings" type="button" aria-label="Fechar configurações" data-i18n-aria-label="Fechar configurações" title="Fechar configurações" data-i18n-title="Fechar configurações">×</button>
-    </header>
-    <div class="settings-layout">
-      <section class="settings-panel" id="audioSettings" role="tabpanel" aria-labelledby="audioSettingsTab">
-        <h3 data-i18n="Som">Som</h3>
-        <div class="volume-setting">
-          <label for="musicVolume" data-i18n="Volume da música">Volume da música</label>
-          <div class="volume-control"><input id="musicVolume" type="range" min="0" max="100" step="1" value="65"><output for="musicVolume" id="musicVolumeValue">65%</output></div>
-        </div>
-        <div class="volume-setting">
-          <label for="gameVolume" data-i18n="Volume do jogo">Volume do jogo</label>
-          <div class="volume-control"><input id="gameVolume" type="range" min="0" max="100" step="1" value="80"><output for="gameVolume" id="gameVolumeValue">80%</output></div>
-        </div>
-      </section>
-      <section class="settings-panel" id="languageSettings" role="tabpanel" aria-labelledby="languageSettingsTab" hidden>
-        <h3 data-i18n="Legendas">Legendas</h3>
-        <label class="subtitle-setting" for="subtitlesEnabled">
-          <span data-i18n="Ligadas / desligadas">Ligadas / desligadas</span>
-          <input class="settings-switch" id="subtitlesEnabled" type="checkbox" role="switch" checked>
-        </label>
-        <div class="language-setting">
-          <label for="gameLanguage" data-i18n="Idioma">Idioma</label>
-          <select id="gameLanguage"><option value="pt-BR" lang="pt-BR">Português</option><option value="en" lang="en">English</option></select>
-        </div>
-      </section>
-      <nav class="settings-tabs" role="tablist" aria-label="Categorias de configurações" data-i18n-aria-label="Categorias de configurações" aria-orientation="vertical">
-        <button class="settings-tab" id="audioSettingsTab" type="button" role="tab" aria-selected="true" aria-controls="audioSettings" aria-label="Som" data-i18n-aria-label="Som" title="Som" data-i18n-title="Som">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 9l12-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="18" cy="16" rx="3" ry="2"/></svg>
-        </button>
-        <button class="settings-tab" id="languageSettingsTab" type="button" role="tab" aria-selected="false" aria-controls="languageSettings" aria-label="Legendas e idioma" data-i18n-aria-label="Legendas e idioma" title="Legendas e idioma" data-i18n-title="Legendas e idioma" tabindex="-1">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M6 11h4m3 0h5M6 15h7m3 0h2"/></svg>
-        </button>
-      </nav>
-    </div>
-  </dialog>
-  <audio id="menuMusic" src="/assets/audio/stellar-rift.mp3" preload="metadata" loop></audio>
 
   <div class="story-overlay" id="introOverlay" hidden>
     <section class="story-card" id="welcomeScreen" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
       <p class="eyebrow" data-i18n="OPPORTUNITY · TREINAMENTO EM MARTE">OPPORTUNITY · TREINAMENTO EM MARTE</p>
-      <h2 id="welcomeTitle" data-i18n="Preparação da missão">Preparação da missão</h2>
+      <h2 id="welcomeTitle">Preparação da missão</h2>
       <p class="story-copy" data-i18n="Informe seu nome e confirme o equipamento para começar.">Informe seu nome e confirme o equipamento para começar.</p>
       <p class="profile-character" data-i18n="PERSONAGEM · ASTRONAUTA">PERSONAGEM · ASTRONAUTA</p>
       <form id="welcomeForm">
@@ -290,14 +227,14 @@
         <input id="cadetName" name="cadetName" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome" data-i18n-placeholder="Digite seu nome" required>
         <div class="suit-steps">
           <button class="suit-step" id="wearSuit" type="button" aria-pressed="false">
-            <kbd>01</kbd><span data-i18n="Traje e botas">Traje e botas</span><span class="suit-step-state" data-i18n="PENDENTE">PENDENTE</span>
+            <kbd>01</kbd><span data-i18n="Traje e botas">Traje e botas</span><span class="suit-step-state">PENDENTE</span>
           </button>
           <button class="suit-step" id="wearHelmet" type="button" aria-pressed="false" disabled>
-            <kbd>02</kbd><span data-i18n="Capacete">Capacete</span><span class="suit-step-state" data-i18n="PENDENTE">PENDENTE</span>
+            <kbd>02</kbd><span data-i18n="Capacete">Capacete</span><span class="suit-step-state">PENDENTE</span>
           </button>
         </div>
-        <p class="suit-feedback" id="suitFeedback" role="status" data-i18n="Conclua as duas etapas.">Conclua as duas etapas.</p>
-        <button class="story-button" id="confirmSuit" type="submit" disabled data-i18n="Iniciar missão">Iniciar missão</button>
+        <p class="suit-feedback" id="suitFeedback" role="status">Conclua as duas etapas.</p>
+        <button class="story-button" id="confirmSuit" type="submit" disabled>Iniciar missão</button>
       </form>
     </section>
   </div>
@@ -310,6 +247,40 @@
     </section>
   </div>
 
+  <div class="launch-room-overlay" id="launchRoomOverlay" hidden>
+    <section class="launch-room-dialog" role="dialog" aria-modal="true" aria-labelledby="launchRoomTitle">
+      <header class="launch-room-header">
+        <h2 id="launchRoomTitle" data-i18n="Sala de lançamento · MARS 01">Sala de lançamento · MARS 01</h2>
+        <button id="leaveLaunchRoom" type="button" data-i18n="Voltar ao laboratório · Esc">Voltar ao laboratório · Esc</button>
+      </header>
+      <iframe id="launchRoomFrame" title="Protótipo interativo de lançamento MARS 01" data-i18n-title="Protótipo interativo de lançamento MARS 01" allow="autoplay"></iframe>
+    </section>
+  </div>
+
+  <div class="camera-overlay" id="cameraOverlay" hidden>
+    <section class="camera-dialog" role="dialog" aria-modal="true" aria-labelledby="cameraTitle" aria-describedby="cameraHelp">
+      <header class="camera-header">
+        <div><p class="eyebrow" data-i18n="PANCAM · VISÃO 3D">PANCAM · VISÃO 3D</p><h2 id="cameraTitle" data-i18n="Câmera científica">Câmera científica</h2></div>
+        <button id="closeCamera" type="button" data-i18n="Voltar ao mapa · Esc">Voltar ao mapa · Esc</button>
+      </header>
+      <div class="camera-viewport" id="cameraViewport">
+        <div class="camera-reticle" aria-hidden="true">＋</div>
+        <p id="cameraMessage" role="status" aria-live="polite">Carregando ambiente 3D…</p>
+      </div>
+      <footer class="camera-footer">
+        <p id="cameraHelp" data-i18n="Arraste para olhar · Setas: orientar · Scroll: zoom · R: centralizar · E: fotografar. A posição fica fixa; volte ao mapa para caminhar.">Arraste para olhar · Setas: orientar · Scroll: zoom · R: centralizar · E: fotografar. A posição fica fixa; volte ao mapa para caminhar.</p>
+        <div class="camera-controls">
+          <button id="cameraMouse" type="button" disabled data-i18n="Capturar mouse">Capturar mouse</button>
+          <button id="cameraCenter" type="button" disabled data-i18n="Centralizar · R">Centralizar · R</button>
+          <label for="cameraQuality"><span data-i18n="Qualidade">Qualidade</span> <select id="cameraQuality" disabled><option value="low" data-i18n="Baixa">Baixa</option><option value="balanced" selected data-i18n="Equilibrada">Equilibrada</option><option value="high" data-i18n="Alta">Alta</option></select></label>
+          <label for="cameraZoom">Zoom <input id="cameraZoom" type="range" min="1" max="4" step="0.1" value="1" disabled> <output id="cameraZoomValue">1.0×</output></label>
+          <button id="cameraCapture" type="button" disabled data-i18n="Fotografar · E">Fotografar · E</button>
+        </div>
+        <output id="cameraTelemetry" aria-label="Orientação da câmera" data-i18n-aria-label="Orientação da câmera"></output>
+      </footer>
+    </section>
+  </div>
+
   <script src="js/i18n.js"></script>
   <script src="js/preferences.js"></script>
   <script src="js/config.js"></script>
@@ -318,6 +289,8 @@
   <script src="js/animation.js"></script>
   <script src="js/character.js"></script>
   <script src="/map-engine-v2/js/renderer.js"></script>
+  <script src="js/tutorial.js"></script>
+  <script src="js/tutorial-navigation.js"></script>
   <script src="/map-engine-v2/js/controls.js"></script>
   <script src="/map-engine-v2/js/engine.js"></script>
   <script src="js/app.js"></script>

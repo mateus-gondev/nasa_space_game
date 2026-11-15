@@ -4,7 +4,7 @@
  */
 window.MAP_ENGINE_CONFIG = {
   grid: { tileSize: 40, columns: 80, rows: 52 },
-  camera: { viewTiles: { w: 26, h: 15 }, smooth: 8 },
+  camera: { viewTiles: { w: 26, h: 15 }, smooth: 8, renderQuality: "balanced" },
   player: {
     startX: 60, startY: 11, speed: 4.4, collisionRadius: 0.30,
     spriteSize: 50, animationFps: { idle: 7, run: 10, jump: 8, death: 7 }

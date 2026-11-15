@@ -17,7 +17,7 @@
   const trigger = document.querySelector("#openSettings");
   const music = document.querySelector("#menuMusic");
   const menu = document.querySelector("#mainMenuOverlay");
-  const tabs = [...dialog.querySelectorAll('[role="tab"]')];
+  const tabs = [...(dialog?.querySelectorAll('[role="tab"]') || [])];
   let audioContext;
   let effectsGain;
   let musicPending = false;
@@ -28,6 +28,7 @@
   }
 
   function syncMusic() {
+    if (!music || !menu) return;
     music.volume = settings.musicVolume / 100;
     if (menu.hidden || document.hidden || settings.musicVolume === 0) {
       music.pause();
@@ -77,12 +78,15 @@
     document.documentElement.dataset.subtitles = settings.subtitles ? "on" : "off";
     for (const channel of ["music", "game"]) {
       const input = document.querySelector(`#${channel}Volume`);
+      if (!input) continue;
       input.value = settings[`${channel}Volume`];
       input.style.setProperty("--volume", `${input.value}%`);
       document.querySelector(`#${channel}VolumeValue`).value = `${input.value}%`;
     }
-    document.querySelector("#subtitlesEnabled").checked = settings.subtitles;
-    document.querySelector("#gameLanguage").value = settings.language;
+    const subtitlesInput = document.querySelector("#subtitlesEnabled");
+    const languageInput = document.querySelector("#gameLanguage");
+    if (subtitlesInput) subtitlesInput.checked = settings.subtitles;
+    if (languageInput) languageInput.value = settings.language;
     if (effectsGain) effectsGain.gain.value = settings.gameVolume / 100;
     window.GameI18n.setLanguage(settings.language);
     syncMusic();
@@ -98,14 +102,14 @@
     if (focus) tab.focus();
   }
 
-  trigger.addEventListener("click", () => {
+  trigger?.addEventListener("click", () => {
     selectTab(tabs[0]);
     dialog.showModal();
     tabs[0].focus();
   });
-  document.querySelector("#closeSettings").addEventListener("click", () => dialog.close());
-  dialog.addEventListener("close", () => trigger.focus());
-  dialog.addEventListener("click", event => {
+  document.querySelector("#closeSettings")?.addEventListener("click", () => dialog.close());
+  dialog?.addEventListener("close", () => trigger?.focus());
+  dialog?.addEventListener("click", event => {
     const bounds = dialog.getBoundingClientRect();
     if (event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) dialog.close();
   });
@@ -123,19 +127,19 @@
     });
   });
   ["music", "game"].forEach(channel => {
-    document.querySelector(`#${channel}Volume`).addEventListener("input", event => {
+    document.querySelector(`#${channel}Volume`)?.addEventListener("input", event => {
       settings[`${channel}Volume`] = Number(event.target.value);
       save();
       applySettings();
     });
   });
-  document.querySelector("#gameVolume").addEventListener("change", () => playEffect());
-  document.querySelector("#subtitlesEnabled").addEventListener("change", event => {
+  document.querySelector("#gameVolume")?.addEventListener("change", () => playEffect());
+  document.querySelector("#subtitlesEnabled")?.addEventListener("change", event => {
     settings.subtitles = event.target.checked;
     save();
     applySettings();
   });
-  document.querySelector("#gameLanguage").addEventListener("change", event => {
+  document.querySelector("#gameLanguage")?.addEventListener("change", event => {
     settings.language = event.target.value;
     save();
     applySettings();
@@ -146,8 +150,8 @@
     if (event.target.closest("button") && !event.target.closest("#appShell")) playEffect(460, .035);
   });
   document.addEventListener("visibilitychange", syncMusic);
-  window.addEventListener("pagehide", () => music.pause());
-  new MutationObserver(syncMusic).observe(menu, { attributes: true, attributeFilter: ["hidden"] });
+  window.addEventListener("pagehide", () => music?.pause());
+  if (menu) new MutationObserver(syncMusic).observe(menu, { attributes: true, attributeFilter: ["hidden"] });
 
   window.GamePreferences = { get: () => ({ ...settings }), playEffect, syncMusic };
   applySettings();

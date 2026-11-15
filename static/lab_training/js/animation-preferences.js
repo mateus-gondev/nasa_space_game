@@ -7,7 +7,10 @@
   document.querySelectorAll("#caption, #cap").forEach(element => { element.hidden = !captionsEnabled; });
   document.querySelectorAll("#hud div").forEach(element => { element.textContent = window.GameI18n.t(element.textContent); });
   window.AnimationPreferences = {
+    embedded,
+    captionsEnabled,
     t: window.GameI18n.t,
+    localizeTimeline: entries => entries.map(([time, text]) => [time, window.GameI18n.t(text)]),
     playEffect(frequency, duration = .12) {
       if (!embedded) return false;
       window.parent.postMessage({ type: "equipment-sound", frequency, duration }, location.origin);
