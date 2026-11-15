@@ -60,9 +60,9 @@ Durante a missão, o HUD usa os ícones pixelados do pacote `static/assets/visua
 
 - `WASD` ou setas: mover pelo mapa top-down.
 - `E` ou espaço: interagir com o objeto próximo.
-- `1`–`4`: selecionar ferramenta científica.
+- `3`: abrir Pesquisa científica; dentro do seletor, `1`–`4` escolhem uma ferramenta. Fora dele, `1`, `2` e `4` selecionam diretamente a ferramenta correspondente.
 - `M`: abrir/fechar o mapa; `Tab`: abrir/fechar a mochila.
-- Clique em Pesquisa para abrir as ferramentas científicas ou em Mapa/Mochila para abrir esses painéis.
+- Clique no slot de Pesquisa para abrir ou trocar a ferramenta; o slot mostra o ícone e o nome da ferramenta escolhida. Clique em Mapa/Mochila para abrir esses painéis.
 - `Esc`: fechar painéis. No celular, use os controles sobre o mapa.
 - Os controles de pausa, reinício e tela cheia ficam no canto superior direito.
 

@@ -75,7 +75,7 @@
             </div>
           </div>
 
-          <div class="quick-tools-panel hud-panel" id="quickToolsPanel" role="region" aria-labelledby="quickToolsTitle" hidden>
+          <div class="quick-tools-panel hud-panel" id="quickToolsPanel" role="dialog" aria-modal="true" aria-labelledby="quickToolsTitle" hidden>
             <div class="quick-tools-heading">
               <div><span class="hud-kicker" data-i18n="AÇÃO 03">AÇÃO 03</span><strong id="quickToolsTitle" data-i18n="Pesquisa científica">Pesquisa científica</strong></div>
               <button class="hud-close" id="closeQuickTools" type="button" aria-label="Fechar ferramentas" data-i18n-aria-label="Fechar ferramentas">×</button>
@@ -84,23 +84,40 @@
           </div>
 
           <nav class="hud-action-dock" aria-label="Ações da missão" data-i18n-aria-label="Ações da missão">
-            <button class="hud-action unavailable" type="button" disabled title="Construção indisponível neste treinamento" data-i18n-title="Construção indisponível neste treinamento">
-              <img src="/assets/visuals/hud_assets/svg/acao_1_obra.svg" alt="">
-              <span data-i18n="OBRA">OBRA</span><small data-i18n="FUTURO">FUTURO</small>
-            </button>
-            <button class="hud-action unavailable" type="button" disabled title="Reparo indisponível neste treinamento" data-i18n-title="Reparo indisponível neste treinamento">
-              <img src="/assets/visuals/hud_assets/svg/acao_2_reparo.svg" alt="">
-              <span data-i18n="REPARO">REPARO</span><small data-i18n="FUTURO">FUTURO</small>
-            </button>
-            <button class="hud-action" id="researchAction" type="button" aria-expanded="false" aria-controls="quickToolsPanel" title="Abrir ferramentas científicas" data-i18n-title="Abrir ferramentas científicas">
-              <img src="/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg" alt="">
-              <span data-i18n="PESQUISA">PESQUISA</span><small>1–4</small>
-            </button>
-            <button class="hud-action" id="mapAction" type="button" title="Abrir mapa (M)" data-i18n-title="Abrir mapa (M)">
-              <img src="/assets/visuals/hud_assets/svg/acao_4_mapa.svg" alt="">
+            <div class="hud-action-group" aria-label="Atalhos de ação" data-i18n-aria-label="Atalhos de ação">
+              <button class="hud-action unavailable" type="button" disabled title="Construção indisponível neste treinamento" data-i18n-title="Construção indisponível neste treinamento">
+                <img src="/assets/visuals/hud_assets/svg/acao_1_obra.svg" alt="">
+                <span data-i18n="OBRA">OBRA</span><small data-i18n="FUTURO">FUTURO</small>
+              </button>
+              <button class="hud-action unavailable" type="button" disabled title="Reparo indisponível neste treinamento" data-i18n-title="Reparo indisponível neste treinamento">
+                <img src="/assets/visuals/hud_assets/svg/acao_2_reparo.svg" alt="">
+                <span data-i18n="REPARO">REPARO</span><small data-i18n="FUTURO">FUTURO</small>
+              </button>
+              <button class="hud-action" id="researchAction" type="button" aria-expanded="false" aria-controls="quickToolsPanel" title="Abrir ferramentas científicas" data-i18n-title="Abrir ferramentas científicas">
+                <img id="researchActionIcon" src="/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg" alt="">
+                <span id="researchActionName">PESQUISA</span><small id="researchActionShortcut">1–4</small>
+              </button>
+            </div>
+            <button class="hud-action hud-action-orange" id="mapAction" type="button" title="Abrir mapa (M)" data-i18n-title="Abrir mapa (M)">
+              <svg class="hud-pixel-icon hud-compass-icon" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                <path fill="#10245a" d="M2 0h3v1h1v1h1v3H6v1H5v1H2V6H1V5H0V2h1V1h1z"/>
+                <path fill="#eaf7ff" d="M2 1h3v1h1v3H5v1H2V5H1V2h1z"/>
+                <path fill="#238fff" d="M2 2h3v1h1v2H5v1H2V5H1V3h1z"/>
+                <path fill="#ff493f" d="M4 2h1L3 5V4z"/>
+                <path fill="#ffe36a" d="M3 5h1L4 3z"/>
+              </svg>
               <span data-i18n="MAPA">MAPA</span><small>M</small>
             </button>
-            <button class="hud-inventory" id="inventoryAction" type="button" aria-label="Abrir mochila (Tab)" data-i18n-aria-label="Abrir mochila (Tab)">TAB <span data-i18n="MOCHILA">MOCHILA</span></button>
+            <button class="hud-inventory" id="inventoryAction" type="button" aria-label="Abrir mochila (Tab)" data-i18n-aria-label="Abrir mochila (Tab)">
+              <svg class="hud-pixel-icon backpack-icon" viewBox="0 0 7 7" aria-hidden="true" shape-rendering="crispEdges">
+                <path fill="#14224d" d="M2 0h3v1h1v1h1v4H6v1H1V6H0V2h1V1h1z"/>
+                <path fill="#ff982e" d="M2 1h3v1h1v3H5v2H2V6H1V3h1z"/>
+                <path fill="#ffbe47" d="M2 2h3v2H2z"/>
+                <path fill="#843d1d" d="M1 3h1v2H1zM5 3h1v2H5zM3 0h1v2H3z"/>
+                <path fill="#f3d16b" d="M2 4h3v1H2z"/>
+              </svg>
+              <span class="inventory-copy"><kbd>TAB</kbd><b data-i18n="MOCHILA">MOCHILA</b></span>
+            </button>
           </nav>
           <section class="tutorial-objective" id="tutorialObjective" aria-live="polite" hidden>
             <p class="eyebrow" id="tutorialStepLabel">OBJETIVO DO TREINAMENTO</p>
@@ -137,6 +154,37 @@
               <div class="modal-heading">
                 <div><p class="eyebrow" data-i18n="TAB · MOCHILA">TAB · MOCHILA</p><h2 id="inventoryTitle" data-i18n="Inventário de missão">Inventário de missão</h2></div>
                 <button class="icon-button" id="closeInventory" type="button" aria-label="Fechar mochila" data-i18n-aria-label="Fechar mochila">×</button>
+              </div>
+              <div class="inventory-overview">
+                <section class="inventory-profile" aria-label="Cadete da missão" data-i18n-aria-label="Cadete da missão">
+                  <div class="inventory-astronaut" id="inventoryAstronaut" role="img" aria-label="Astronauta" data-i18n-aria-label="Astronauta"></div>
+                  <div class="inventory-profile-copy">
+                    <span class="inventory-profile-kicker" data-i18n="CADETE · OPPORTUNITY">CADETE · OPPORTUNITY</span>
+                    <strong id="inventoryCadetName">Astronauta</strong>
+                    <span id="inventoryLocation">Instrument Lab</span>
+                  </div>
+                </section>
+                <section class="inventory-vitals" aria-labelledby="inventoryVitalsTitle">
+                  <h3 id="inventoryVitalsTitle" data-i18n="Status da missão">Status da missão</h3>
+                  <div class="inventory-vital-list" id="inventoryVitals">
+                    <div class="inventory-vital" data-source-label="Oxigênio" style="--vital-color:#4fd1ff">
+                      <div class="inventory-vital-label"><img src="/assets/visuals/hud_assets/svg/icone_oxigenio.svg" alt=""><span>O₂</span><strong class="inventory-vital-value">100%</strong></div>
+                      <div class="inventory-vital-track" role="meter" aria-label="Oxigênio" data-i18n-aria-label="Oxigênio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="inventory-vital-fill"></span></div>
+                    </div>
+                    <div class="inventory-vital" data-source-label="Água" style="--vital-color:#4a86ff">
+                      <div class="inventory-vital-label"><img src="/assets/visuals/hud_assets/svg/icone_agua.svg" alt=""><span data-i18n="ÁGUA">ÁGUA</span><strong class="inventory-vital-value">100%</strong></div>
+                      <div class="inventory-vital-track" role="meter" aria-label="Água" data-i18n-aria-label="Água" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="inventory-vital-fill"></span></div>
+                    </div>
+                    <div class="inventory-vital" data-source-label="Energia" style="--vital-color:#ffe45e">
+                      <div class="inventory-vital-label"><img src="/assets/visuals/hud_assets/svg/icone_energia.svg" alt=""><span data-i18n="ENERGIA">ENERGIA</span><strong class="inventory-vital-value">100%</strong></div>
+                      <div class="inventory-vital-track" role="meter" aria-label="Energia" data-i18n-aria-label="Energia" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="inventory-vital-fill"></span></div>
+                    </div>
+                    <div class="inventory-vital" data-source-label="Alimentação" style="--vital-color:#ff9a3c">
+                      <div class="inventory-vital-label"><img src="/assets/visuals/hud_assets/svg/icone_alimentacao.svg" alt=""><span data-i18n="ALIMENTO">ALIMENTO</span><strong class="inventory-vital-value">100%</strong></div>
+                      <div class="inventory-vital-track" role="meter" aria-label="Alimento" data-i18n-aria-label="Alimento" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><span class="inventory-vital-fill"></span></div>
+                    </div>
+                  </div>
+                </section>
               </div>
               <p class="modal-description" id="inventoryCount">Quatro slots disponíveis para os resultados do treinamento.</p>
               <div class="inventory-slots" id="inventorySlots"></div>
@@ -211,30 +259,55 @@
       <h2 id="coachTitle"></h2>
       <p class="story-copy" id="coachDescription"></p>
       <div class="coach-shortcut" id="coachKey"></div>
-      <button class="story-button" id="continueTutorial" type="button">Entendido, vamos lá</button>
+      <button class="story-button" id="continueTutorial" type="button" data-i18n="Entendido, vamos lá">Entendido, vamos lá</button>
       <a class="tutorial-menu-link" id="tutorialMenuLink" href="/" hidden data-i18n="Voltar ao menu">Voltar ao menu</a>
     </section>
   </div>
 
   <div class="story-overlay" id="introOverlay" hidden>
     <section class="story-card" id="welcomeScreen" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
-      <p class="eyebrow" data-i18n="OPPORTUNITY · TREINAMENTO EM MARTE">OPPORTUNITY · TREINAMENTO EM MARTE</p>
-      <h2 id="welcomeTitle">Preparação da missão</h2>
-      <p class="story-copy" data-i18n="Informe seu nome e confirme o equipamento para começar.">Informe seu nome e confirme o equipamento para começar.</p>
-      <p class="profile-character" data-i18n="PERSONAGEM · ASTRONAUTA">PERSONAGEM · ASTRONAUTA</p>
+      <header class="prep-header">
+        <p class="prep-brand">OPPORTUNITY -<br><span data-i18n="TREINAMENTO EM MARTE">TREINAMENTO EM MARTE</span></p>
+        <svg class="prep-rocket" viewBox="0 0 48 48" aria-hidden="true" shape-rendering="crispEdges">
+          <path fill="#138cf0" d="M27 3h12v4h4v12h-4v8h-4v5h-8l-8 8-2-2 4-9V17l8-8z"/>
+          <path fill="#51e5ff" d="M27 7h12v4h-4v8h-4v4h-8v-8h4z"/>
+          <path fill="#08285f" d="M23 17h8v8h-8z"/>
+          <path fill="#d8f6ff" d="M27 9h6v6h-6z"/>
+          <path fill="#ffb31a" d="M15 29h8v7h-5l-5 5h-4v-5l5-4z"/>
+          <path fill="#ff5b24" d="M14 37h7l-4 6h-6z"/>
+          <path fill="#112d78" d="M35 24h6v5h-5v4h-8v-4h7z"/>
+        </svg>
+        <button class="prep-back" id="backToMenu" type="button" data-i18n="Voltar">Voltar</button>
+      </header>
+      <h2 id="welcomeTitle" class="prep-title">Preparação da missão</h2>
+      <p class="profile-character" data-i18n="Personagem - Astronauta">Personagem - Astronauta</p>
       <form id="welcomeForm">
-        <label for="cadetName" data-i18n="Identificação do cadete">Identificação do cadete</label>
-        <input id="cadetName" name="cadetName" type="text" maxlength="24" autocomplete="given-name" placeholder="Digite seu nome" data-i18n-placeholder="Digite seu nome" required>
+        <label class="visually-hidden" for="cadetName" data-i18n="Nome do Astronauta">Nome do Astronauta</label>
+        <input id="cadetName" name="cadetName" type="text" maxlength="24" autocomplete="given-name" placeholder="Nome do Astronauta" data-i18n-placeholder="Nome do Astronauta" required>
         <div class="suit-steps">
           <button class="suit-step" id="wearSuit" type="button" aria-pressed="false">
-            <kbd>01</kbd><span data-i18n="Traje e botas">Traje e botas</span><span class="suit-step-state">PENDENTE</span>
+            <span class="suit-step-title" data-i18n="Traje e Botas">Traje e Botas</span>
+            <span class="suit-icon suit-icon-astronaut" aria-hidden="true"></span>
+            <span class="suit-step-state">PENDENTE</span>
+            <kbd>01</kbd>
           </button>
           <button class="suit-step" id="wearHelmet" type="button" aria-pressed="false" disabled>
-            <kbd>02</kbd><span data-i18n="Capacete">Capacete</span><span class="suit-step-state">PENDENTE</span>
+            <span class="suit-step-title" data-i18n="Capacete">Capacete</span>
+            <svg class="suit-icon suit-icon-helmet" viewBox="0 0 64 64" aria-hidden="true" shape-rendering="crispEdges">
+              <path fill="#101c4b" d="M16 5h32v4h8v8h4v27h-4v8h-8v4H16v-4H8v-8H4V17h4V9h8z"/>
+              <path fill="#d8e9f4" d="M16 9h32v4h4v8h4v19h-4v8h-8v4H20v-4h-8v-8H8V21h4v-8h4z"/>
+              <path fill="#aebfd2" d="M16 13h4v32h-4v-4h-4V21h4zM44 13h4v4h4v20h-4v8h-4z"/>
+              <path fill="#0c3477" d="M20 17h24v4h4v15h-4v4H20v-4h-4V21h4z"/>
+              <path fill="#19b9f4" d="M21 21h22v3h3v10h-3v3H21v-3h-3V24h3z"/>
+              <path fill="#78edff" d="M22 22h7v3h-4v4h-3zM31 22h7v2h-7z"/>
+              <path fill="#7489a9" d="M12 45h40v4h-8v4H20v-4h-8z"/>
+            </svg>
+            <span class="suit-step-state">PENDENTE</span>
+            <kbd>02</kbd>
           </button>
+          <button class="story-button" id="confirmSuit" type="submit" disabled><span class="prep-action-label">Iniciar missão</span><span class="prep-step-number">03</span></button>
         </div>
-        <p class="suit-feedback" id="suitFeedback" role="status">Conclua as duas etapas.</p>
-        <button class="story-button" id="confirmSuit" type="submit" disabled>Iniciar missão</button>
+        <p class="suit-feedback" id="suitFeedback" role="status" aria-live="polite"></p>
       </form>
     </section>
   </div>

@@ -55,10 +55,10 @@
   let cameraOpening = 0;
 
   const tools = [
-    { key: 1, name: "Câmera científica", detail: "Fotografa terrenos e materiais", target: "telescope", targetName: "Pancam", result: "Imagem panorâmica registrada na mochila." },
-    { key: 2, name: "Microscópio portátil", detail: "Analisa amostras de perto", target: "micro", targetName: "Microscopic Imager", result: "Análise microscópica da amostra registrada." },
-    { key: 3, name: "Sensor de temperatura", detail: "Mede a temperatura de sólidos", target: "spec", targetName: "amostra no espectrômetro", result: "Leitura registrada: superfície sólida a -21,6 °C." },
-    { key: 4, name: "Furadeira de amostras", detail: "Extrai material do solo", target: "bench", targetName: "bancada de amostras", result: "Amostra de rególito extraída e guardada." }
+    { key: 1, name: "Câmera científica", icon: "camera", detail: "Fotografa terrenos e materiais", target: "telescope", targetName: "Pancam", result: "Imagem panorâmica registrada na mochila." },
+    { key: 2, name: "Microscópio portátil", icon: "microscope", detail: "Analisa amostras de perto", target: "micro", targetName: "Microscopic Imager", result: "Análise microscópica da amostra registrada." },
+    { key: 3, name: "Sensor de temperatura", icon: "temperature", detail: "Mede a temperatura de sólidos", target: "spec", targetName: "amostra no espectrômetro", result: "Leitura registrada: superfície sólida a -21,6 °C." },
+    { key: 4, name: "Furadeira de amostras", icon: "drill", detail: "Extrai material do solo", target: "bench", targetName: "bancada de amostras", result: "Amostra de rególito extraída e guardada." }
   ];
   const tutorial = new LabTutorial();
   const tutorialCoach = $("#tutorialCoach");
@@ -83,7 +83,7 @@
   appShell.inert = true;
   engine.controls.enabled = false;
   engine.controls.movementEnabled = false;
-  engine.onToolSelect = selectTool;
+  engine.onToolSelect = handleToolShortcut;
   engine.onMapToggle = toggleMap;
   engine.onInventoryToggle = toggleInventory;
   engine.onEscape = handleEscape;
@@ -126,7 +126,7 @@
     engine.controls.enabled = false;
     engine.controls.movementEnabled = false;
     $("#welcomeTitle").textContent = t("Preparação do treinamento");
-    $("#confirmSuit").textContent = t("Iniciar treinamento");
+    $("#confirmSuit .prep-action-label").textContent = t("Iniciar treinamento");
     for (const id of ["wearSuit", "wearHelmet"]) {
       const button = $(`#${id}`);
       button.disabled = id === "wearHelmet";
@@ -229,6 +229,26 @@
       const progress = button.querySelector(".tool-progress");
       progress.textContent = completedTests.has(key) ? "OK" : selectedTool === key ? t("ATIVA") : "";
     });
+    const researchAction = $("#researchAction");
+    const researchActionIcon = $("#researchActionIcon");
+    const researchActionName = $("#researchActionName");
+    const researchActionShortcut = $("#researchActionShortcut");
+    const activeTool = tools.find(tool => tool.key === selectedTool);
+    researchAction.setAttribute("aria-pressed", String(Boolean(activeTool)));
+    if (activeTool) {
+      researchActionIcon.src = `/assets/visuals/hud_assets/svg/tool_${activeTool.icon}.svg`;
+      researchActionIcon.alt = "";
+      researchActionName.textContent = t(activeTool.name);
+      researchActionShortcut.hidden = true;
+      researchAction.title = t("{tool} · clicar para trocar", { tool: t(activeTool.name) });
+      researchAction.setAttribute("aria-label", t("{tool}. Abrir ferramentas científicas", { tool: t(activeTool.name) }));
+    } else {
+      researchActionIcon.src = "/assets/visuals/hud_assets/svg/acao_3_pesquisa.svg";
+      researchActionName.textContent = t("PESQUISA");
+      researchActionShortcut.hidden = false;
+      researchAction.title = t("Abrir ferramentas científicas");
+      researchAction.setAttribute("aria-label", t("Pesquisa científica (1–4)"));
+    }
 
   }
 
@@ -258,13 +278,16 @@
       button.className = "tool-button";
       button.dataset.tool = String(tool.key);
       button.setAttribute("aria-pressed", "false");
+      const icon = document.createElement("img");
+      icon.src = `/assets/visuals/hud_assets/svg/tool_${tool.icon}.svg`;
+      icon.alt = "";
       const key = document.createElement("kbd");
       key.textContent = String(tool.key);
       const name = document.createElement("span");
       name.textContent = t(tool.name);
       const progress = document.createElement("span");
       progress.className = "tool-progress";
-      button.append(key, name, progress);
+      button.append(icon, name, key, progress);
       button.title = t(tool.detail);
       button.addEventListener("click", () => selectTool(tool.key));
       container.append(button);
@@ -280,6 +303,18 @@
     showFeedback("{tool} ativa", { tool: t(tools[key - 1].name) });
     setModalState();
     if (key === 1) openCamera();
+  }
+
+  function handleToolShortcut(key) {
+    if (!quickToolsPanel.hidden) {
+      selectTool(key);
+      return;
+    }
+    if (key === 3) {
+      toggleQuickTools();
+      return;
+    }
+    selectTool(key);
   }
 
   function handleInteraction(prop, photo = null) {
@@ -311,6 +346,7 @@
   }
 
   function renderInventory() {
+    renderInventoryOverview();
     const slots = $("#inventorySlots");
     slots.replaceChildren();
     for (let index = 0; index < 4; index++) {
@@ -338,6 +374,42 @@
       ? t("{count}/4 resultados do treinamento guardados.", { count: inventoryItems.length })
       : t("Quatro slots disponíveis para os resultados do treinamento.");
   }
+
+  function renderInventoryOverview() {
+    const cadetName = $("#hudCadetName").textContent.trim() || t("Astronauta");
+    $("#inventoryCadetName").textContent = cadetName;
+    $("#inventoryLocation").textContent = $("#hudLocation").textContent.trim();
+    $("#inventoryAstronaut").setAttribute("aria-label", t("Astronauta de {name}", { name: cadetName }));
+
+    document.querySelectorAll("#inventoryVitals .inventory-vital").forEach(inventoryVital => {
+      const sourceLabel = inventoryVital.dataset.sourceLabel;
+      const sourceVital = [...document.querySelectorAll(".hud-vitals .vital-item")].find(vital =>
+        (vital.querySelector(".vital-track")?.getAttribute("data-i18n-aria-label") || vital.querySelector(".vital-track")?.getAttribute("aria-label")) === sourceLabel
+      );
+      const sourceMeter = sourceVital?.querySelector(".vital-track");
+      const sourceValue = sourceMeter?.getAttribute("aria-valuenow");
+      const value = Number(sourceValue);
+      if (sourceValue === null || sourceValue === undefined || !Number.isFinite(value)) {
+        console.error(`Valor de suporte vital indisponível: ${sourceLabel}.`);
+        return;
+      }
+
+      const percent = Math.max(0, Math.min(100, value));
+      const displayValue = Number.isInteger(percent) ? percent : percent.toFixed(1);
+      inventoryVital.querySelector(".inventory-vital-value").textContent = `${displayValue}%`;
+      const inventoryMeter = inventoryVital.querySelector(".inventory-vital-track");
+      inventoryMeter.setAttribute("aria-valuenow", String(percent));
+      inventoryVital.querySelector(".inventory-vital-fill").style.width = `${percent}%`;
+    });
+  }
+
+  const inventoryHudObserver = new MutationObserver(renderInventoryOverview);
+  inventoryHudObserver.observe($("#hudCadetName"), { childList: true, characterData: true, subtree: true });
+  inventoryHudObserver.observe($("#hudLocation"), { childList: true, characterData: true, subtree: true });
+  inventoryHudObserver.observe($(".hud-vitals"), {
+    attributes: true, childList: true, characterData: true, subtree: true,
+    attributeFilter: ["aria-valuenow", "style"]
+  });
 
   function drawMinimap() {
     const ctx = miniMap.getContext("2d");
@@ -639,7 +711,7 @@
     $("#suitFeedback").textContent = t(isSuit ? "Vestindo o traje..." : "Colocando o capacete...");
     equipmentAnimationOverlay.hidden = false;
     const animationPath = isSuit
-      ? "/assets/Animations/astronauta_vestindo_traje_8bit.html"
+      ? "/assets/Animations/astronauta_traje_espacial_8bit.html"
       : "/assets/Animations/anima%C3%A7%C3%A3o%20capacete%20atualizada/index.html";
     equipmentAnimationFrame.src = `${animationPath}?${animationParams()}`;
     $("#skipEquipmentAnimation").focus();
@@ -748,6 +820,7 @@
   });
   $("#mapAction").addEventListener("click", toggleMap);
   $("#inventoryAction").addEventListener("click", toggleInventory);
+  $("#backToMenu").addEventListener("click", () => { window.location.href = "/"; });
   $("#showTutorialHelp").addEventListener("click", showTutorialCoach);
   $("#continueTutorial").addEventListener("click", closeTutorialCoach);
   tutorialCoach.addEventListener("keydown", event => {

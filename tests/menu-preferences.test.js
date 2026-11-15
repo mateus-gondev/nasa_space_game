@@ -79,3 +79,47 @@ test('all guided tutorial briefings remain translated with the saved English set
     }
   }
 });
+
+test('inventory reads live HUD meters after their accessible labels are translated', () => {
+  const { context, nodes } = loadPreferences({ saved: { language: 'en' } });
+  const values = [0, 37.5, 90, 100];
+  const labels = ['Oxigênio', 'Água', 'Energia', 'Alimentação'];
+  const inventoryRows = labels.map(sourceLabel => ({
+    dataset: { sourceLabel },
+    value: {}, meter: { setAttribute(name, value) { this[name] = value; } }, fill: { style: {} },
+    querySelector(selector) {
+      return selector === '.inventory-vital-value' ? this.value : selector === '.inventory-vital-track' ? this.meter : this.fill;
+    },
+  }));
+  const hudRows = labels.map((source, index) => ({
+    querySelector() {
+      return { getAttribute(name) {
+        if (name === 'data-i18n-aria-label') return source;
+        if (name === 'aria-label') return context.window.GameI18n.t(source);
+        if (name === 'aria-valuenow') return String(values[index]);
+        return null;
+      } };
+    },
+  }));
+  nodes.set('#hudCadetName', { textContent: 'Cadet Nova' });
+  nodes.set('#hudLocation', { textContent: 'Instrument Lab' });
+  nodes.set('#inventoryCadetName', {});
+  nodes.set('#inventoryLocation', {});
+  nodes.set('#inventoryAstronaut', { setAttribute() {} });
+  context.document.querySelectorAll = selector => selector.startsWith('#inventoryVitals') ? inventoryRows : hudRows;
+  context.$ = context.document.querySelector;
+  context.t = context.window.GameI18n.t;
+  const errors = [];
+  context.console = { error: message => errors.push(message) };
+  const source = fs.readFileSync(path.join(__dirname, '../static/lab_training/js/app.js'), 'utf8');
+  vm.runInContext(source.slice(source.indexOf('  function renderInventoryOverview()'), source.indexOf('  const inventoryHudObserver')), context);
+  context.renderInventoryOverview();
+  assert.deepEqual(errors, []);
+  assert.equal(nodes.get('#inventoryCadetName').textContent, 'Cadet Nova');
+  assert.equal(nodes.get('#inventoryLocation').textContent, 'Instrument Lab');
+  inventoryRows.forEach((row, index) => {
+    assert.equal(row.value.textContent, `${values[index]}%`);
+    assert.equal(row.meter['aria-valuenow'], String(values[index]));
+    assert.equal(row.fill.style.width, `${values[index]}%`);
+  });
+});

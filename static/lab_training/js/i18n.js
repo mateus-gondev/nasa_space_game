@@ -219,6 +219,18 @@
     "↺ REINICIAR": "↺ RESTART", "Reiniciar o protótipo": "Restart prototype", "Informações do foguete": "Rocket information",
     "Foguete MARS 01 em uma plataforma de lançamento 3D interativa": "MARS 01 rocket on an interactive 3D launch platform"
   });
+  Object.assign(english, {
+    "Atalhos de ação": "Action shortcuts", "Cadete da missão": "Mission cadet", "Status da missão": "Mission status", "Alimento": "Food",
+    "Voltar": "Back", "TREINAMENTO EM MARTE": "MARS TRAINING", "Personagem - Astronauta": "Character - Astronaut",
+    "Nome do Astronauta": "Astronaut name", "Traje e Botas": "Suit and boots",
+    "{tool} · clicar para trocar": "{tool} · click to change", "{tool}. Abrir ferramentas científicas": "{tool}. Open scientific tools",
+    "Pesquisa científica (1–4)": "Scientific research (1–4)", "Astronauta de {name}": "Astronaut of {name}",
+    "MACACAO .... OK": "SUIT ....... OK", "LUVAS ........ OK": "GLOVES ....... OK", "BOTAS ........ OK": "BOOTS ........ OK",
+    "SISTEMAS ..... OK": "SYSTEMS ...... OK", "TRAJE PRONTO!": "SUIT READY!", "PREPARANDO O TRAJE": "PREPARING THE SUIT",
+    "VESTINDO O MACACAO...": "PUTTING ON THE SUIT...", "AJUSTANDO AS PERNAS": "ADJUSTING THE LEGS",
+    "VESTINDO AS MANGAS": "PUTTING ON THE SLEEVES", "CALCANDO AS BOTAS": "PUTTING ON THE BOOTS",
+    "ACOPLANDO EQUIPAMENTO": "ATTACHING EQUIPMENT", "VERIFICANDO SISTEMAS": "CHECKING SYSTEMS"
+  });
   const portuguese = {
     "Mission Control": "Controle da Missão", "Atrium": "Átrio", "Instrument Lab": "Laboratório de Instrumentos",
     "Rover Bay": "Hangar do Rover", "Storage": "Depósito", "Power": "Energia", "Transit": "Corredor",

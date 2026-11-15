@@ -4,6 +4,26 @@ const fs = require('node:fs');
 const vm = require('node:vm');
 const path = require('node:path');
 
+test('tool shortcuts stay available while the research selector blocks movement', () => {
+  const context = vm.createContext({
+    window: { addEventListener() {} },
+    document: { querySelectorAll: () => [], querySelector: () => null },
+  });
+  vm.runInContext(fs.readFileSync(path.join(__dirname, '../static/opportunity-map-engine-v2/opportunity-map-engine/js/controls.js'), 'utf8'), context);
+  const selected = [];
+  const controls = new context.window.MapControls({ onToolSelect: key => selected.push(key) });
+  controls.movementEnabled = false;
+  const event = key => ({ key, target: { tagName: 'BODY' }, preventDefault() {} });
+  controls.onKeyDown(event('3'));
+  controls.onKeyDown(event('2'));
+  controls.onKeyDown(event('w'));
+  assert.deepEqual(selected, [3, 2]);
+  assert.equal(controls.keys.size, 0);
+  controls.enabled = false;
+  controls.onKeyDown(event('4'));
+  assert.deepEqual(selected, [3, 2]);
+});
+
 function loadTraining() {
   const context = vm.createContext({ window: { MapRenderer: class {} } });
   for (const file of [
