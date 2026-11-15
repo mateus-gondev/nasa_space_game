@@ -1,0 +1,171 @@
+{
+  "schemaVersion": 1,
+  "scenarioId": "mars-first-mission",
+  "version": "1.0.0",
+  "title": "Primeira missão em Marte",
+  "dataPolicy": {
+    "mode": "offline",
+    "note": "Todos os números abaixo são parâmetros pedagógicos de balanceamento, não previsões físicas.",
+    "references": [
+      {
+        "name": "NASA OSDR study OSD-1010",
+        "url": "https://osdr.nasa.gov/bio/repo/data/studies/OSD-1010",
+        "use": "Referência futura para contextualizar pesquisa biológica; nenhum dado ou taxa foi importado."
+      },
+      {
+        "name": "Canadian Space Agency - Food production toolkit",
+        "url": "https://www.asc-csa.gc.ca/eng/youth-educators/toolkits/food-production/",
+        "use": "Referência educativa para cultivo, alimentação e o investimento antes da colheita."
+      },
+      {
+        "name": "Canadian Space Agency - STEM and youth resources",
+        "url": "https://www.asc-csa.gc.ca/eng/youth-educators/resources-stem-and-youth-organizations.asp",
+        "use": "Referência de público e recursos educativos para jovens."
+      },
+      {
+        "name": "NASA Mars Trek",
+        "url": "https://trek.nasa.gov/mars/#v=0.1&x=103.23056850204844&y=0.7509705051452471&z=3&p=urn%3Aogc%3Adef%3Acrs%3AEPSG%3A%3A104905&d=&locale=&b=mars&e=35.73056976116419%2C-31.856450761610034%2C170.7305672429327%2C33.35839177190053&sfz=&w=",
+        "use": "Referência cartográfica para seleção futura do local; o link não foi convertido em parâmetros ambientais."
+      }
+    ]
+  },
+  "clock": {
+    "tickMinutes": 10,
+    "missionDurationTicks": 72,
+    "maxAdvanceTicks": 144
+  },
+  "resources": {
+    "energy": { "amount": 16, "capacity": 24 },
+    "waterClean": { "amount": 80, "capacity": 120 },
+    "waterUsed": { "amount": 10, "capacity": 60 },
+    "oxygen": { "amount": 40, "capacity": 80 },
+    "food": { "amount": 36, "capacity": 80 },
+    "seeds": { "amount": 2, "capacity": 8 },
+    "materials": { "amount": 14, "capacity": 30 },
+    "repairParts": { "amount": 2, "capacity": 8 }
+  },
+  "team": {
+    "members": 4,
+    "fatigue": 0,
+    "location": "habitat",
+    "exposure": 0
+  },
+  "systems": {
+    "co2": 10,
+    "temperature": 20,
+    "filterCondition": 1,
+    "solarCondition": 1,
+    "shelterBuilt": false,
+    "shelterProtection": 0
+  },
+  "power": {
+    "baseGeneration": 10,
+    "consumers": {
+      "lifeSupport": { "demand": 2, "priority": 1 },
+      "airFilter": { "demand": 2, "priority": 2 },
+      "oxygenProduction": { "demand": 2, "priority": 2 },
+      "thermal": { "demand": 1, "priority": 3 },
+      "cultivation": { "demand": 1, "priority": 4 },
+      "research": { "demand": 2, "priority": 5 }
+    }
+  },
+  "rates": {
+    "teamWaterUse": 1,
+    "usedWaterFraction": 0.6,
+    "oxygenUse": 1.5,
+    "oxygenWaterInput": 0.5,
+    "oxygenOutput": 2,
+    "foodUse": 0.5,
+    "co2Output": 0.5,
+    "co2Filtered": 1,
+    "unheatedTemperatureStep": 1,
+    "outsideExposure": 1,
+    "shelterBuildProtection": 0.8,
+    "cropGrowthTicks": 12,
+    "cropYield": 20,
+    "waterRecycleInput": 10,
+    "waterRecycleOutput": 9
+  },
+  "limits": {
+    "co2Warning": 30,
+    "co2Critical": 80,
+    "temperatureMin": -5,
+    "temperatureMax": 40,
+    "resourceWarningFraction": 0.2
+  },
+  "events": [
+    {
+      "id": "solar-dust",
+      "type": "solarDust",
+      "warningAt": 7,
+      "startAt": 8,
+      "endAt": 16,
+      "solarMultiplier": 0.3
+    },
+    {
+      "id": "filter-failure",
+      "type": "filterFailure",
+      "warningAt": 22,
+      "startAt": 24
+    },
+    {
+      "id": "communications-outage",
+      "type": "communicationsOutage",
+      "warningAt": 39,
+      "startAt": 40,
+      "endAt": 43
+    }
+  ],
+  "communication": {
+    "outboundTicks": 2,
+    "processingTicks": 1,
+    "returnTicks": 2
+  },
+  "activities": {
+    "explore": {
+      "durationTicks": 6,
+      "reserved": {},
+      "powerConsumer": null
+    },
+    "research": {
+      "durationTicks": 6,
+      "reserved": {},
+      "powerConsumer": "research"
+    },
+    "buildShelter": {
+      "durationTicks": 8,
+      "reserved": { "materials": 8 },
+      "powerConsumer": null
+    },
+    "transferToShelter": {
+      "durationTicks": 1,
+      "reserved": {},
+      "powerConsumer": null
+    },
+    "repairFilter": {
+      "durationTicks": 4,
+      "reserved": { "repairParts": 1 },
+      "powerConsumer": null
+    },
+    "plant": {
+      "durationTicks": 1,
+      "reserved": { "seeds": 1, "waterClean": 5 },
+      "powerConsumer": null
+    },
+    "harvest": {
+      "durationTicks": 1,
+      "reserved": {},
+      "powerConsumer": null
+    },
+    "recycleWater": {
+      "durationTicks": 2,
+      "reserved": { "waterUsed": 10 },
+      "powerConsumer": null
+    },
+    "rest": {
+      "durationTicks": 6,
+      "reserved": {},
+      "powerConsumer": null
+    }
+  }
+}

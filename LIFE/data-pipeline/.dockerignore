@@ -1,0 +1,11 @@
+.env
+.git
+output/
+repo/.env
+repo/.env.*
+!repo/.env.example
+repo/.git
+repo/.runtime
+repo/data/
+repo/work/
+repo/__pycache__/

@@ -38,6 +38,10 @@ h1 { margin: 5px 0 1px; font-size: clamp(22px, 3vw, 32px); font-weight: 600; let
 .stage { position: relative; overflow: hidden; border: 1px solid #245064; background: #05090d; box-shadow: 0 0 0 1px #07151c, 0 18px 55px #0008; line-height: 0; }
 canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
 canvas:focus-visible { outline: 2px solid var(--cyan); outline-offset: -3px; }
+.hud-minimap { position: absolute; z-index: 2; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); width: min(220px, 20vw); padding: 5px; border: 2px solid #7fdcff; background: #07121a; box-shadow: 0 0 0 2px #183b4d; pointer-events: none; }
+.hud-minimap canvas { width: 100%; height: auto; image-rendering: pixelated; }
+@media (max-width: 1100px) { .hud-minimap { bottom: max(170px, calc(env(safe-area-inset-bottom) + 170px)); } }
+@media (max-width: 760px) { .hud-minimap { right: max(10px, env(safe-area-inset-right)); bottom: max(100px, calc(env(safe-area-inset-bottom) + 100px)); width: min(180px, 27vw); } }
 .stage-vignette { position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 90px #0009, inset 0 0 0 1px #55c6df22; }
 .stage-status { position: absolute; top: 12px; left: 14px; padding: 5px 8px; color: #a6cbd1; background: #061018d9; border: 1px solid #1e5363; font: 9px var(--mono); letter-spacing: .1em; }
 .stage-status span { display: inline-block; width: 6px; height: 6px; margin-left: 5px; border-radius: 50%; background: var(--green); box-shadow: 0 0 9px var(--green); }
@@ -244,7 +248,62 @@ body { background: #05090d; }
 .inspect-card-heading .toolbar-label, .inspect-card p, .inspect-footnote { display: none; }
 .inspect-card h2 { margin: 0; padding-right: 30px; font-size: 13px; }
 .inspect-card .icon-button { position: absolute; top: 8px; right: 8px; }
-.paused-overlay { z-index: 10; }
+.paused-overlay { z-index: 10; align-content: center; gap: 24px; text-align: center; padding: 16px; }
+.vitals-heading #lifeOpen { padding: 0; border: 0; background: transparent; color: #7fdcff; font: inherit; text-align: left; cursor: pointer; }
+#lifeOpen:focus-visible { outline: 2px solid #ffca70; outline-offset: 3px; }
+#lifeStatus[data-warning="true"] { color: #ff7676; }
+.life-fatigue { grid-column: 1 / -1; }
+.life-overlay { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; padding: 16px; background: #03070ada; line-height: 1.5; }
+.life-card { width: min(760px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 20px; color: #e8f6ff; background: #101c2c; border: 2px solid #7fdcff; box-shadow: 0 0 0 3px #183b4d; font: 13px/1.6 var(--mono); }
+.life-card h2 { margin: 0; font-size: 18px; }
+.life-card > .modal-heading { position: sticky; top: -20px; padding: 10px 0; background: #101c2c; z-index: 1; }
+.life-card h3 { margin: 22px 0 8px; color: #7fdcff; font-size: 14px; }
+.life-card p { margin: 8px 0; }
+.life-card button, .life-card select { padding: 9px 12px; color: #e8f6ff; background: #173454; border: 1px solid #7fdcff; font: inherit; cursor: pointer; }
+.life-card button:disabled, .life-card select:disabled { opacity: .5; cursor: default; }
+.life-card button:focus-visible, .life-card select:focus-visible { outline: 2px solid #ffca70; outline-offset: 2px; }
+.life-buttons { display: flex; flex-wrap: wrap; gap: 12px; }
+#lifeResources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.life-resource-card { min-width: 0; padding: 16px; border: 1px solid #314b62; border-top: 3px solid var(--resource-color); background: #0a1524; }
+.life-resource-card[data-low="true"] { border-color: #ff8982; }
+.life-resource-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.life-resource-heading h4, .life-system-card h4 { margin: 0; color: #c1d3e4; font: 600 12px/1.4 var(--sans); }
+.life-resource-heading strong { color: var(--resource-color); font: 700 27px/1 var(--sans); }
+.life-card .life-quantity { margin: 8px 0 10px; color: #e8f6ff; font: 600 16px/1.5 var(--sans); }
+.life-reserve-bar { height: 9px; overflow: hidden; background: #223349; border-radius: 2px; }
+.life-reserve-bar > span { display: block; height: 100%; background: var(--resource-color); transition: width .3s ease; }
+.life-card .life-change { margin: 10px 0 2px; font-size: 11px; color: #a8bbcf; }
+.life-change[data-direction="up"] { color: #8fe1bd; }
+.life-change[data-direction="down"] { color: #ffb28c; }
+.life-resource-card svg { display: block; width: 100%; height: 64px; margin-top: 6px; color: var(--resource-color); }
+.life-chart-grid { fill: none; stroke: #26384c; stroke-width: 1; }
+.life-chart-line { fill: none; stroke: currentColor; stroke-width: 2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.life-resource-card circle { fill: currentColor; }
+.life-chart-caption, .life-reserved { display: block; color: #91a8be; font: 10px/1.6 var(--sans); }
+.life-reserved { margin-top: 7px; }
+.life-supplies { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.life-supplies > div { display: grid; gap: 4px; padding: 12px; background: #152638; border: 1px solid #29435a; font: 11px/1.5 var(--sans); }
+.life-supplies strong { font-size: 16px; color: #e8f6ff; }
+.life-supplies small { color: #9fb5cb; }
+#lifeSystems { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.life-system-card { display: grid; align-content: start; gap: 10px; padding: 14px; background: #152638; border: 1px solid #29435a; }
+.life-system-value { font: 700 21px/1.3 var(--sans); color: #e7f3ff; }
+.life-system-card small { font: 11px/1.5 var(--sans); color: #a8bdd1; }
+.life-current-activity { grid-column: 1 / -1; }
+.life-card .life-notice { padding: 9px 12px; color: #97e7d4; border-left: 3px solid #70d5bc; background: #123433; font: 12px/1.5 var(--sans); }
+.life-help { margin: 12px 0; color: #a8bdd1; font: 12px/1.6 var(--sans); }
+.life-help summary { cursor: pointer; color: #7fdcff; }
+#lifeAlerts { padding: 12px; border-left: 3px solid #ffca70; background: #302a20; font: 12px/1.6 var(--sans); }
+@media (max-width: 520px) { .life-resource-card { padding: 10px; } .life-resource-heading { flex-wrap: wrap; } .life-resource-heading strong { font-size: 23px; } .life-resource-card svg { height: 48px; } .life-supplies { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 340px) { #lifeResources, #lifeSystems { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .life-reserve-bar > span { transition: none; } }
+#lifeActivities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+#lifeActivities small { display: block; margin-top: 5px; color: #b5c5d6; }
+#lifePriorities { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+#lifePriorities label { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+@media (max-width: 520px) { .life-overlay { padding: 8px; } .life-card { padding: 12px; max-height: calc(100dvh - 16px); font-size: 11px; } #lifePriorities { grid-template-columns: 1fr; } }
+.resume-button { padding: 14px 22px; border: 2px solid #7fdcff; color: #eaf7ff; background: #102750; font: 600 14px/1.4 var(--mono); cursor: pointer; }
+.resume-button:hover, .resume-button:focus-visible { background: #17438b; outline: 2px solid #ffca70; outline-offset: 4px; }
 .stage-modal { z-index: 12; }
 .mobile-controls { position: absolute; z-index: 8; left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); display: none; align-items: center; gap: 5px; padding: 8px; background: #07121bd9; border: 1px solid #26414b; border-radius: 12px; }
 .mobile-controls-row { display: flex; gap: 5px; }

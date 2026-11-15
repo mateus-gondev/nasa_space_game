@@ -1,0 +1,10 @@
+services:
+  data-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NASA_API_KEY: ${NASA_API_KEY:-}
+    volumes:
+      - ./repo/data:/app/data
+    command: ["--help"]

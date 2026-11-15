@@ -38,6 +38,19 @@ window.MapRenderer = class MapRenderer {
     this.drawStaticMap();
   }
 
+  async loadAssets() {
+    const source = this.config.assets.background;
+    if (!source) return;
+    const image = new Image();
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = () => reject(new Error(`Não foi possível carregar o fundo: ${source}`));
+      image.src = source;
+    });
+    this.backgroundPattern = this.staticContext.createPattern(image, "repeat");
+    this.drawStaticMap();
+  }
+
   drawStaticMap() {
     const ctx = this.staticContext;
     const previous = this.ctx;
@@ -125,6 +138,14 @@ window.MapRenderer = class MapRenderer {
 
   drawVoid(x, y) {
     const ctx = this.ctx, t = this.tile, px = x * t, py = y * t;
+    if (this.backgroundPattern) {
+      ctx.save();
+      ctx.imageSmoothingEnabled = false;
+      ctx.fillStyle = this.backgroundPattern;
+      ctx.fillRect(px, py, t, t);
+      ctx.restore();
+      return;
+    }
     ctx.fillStyle = "#070a0f"; ctx.fillRect(px, py, t, t);
     const h = (x * 73856093 ^ y * 19349663) >>> 0;
     if (h % 5 === 0) { ctx.fillStyle = `rgba(190,215,255,${.15 + (h % 7) / 20})`; ctx.fillRect(px + (h % 31) + 3, py + ((h >> 5) % 31) + 3, 2, 2); }

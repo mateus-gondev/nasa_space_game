@@ -1,5 +1,4 @@
 node_modules/
-LIFE/
 .env
 .env.*
 !.env.example

@@ -44,7 +44,7 @@
     "PONTO CIANO: CADETE · PONTO ÂMBAR: OBJETIVO ATUAL": "CYAN DOT: CADET · AMBER DOT: CURRENT OBJECTIVE",
     "TAB · MOCHILA": "TAB · INVENTORY", "Inventário de missão": "Mission inventory", "Fechar mochila": "Close inventory",
     "Quatro slots disponíveis para os resultados do treinamento.": "Four slots available for training results.",
-    "SIMULAÇÃO PAUSADA": "SIMULATION PAUSED", "Controles de movimento": "Movement controls",
+    "SIMULAÇÃO PAUSADA": "SIMULATION PAUSED", "Continuar jogo": "Resume game", "Controles de movimento": "Movement controls",
     "Cima": "Up", "Esquerda": "Left", "Baixo": "Down", "Direita": "Right", "E · USAR": "E · USE",
     "Mapa top-down da instalação Opportunity com um astronauta": "Top-down map of the Opportunity facility with an astronaut",
     "Teste de gravidade marciana": "Martian gravity test",

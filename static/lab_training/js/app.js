@@ -45,6 +45,7 @@
   const inventoryOverlay = $("#inventoryOverlay");
   const quickToolsPanel = $("#quickToolsPanel");
   const miniMap = $("#miniMap");
+  const hudMiniMap = $("#hudMiniMap");
   const tutorialObjective = $("#tutorialObjective");
   const tutorialFeedback = $("#tutorialFeedback");
   const cadetInput = $("#cadetName");
@@ -166,6 +167,7 @@
   }
 
   function updateInterface(state = engine.getState()) {
+    drawMinimap(hudMiniMap);
     $("#telemetryRoom").textContent = t(state.room);
     $("#telemetryMood").textContent = t(state.mood);
     $("#telemetryPosition").textContent = state.position;
@@ -411,10 +413,10 @@
     attributeFilter: ["aria-valuenow", "style"]
   });
 
-  function drawMinimap() {
-    const ctx = miniMap.getContext("2d");
-    const cellWidth = miniMap.width / map.width;
-    const cellHeight = miniMap.height / map.height;
+  function drawMinimap(targetCanvas = miniMap) {
+    const ctx = targetCanvas.getContext("2d");
+    const cellWidth = targetCanvas.width / map.width;
+    const cellHeight = targetCanvas.height / map.height;
     ctx.imageSmoothingEnabled = false;
     for (let y = 0; y < map.height; y++) {
       for (let x = 0; x < map.width; x++) {
@@ -432,7 +434,7 @@
     });
     const { target, route } = engine.renderer.getGuideRoute();
     if (route.length > 1) {
-      ctx.strokeStyle = "#ffb552"; ctx.lineWidth = 2; ctx.beginPath();
+      ctx.strokeStyle = "#ff4040"; ctx.lineWidth = 2; ctx.beginPath();
       route.forEach((point, index) => ctx[index ? "lineTo" : "moveTo"](point.x * cellWidth, point.y * cellHeight));
       ctx.stroke();
     }
@@ -837,6 +839,10 @@
     }
   });
   $("#pauseButton").addEventListener("click", () => engine.setPaused());
+  $("#resumeButton").addEventListener("click", () => {
+    engine.setPaused(false);
+    canvas.focus();
+  });
   $("#resetButton").addEventListener("click", resetTraining);
   async function toggleFullscreen() {
     try {
@@ -954,6 +960,15 @@
   });
 
   cadetInput.value = cadetName;
+  const fatigueItem = document.createElement("div");
+  fatigueItem.className = "vital-item life-fatigue";
+  fatigueItem.style.setProperty("--vital-color", "#d2a6ff");
+  fatigueItem.innerHTML = '<div class="vital-label"><span>FADIGA</span><strong>0%</strong></div><div class="vital-track" role="meter" aria-label="Fadiga" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span style="width:0%"></span></div>';
+  $(".hud-vitals .vital-grid").append(fatigueItem);
+  window.LifeUI.mount({
+    game: engine,
+    isSuspended: () => !introOverlay.hidden || !tutorialCoach.hidden || !equipmentAnimationOverlay.hidden || !launchRoomOverlay.hidden || !cameraOverlay.hidden || !mapOverlay.hidden || !inventoryOverlay.hidden || !quickToolsPanel.hidden
+  });
   updateInterface();
   prepareEquipment();
   engine.start().then(() => {

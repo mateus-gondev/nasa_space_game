@@ -47,7 +47,7 @@
             </section>
 
             <section class="hud-panel hud-vitals" aria-label="Suporte vital da missão" data-i18n-aria-label="Suporte vital da missão">
-              <div class="vitals-heading"><span data-i18n="SUPORTE VITAL">SUPORTE VITAL</span><span><i></i>NOMINAL</span></div>
+              <div class="vitals-heading"><button id="lifeOpen" type="button" aria-controls="lifePanel" aria-expanded="false">SUPORTE VITAL · GESTÃO</button><span id="lifeStatus">CARREGANDO</span></div>
               <div class="vital-grid">
                 <div class="vital-item" style="--vital-color:#4fd1ff">
                   <div class="vital-label"><img src="/assets/visuals/hud_assets/svg/icone_oxigenio.svg" alt=""><span>O₂</span><strong>100%</strong></div>
@@ -75,6 +75,24 @@
             </div>
           </div>
 
+          <div class="life-overlay" id="lifePanel" role="dialog" aria-modal="true" aria-labelledby="lifeTitle" hidden>
+            <section class="life-card">
+              <div class="modal-heading"><h2 id="lifeTitle">LIFE · Gestão de suporte vital</h2><button id="lifeClose" type="button" aria-label="Fechar gestão">×</button></div>
+              <p id="lifeClock">Carregando gestão…</p>
+              <p class="life-notice">⏸ Gestão congelada enquanto este painel está aberto. Feche para continuar.</p>
+              <details class="life-help"><summary>Como funciona a gestão?</summary><p>Começa sem consumo até você ativar. A fadiga representa o trabalho da equipe da base. O tutorial continua disponível mesmo se a gestão terminar. Menus e pausas congelam o consumo. Valores em unidades de jogo.</p></details>
+              <div class="life-buttons"><button id="lifeActivate" type="button">Ativar gestão e consumo</button><button id="lifeNew" type="button">Nova gestão</button></div>
+              <p id="lifeMessage" role="status" aria-live="polite"></p>
+              <h3>Reservas e saldo por passo</h3><div id="lifeResources"></div>
+              <h3>Equipe e sistemas</h3><div id="lifeSystems"></div>
+              <h3>Alertas</h3><p id="lifeAlerts" role="status" aria-live="polite"></p>
+              <h3>Atividades</h3><p>Confira custos e pré-requisitos antes de iniciar. Uma atividade por vez; descanso recupera fadiga enquanto os sistemas continuam consumindo recursos.</p>
+              <div id="lifeActivities"></div><button id="lifeCancel" type="button" disabled>Cancelar atividade</button>
+              <h3>Prioridades de energia</h3><p>1 recebe primeiro, 10 por último. Sistemas ativos sem energia podem parar. A distribuição muda no próximo passo.</p>
+              <div id="lifePriorities"></div><button id="lifePrioritiesApply" type="button" disabled>Aplicar prioridades</button>
+              <p>A gestão é salva automaticamente neste navegador. “Nova gestão” reinicia somente os recursos e atividades da LIFE.</p>
+            </section>
+          </div>
           <div class="quick-tools-panel hud-panel" id="quickToolsPanel" role="dialog" aria-modal="true" aria-labelledby="quickToolsTitle" hidden>
             <div class="quick-tools-heading">
               <div><span class="hud-kicker" data-i18n="AÇÃO 03">AÇÃO 03</span><strong id="quickToolsTitle" data-i18n="Pesquisa científica">Pesquisa científica</strong></div>
@@ -138,6 +156,9 @@
             <p id="inspectDescription"></p>
             <span class="inspect-footnote">OPPORTUNITY / FIELD DATABASE</span>
           </aside>
+          <aside class="hud-minimap" aria-label="Minimapa em tempo real">
+            <canvas id="hudMiniMap" width="280" height="180" aria-label="Posição do jogador e objetivo atual"></canvas>
+          </aside>
           <div class="stage-modal" id="mapOverlay" hidden>
             <section class="modal-card map-card" role="dialog" aria-modal="true" aria-labelledby="mapTitle">
               <div class="modal-heading">
@@ -190,7 +211,10 @@
               <div class="inventory-slots" id="inventorySlots"></div>
             </section>
           </div>
-          <div class="paused-overlay" id="pausedOverlay" hidden data-i18n="SIMULAÇÃO PAUSADA">SIMULAÇÃO PAUSADA</div>
+          <div class="paused-overlay" id="pausedOverlay" hidden>
+            <span data-i18n="SIMULAÇÃO PAUSADA">SIMULAÇÃO PAUSADA</span>
+            <button class="resume-button" id="resumeButton" type="button" data-i18n="Continuar jogo">Continuar jogo</button>
+          </div>
           <div class="mobile-controls" aria-label="Controles de movimento" data-i18n-aria-label="Controles de movimento">
             <button type="button" data-key="ArrowUp" aria-label="Cima" data-i18n-aria-label="Cima">▲</button>
             <div class="mobile-controls-row">
@@ -366,6 +390,9 @@
   <script src="js/tutorial-navigation.js"></script>
   <script src="/map-engine-v2/js/controls.js"></script>
   <script src="/map-engine-v2/js/engine.js"></script>
+  <script src="/life/engine.js"></script>
+  <script src="/life/management.js"></script>
+  <script src="/life/browser-ui.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
