@@ -27,6 +27,12 @@ button { color: inherit; font: inherit; }
 .menu-info-list { display: grid; gap: 12px; padding: 0; list-style: none; }
 .menu-info-list li { display: flex; align-items: center; gap: 8px; color: #e4d8d5; }
 .menu-info-list kbd { padding: 3px 6px; border: 1px solid #eee6e35c; color: #fff; background: #fff1; font: 11px var(--mono); }
+.menu-science { margin-top: 22px; padding-top: 16px; border-top: 1px solid #eee6e340; }
+.menu-science h3 { margin: 0 0 8px; font-size: 16px; color: #fff; }
+.menu-science p { margin: 0 0 8px; }
+.menu-source-link { display: inline-flex; align-items: center; min-height: 44px; color: #8de7ff; text-underline-offset: 3px; }
+.menu-source-link:hover { color: #fff; }
+.menu-source-link:focus-visible { outline: 2px solid #8de7ff; outline-offset: 4px; }
 @media (max-width: 640px) {
   .menu-home { --menu-left: 6%; }
   .menu-logo { top: 10%; width: min(520px, 88vw); }

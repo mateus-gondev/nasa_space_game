@@ -1,6 +1,9 @@
 /* Textos do Lab Training. As chaves em português também são o idioma de fallback. */
 (() => {
   const english = {
+    "Ciência no jogo": "Science in the game",
+    "Usamos dados da NASA para criar as regras de água, ar, comida e energia. Nossa principal referência foi o BVAD, sobre suporte à vida no espaço. Os valores e tempos foram adaptados para aprender brincando.": "We used NASA data to create the rules for water, air, food and energy. Our main reference was the BVAD, about life support in space. Values and timing were adapted for learning through play.",
+    "Ler documento da NASA (PDF em inglês, abre em nova aba)": "Read the NASA document (PDF in English, opens in a new tab)",
     "Siga a trilha até a antena. Pressione X para enviar os quatro registros à Terra.": "Follow the trail to the antenna. Press X to send the four records to Earth.",
     "Rever dica da NOVA": "Show NOVA's tip", "Recolher dica": "Hide tip", "Ver missão": "View mission",
     "Tudo pronto! Toque em Iniciar lançamento para decolar.": "All ready! Tap Start launch to lift off.",
