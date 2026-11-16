@@ -61,4 +61,6 @@ Os objetos foram gerados/adaptados com a ferramenta integrada de geração de im
 
 ## Verificação
 
+O jogo usa `sprites/rocket.webp`, fornecido pelo usuário, para o foguete pousado. O renderer recompõe o chão sob a nave antiga usando os tiles originais e desenha a nova imagem com a proporção preservada. A entrada e as colisões da nave continuam ligadas ao mesmo objeto do mapa. Os PNGs autorais dos mapas e `nave_perfuradora.png` permanecem como arquivos de origem.
+
 validacao_arte.json registra cores e alfa dos PNGs. validacao_mapas.json registra navegação em grade: spawns livres, destinos existentes, passagens alcançáveis e recursos acessíveis. Essa verificação usa a máscara de colisão incluída; não substitui a configuração do controlador do personagem na engine.

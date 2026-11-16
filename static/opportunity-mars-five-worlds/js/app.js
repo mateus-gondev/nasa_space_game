@@ -4,9 +4,9 @@
   const config=window.MAP_ENGINE_CONFIG,worlds=window.MARS_WORLDS.list,byId=window.MARS_WORLDS.byId;
   const $=selector=>document.querySelector(selector);
   const loading=$('#toast');loading.textContent='Carregando a área de pouso…';loading.hidden=false;
-  await Promise.all(worlds.filter(world=>world.tilemapImage).map(world=>new Promise((resolve,reject)=>{
+  await Promise.all(worlds.filter(world=>world.tilemapImage).map(world=>new Promise(resolve=>{
     const image=new Image();image.onload=()=>{world.backgroundImage=image;resolve();};
-    image.onerror=()=>reject(new Error('Não foi possível carregar '+world.name));image.src=world.tilemapImage;
+    image.onerror=()=>{console.warn('Mapa sem imagem de fundo:',world.name);resolve();};image.src=world.tilemapImage;
   })));
   loading.hidden=true;
   const STORAGE_KEY='opportunity_mars_atlas_progress_v1';
@@ -42,10 +42,10 @@
     updateInterface();persist();notify(`Travessia concluída: ${target.name}`);
   }
   function updateInterface(state=engine.getState()){
-    const atlasOpen=!$('#atlasModal').hidden,blocked=state.paused||atlasOpen||!!engine.inspectedObject;
+    const atlasOpen=!$('#atlasModal').hidden,blocked=state.paused||atlasOpen||!!engine.inspectedObject||!!engine.cameraOpen;
     const pauseOverlay=$('#pausedOverlay'),wasHidden=pauseOverlay.hidden;
-    pauseOverlay.hidden=!state.paused||atlasOpen;
-    engine.controls.enabled=!state.paused&&!atlasOpen;
+    pauseOverlay.hidden=!state.paused||atlasOpen||!!engine.cameraOpen||!!$('#missionDialog')?.open;
+    engine.controls.enabled=!state.paused&&!atlasOpen&&!engine.cameraOpen;
     if(blocked)engine.controls.keys.clear();
     canvas.inert=blocked;
     $('#stage').dataset.blocked=String(blocked);
@@ -105,7 +105,7 @@
     engine.inspectObjectAt(cam.x/tile+(event.clientX-rect.left)/rect.width*view.w,cam.y/tile+(event.clientY-rect.top)/rect.height*view.h);
   });
   window.addEventListener('keydown',ev=>{
-    if(document.querySelector('#missionDialog')?.open)return;
+    if(document.querySelector('#missionDialog')?.open||engine.cameraOpen)return;
     const key=ev.key.toLowerCase();
     if(ev.repeat)return;
     if(key==='escape'){
@@ -156,14 +156,15 @@
   updateInterface();resizeViewport();
   new ResizeObserver(resizeViewport).observe($('#stage'));
   canvas.focus();
-  engine.start();
+  const camera=window.MarsCameraUI.mount({engine,updateInterface});
   // API compatível com a Map Engine original e extensões para o atlas.
   window.opportunityMap={engine,worlds,goToWorld:switchWorld,goToRoom:name=>engine.goToRoom(name),setAtmosphere:key=>engine.setAtmosphere(key),
-    pause:()=>engine.setPaused(true),resume:()=>engine.setPaused(false),reset:()=>engine.reset(),openAtlas,
+    pause:()=>engine.setPaused(true),resume:()=>engine.setPaused(false),reset:()=>engine.reset(),openAtlas,openCamera:camera.open,closeCamera:camera.close,
     inspect:name=>{const p=engine.map.props.find(x=>x.name?.toLowerCase()===name.toLowerCase());if(p){engine.inspectedObject=p;engine.onInspect(p)}},
     addProp:prop=>{if(!prop?.type||!Number.isFinite(prop.x)||!Number.isFinite(prop.y))throw Error('type/x/y obrigatórios');engine.map.props.push({w:1,h:1,solid:false,...prop});engine.map.props.sort((a,b)=>(a.y+a.h)-(b.y+b.h));},
     loadAsset:(name,url)=>{const img=new Image();img.onload=()=>engine.loadAsset(name,img);img.src=url;},
     getProgress:()=>worlds.map(w=>({id:w.id,...counts(w)})),getWorld:()=>engine.map.id};
   console.info('Opportunity Mars Atlas carregado: cinco mapas + ações científicas e persistência local.');
-  await window.MarsCampaignUI.mount({engine, worlds, notify, switchWorld, updateInterface});
+  await window.MarsCampaignUI.mount({engine, worlds, notify, switchWorld, updateInterface, openAtlas, openCamera:camera.open});
+  updateInterface();engine.start();
 })().catch(error=>{console.error(error);const toast=document.querySelector('#toast');toast.textContent='Falha ao carregar os mapas. Recarregue a página para tentar novamente.';toast.hidden=false;});

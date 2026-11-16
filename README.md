@@ -82,6 +82,10 @@ Consulte [origem e licenças do tilemap](static/assets/marte_tilemap/LEIA-ME.md)
 
 **Marte:** WASD/setas movem, E/espaço interagem, B abre missão/gestão, M abre regiões, Esc fecha painéis ou pausa, P alterna pausa. Há controles de toque e botão visível para abrir a gestão. Transições laterais funcionam ao atravessar as balizas.
 
+O HUD de Marte inclui botões para base, mochila, mensagens, mapa, câmera e pausa, com recursos ligados ao estado LIFE. **1 ou C** abre a câmera 3D na posição do astronauta, dentro da nave e em todas as regiões; **Tab** abre a mochila. Arraste ou use as setas para olhar, ajuste o zoom e use Fotografar para baixar uma imagem. **R** centraliza e **Esc** retorna ao mapa, preservando posição e pausa anterior. A câmera requer WebGL 2 e suspende a simulação enquanto está aberta.
+
+A superfície 3D usa terreno contínuo com relevo e crateras, cascalho, horizonte em camadas, céu em degradê e iluminação adaptada ao dia, à noite e à tempestade. A nave tem modelo próprio; rochas, minerais e crateras conservam sua identidade visual. Setores ainda não construídos aparecem como plataformas, e as estruturas prontas acompanham o estado da campanha. O relevo é ilustrativo, sem correspondência com topografia científica.
+
 | Chave local | Conteúdo |
 |---|---|
 | `opportunity.campaign.v1` | Estado LIFE, objetivos derivados, posição, setor, amostra, registros, decisões e resultado |

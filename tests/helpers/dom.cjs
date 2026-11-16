@@ -20,7 +20,7 @@ class Element {
   get nextSibling(){return this.parentElement?.children[this.parentElement.children.indexOf(this)+1]||null;}
   insertBefore(node,anchor){this.append(node);if(anchor){this.children.pop();this.children.splice(this.children.indexOf(anchor),0,node);}}
   get classList(){const node=this;return {add(name){if(!node.matches('.'+name))node.className=(node.className||'')+' '+name;},remove(name){node.className=(node.className||'').split(' ').filter(n=>n!==name).join(' ');},toggle(name,force){if(force)this.add(name);else this.remove(name);}};}
-  getContext(){return new Proxy({}, {get:(target,key)=>target[key]||(()=>{})});}
+  getContext(){return new Proxy({createLinearGradient:()=>({addColorStop(){}})}, {get:(target,key)=>target[key]||(()=>{})});}
   getClientRects(){return this.hidden?[]:[{}];}
   focus(){if(this.ownerDocument)this.ownerDocument.activeElement=this;}
   setCustomValidity(){}
