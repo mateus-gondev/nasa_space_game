@@ -7,7 +7,7 @@ Pacote de arte para jogo em visão ortogonal de cima, baseado na identidade de M
 - 32 tiles de chão, 32 × 32 pixels, em tiles/ e no atlas tileset_terreno.png (8 colunas, sem margem ou espaçamento).
 - 21 sprites PNG individuais com transparência binária, em sprites/. Construções e nave ocupam mais de um tile; as dimensões constam em documentacao/assets.csv.
 - 3 mapas editáveis, cada um com 24 × 16 tiles, equivalentes a 768 × 512 pixels.
-- Mapas em Tiled TMX e JSON; tilesets externos terreno.tsx e objetos.tsx.
+- Mapas em Tiled TMX e JSON; tilesets externos terreno.xml e objetos.xml.
 - marte.world posiciona os três mapas lado a lado: pouso → mineração → pesquisa. O mundo completo mede 2304 × 512 pixels.
 - Previews em PNG, incluindo os mapas ampliados 2× por vizinho mais próximo. Os previews são consultas visuais; os arquivos TMX/JSON preservam os elementos separados.
 - Paleta em TXT e GPL e relatórios de validação.
@@ -26,9 +26,9 @@ Fora dos sprites o alfa é 0; dentro deles é 255. Não há antialiasing nem cor
 
 ## Abrir e editar
 
-Mantenha a estrutura de pastas. Abra marte.world ou um mapa .tmx em um editor compatível com Tiled. Os tilesets usam caminhos relativos e os arquivos JSON apontam para os mesmos TSX externos. Para uma engine que exija tilesets embutidos ou outro formato de JSON, exporte a partir do editor conforme o importador utilizado.
+Mantenha a estrutura de pastas. Abra marte.world ou um mapa .tmx em um editor compatível com Tiled. Os tilesets XML usam caminhos relativos e os arquivos JSON apontam para os mesmos arquivos externos. Para uma engine que exija tilesets embutidos ou outro formato de JSON, exporte a partir do editor conforme o importador utilizado.
 
-terreno.tsx inclui um Wang set de cantos com dois tipos de solo. IDs 0–15 representam as 16 combinações TL/TR/BL/BR; IDs 16–19 são variações de regolito, 20–23 de areia, 24–27 de chão rachado e 28–31 de cascalho. Os PNGs individuais conservam esses índices nos nomes. A resolução de todos os tiles é 32 × 32.
+terreno.xml inclui um Wang set de cantos com dois tipos de solo. IDs 0–15 representam as 16 combinações TL/TR/BL/BR; IDs 16–19 são variações de regolito, 20–23 de areia, 24–27 de chão rachado e 28–31 de cascalho. Os PNGs individuais conservam esses índices nos nomes. A resolução de todos os tiles é 32 × 32.
 
 Os GIDs globais 1–32 são terreno; 33–53 correspondem à coleção de objetos. A origem dos objetos gráficos do Tiled é o canto inferior esquerdo. Em scene_manifest.json, os mesmos objetos usam x/y no canto superior esquerdo, para facilitar integração com outras ferramentas.
 

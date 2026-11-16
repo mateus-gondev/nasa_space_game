@@ -5624,10 +5624,10 @@
       "kind": "source"
     },
     {
-      "path": "/assets/marte_tilemap/objetos.tsx",
-      "file": "assets/marte_tilemap/objetos.tsx",
+      "path": "/assets/marte_tilemap/objetos.xml",
+      "file": "assets/marte_tilemap/objetos.xml",
       "group": "marte_tilemap",
-      "name": "objetos.tsx",
+      "name": "objetos.xml",
       "kind": "source"
     },
     {
@@ -5841,10 +5841,10 @@
       "kind": "image"
     },
     {
-      "path": "/assets/marte_tilemap/terreno.tsx",
-      "file": "assets/marte_tilemap/terreno.tsx",
+      "path": "/assets/marte_tilemap/terreno.xml",
+      "file": "assets/marte_tilemap/terreno.xml",
       "group": "marte_tilemap",
-      "name": "terreno.tsx",
+      "name": "terreno.xml",
       "kind": "source"
     },
     {

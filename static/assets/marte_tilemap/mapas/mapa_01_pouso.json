@@ -32,11 +32,11 @@
   "tilesets": [
     {
       "firstgid": 1,
-      "source": "../terreno.tsx"
+      "source": "../terreno.xml"
     },
     {
       "firstgid": 33,
-      "source": "../objetos.tsx"
+      "source": "../objetos.xml"
     }
   ],
   "layers": [
