@@ -11,8 +11,8 @@ test('every Mars sector builds a 3D scene at the real coordinates and releases i
   const three=pathToFileURL(require.resolve('three').replace(/three\.cjs$/,'three.module.js')).href;
   const localImports=source=>source.replaceAll('/vendor/three/three.module.js',three)
     .replace(/(['"])(\/assets\/[^'"]+)\1/g,(_,quote,file)=>quote+pathToFileURL(path.join(root,'static',file.slice(1))).href+quote);
-  const lab=data(localImports(read('static/lab_training/js/camera-view.js')));
-  const {createMarsScene}=await import(data(localImports(read('static/opportunity-mars-five-worlds/js/camera-view.js')).replace('/lab-training/js/camera-view.js',lab)));
+  const lab=data(localImports(read('static/lab_training/js/camera-view.mjs')));
+  const {createMarsScene}=await import(data(localImports(read('static/opportunity-mars-five-worlds/js/camera-view.mjs')).replace('/lab-training/js/camera-view.mjs',lab)));
   const context=vm.createContext({window:{},fetch:async()=>({ok:true,json:async()=>JSON.parse(read('static/assets/marte_tilemap/scene_manifest.json'))})});
   for(const name of ['config','map-data','tilemap-data','ship-data'])vm.runInContext(read('static/opportunity-mars-five-worlds/js/'+name+'.js'),context);
   await context.window.MARS_TILEMAP_READY;

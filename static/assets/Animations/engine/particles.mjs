@@ -1,5 +1,5 @@
 import { Group, Mesh, IcosahedronGeometry, MeshBasicMaterial } from 'three';
-import { disposeScene } from './resources.js';
+import { disposeScene } from './resources.mjs';
 
 /** Deterministic exhaust/dust; no allocation or randomness during update. */
 export function createExhaustParticles({ count = 38, color = 0xf8aa5a, opacity = 0.56, spread = 4, fall = 2 } = {}) {

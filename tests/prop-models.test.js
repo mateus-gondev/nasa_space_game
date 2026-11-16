@@ -12,9 +12,9 @@ test('all real map sprites have distinct, finite models with original footprints
   const THREE = await import('three');
   const base = '../static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/';
   const moduleAt = name => import(pathToFileURL(path.join(__dirname, base, name)).href);
-  const { createPropKit, createEnvironmentProp } = await moduleAt('props.js');
-  const { createEnvironmentMaterials } = await moduleAt('materials.js');
-  const { disposeScene } = await moduleAt('resources.js');
+  const { createPropKit, createEnvironmentProp } = await moduleAt('props.mjs');
+  const { createEnvironmentMaterials } = await moduleAt('materials.mjs');
+  const { disposeScene } = await moduleAt('resources.mjs');
   const context = vm.createContext({ window: {} });
   for (const file of ['static/lab_training/js/config.js', 'static/opportunity-map-engine-v2/opportunity-map-engine/js/map-data.js', 'static/lab_training/js/map-data-training.js']) {
     vm.runInContext(fs.readFileSync(path.join(__dirname, '..', file), 'utf8'), context);

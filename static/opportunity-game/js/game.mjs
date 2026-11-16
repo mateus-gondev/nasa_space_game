@@ -1,5 +1,5 @@
-import { $, S, K, B, DEF } from './state.js';
-import { startLoop, setCutscene, clearCutscene } from './render.js';
+import { $, S, K, B, DEF } from './state.mjs';
+import { startLoop, setCutscene, clearCutscene } from './render.mjs';
 
 let audioContext;
 

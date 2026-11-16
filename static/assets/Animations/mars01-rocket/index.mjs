@@ -1,6 +1,6 @@
 import { ACESFilmicToneMapping, PCFSoftShadowMap, SRGBColorSpace } from 'three';
-import { createAnimation } from '../engine/index.js';
-import { createRocketScene } from './scene.js';
+import { createAnimation } from '../engine/index.mjs';
+import { createRocketScene } from './scene.mjs';
 
 export function createRocketIntro({ onComplete, ...options } = {}) {
   return createAnimation({

@@ -640,7 +640,7 @@
     $("#closeCamera").focus();
     try {
       if (!cameraView) {
-        const { LabCameraView } = await import('./camera-view.js');
+        const { LabCameraView } = await import('./camera-view.mjs');
         if (opening !== cameraOpening) return;
         cameraView = new LabCameraView({
           container: $("#cameraViewport"), map, config,

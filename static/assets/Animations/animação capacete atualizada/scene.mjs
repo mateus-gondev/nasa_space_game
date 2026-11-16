@@ -6,9 +6,9 @@ import {
   MeshBasicMaterial, PointsMaterial, ShaderMaterial,
   DataTexture, NearestFilter, SRGBColorSpace, BackSide, Quaternion, Euler,
 } from 'three';
-import { PAL } from './config.js';
-import { T_FLASH, FLASH_LEN, OPEN_LEN, easeInOut, sampleHelmet } from './timeline.js';
-import { disposeScene } from '../engine/resources.js';
+import { PAL } from './config.mjs';
+import { T_FLASH, FLASH_LEN, OPEN_LEN, easeInOut, sampleHelmet } from './timeline.mjs';
+import { disposeScene } from '../engine/resources.mjs';
 
 const CAM_Y = 1.45;
 const R = 0.35; // raio do capacete

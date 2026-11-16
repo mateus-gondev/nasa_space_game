@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { createEnvironmentMaterials } from '../materials.js';
-import { createPropKit, createEnvironmentProp } from '../props.js';
-import { configureQualityRenderer, getRenderProfile } from '../quality.js';
-import { disposeScene } from '../resources.js';
+import { createEnvironmentMaterials } from '../materials.mjs';
+import { createPropKit, createEnvironmentProp } from '../props.mjs';
+import { configureQualityRenderer, getRenderProfile } from '../quality.mjs';
+import { disposeScene } from '../resources.mjs';
 
 const $ = id => document.getElementById(id), viewport = $('modelViewport');
 const names = {

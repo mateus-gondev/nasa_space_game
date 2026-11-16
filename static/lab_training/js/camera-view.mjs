@@ -1,8 +1,8 @@
 import * as THREE from '/vendor/three/three.module.js';
-import { CameraPOVController } from '/assets/Animations/CameraPOV_arquivos/CameraPOVController.js';
+import { CameraPOVController } from '/assets/Animations/CameraPOV_arquivos/CameraPOVController.mjs';
 
-import { createEnhancedLabScene } from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.js';
-import { configureQualityRenderer, getRenderProfile, RENDER_PROFILES } from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.js';
+import { createEnhancedLabScene } from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.mjs';
+import { configureQualityRenderer, getRenderProfile, RENDER_PROFILES } from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.mjs';
 
 // Mantém o contrato usado pela câmera e pelos testes da planta real.
 export function createLabScene(map, config, mood, { quality = 'balanced' } = {}) {

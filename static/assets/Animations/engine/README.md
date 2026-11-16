@@ -1,25 +1,25 @@
 # Engine de animações Three.js
 
-`index.js` exporta `createAnimation(options)`. O capacete em
-`../animação capacete atualizada/index.js` é a primeira integração.
+`index.mjs` exporta `createAnimation(options)`. O capacete em
+`../animação capacete atualizada/index.mjs` é a primeira integração.
 O HTML existente continua funcionando sozinho e dentro do iframe do treinamento.
 
 O foguete `../opportunity_mars01_rocket.html` também usa a engine, por meio de
-`../mars01-rocket/index.js`. A cena procedural fica em `mars01-rocket/scene.js`;
+`../mars01-rocket/index.mjs`. A cena procedural fica em `mars01-rocket/scene.mjs`;
 o HTML mantém a interface, a telemetria e o fallback CSS. Os dois exemplos usam
 a mesma versão Three.js 0.170.0 pelo importmap.
 
 A engine reutiliza o player do capacete: renderização pixelada, limite de FPS,
 HUD, legendas, bipes e controles. Cena, coreografia e paleta ficam na animação.
 Os módulos ES são servidos pela rota `/assets` existente, sem build.
-O HTML deve definir o importmap de `three` antes de importar os módulos
-(o exemplo mantém Three.js 0.170.0 via CDN e exige internet).
+O HTML deve definir o importmap de `three` antes de importar os módulos.
+No treinamento, o importmap usa a cópia local servida em `/vendor/three`.
 
 ## Nova animação
 
 ```js
-import { createAnimation } from '/assets/Animations/engine/index.js';
-import { createScene } from './scene.js';
+import { createAnimation } from '/assets/Animations/engine/index.mjs';
+import { createScene } from './scene.mjs';
 
 const animation = createAnimation({
   container: document.getElementById('stage'),
@@ -85,10 +85,10 @@ HUD, conclusão, validação de parâmetros e descarte, além do tutorial existe
 Helpers disponíveis, sem dependências além do próprio Three.js:
 
 ```js
-import { createDragRotation } from '/assets/Animations/engine/controls.js';
-import { createExhaustParticles } from '/assets/Animations/engine/particles.js';
-import { addMesh } from '/assets/Animations/engine/scene.js';
-import { disposeScene } from '/assets/Animations/engine/resources.js';
+import { createDragRotation } from '/assets/Animations/engine/controls.mjs';
+import { createExhaustParticles } from '/assets/Animations/engine/particles.mjs';
+import { addMesh } from '/assets/Animations/engine/scene.mjs';
+import { disposeScene } from '/assets/Animations/engine/resources.mjs';
 ```
 
 `createDragRotation(element, { initial, sensitivity })` expõe `angle`, `reset()` e

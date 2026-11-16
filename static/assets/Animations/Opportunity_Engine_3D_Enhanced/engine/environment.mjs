@@ -3,10 +3,10 @@ import {
   BoxGeometry, PlaneGeometry, HemisphereLight, DirectionalLight, PointLight,
   GridHelper, AmbientLight
 } from 'three';
-import { createEnvironmentMaterials } from './materials.js';
-import { createPropKit, createEnvironmentProp } from './props.js';
-import { getRenderProfile } from './quality.js';
-import { disposeScene } from './resources.js';
+import { createEnvironmentMaterials } from './materials.mjs';
+import { createPropKit, createEnvironmentProp } from './props.mjs';
+import { getRenderProfile } from './quality.mjs';
+import { disposeScene } from './resources.mjs';
 
 const FALLBACK_GRID=[
  [1,1,1,1,1,1], [1,2,2,2,2,1], [1,2,2,2,2,1],

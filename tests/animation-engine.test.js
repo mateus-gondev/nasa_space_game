@@ -50,7 +50,7 @@ function loadEngine() {
     },
   });
   // Substitute only browser imports; execute the actual engine/HUD/audio code.
-  for (const name of ['audio.js', 'hud.js', 'index.js']) {
+  for (const name of ['audio.mjs', 'hud.mjs', 'index.mjs']) {
     const source = fs.readFileSync(path.join(__dirname, '../static/assets/Animations/engine', name), 'utf8');
     vm.runInContext(source.replace(/^import .*;\r?\n/gm, '').replace(/^export /gm, ''), context);
   }
@@ -148,7 +148,7 @@ test('smooth responsive scenes retain animated preview, telemetry, reset and cle
 
 test('scene cleanup disposes shared materials, texture maps and shadow resources once', () => {
   const context = vm.createContext({});
-  const source = fs.readFileSync(path.join(__dirname, '../static/assets/Animations/engine/resources.js'), 'utf8');
+  const source = fs.readFileSync(path.join(__dirname, '../static/assets/Animations/engine/resources.mjs'), 'utf8');
   vm.runInContext(source.replace(/^export /gm, ''), context);
   const counts = {};
   const resource = name => ({ dispose() { counts[name] = (counts[name] || 0) + 1; } });
@@ -163,7 +163,7 @@ test('scene cleanup disposes shared materials, texture maps and shadow resources
 
 test('drag rotation handles pointer capture, reset and listener cleanup', () => {
   const context = vm.createContext({});
-  const source = fs.readFileSync(path.join(__dirname, '../static/assets/Animations/engine/controls.js'), 'utf8');
+  const source = fs.readFileSync(path.join(__dirname, '../static/assets/Animations/engine/controls.mjs'), 'utf8');
   vm.runInContext(source.replace(/^export /gm, ''), context);
   const handlers = new Map();
   let captured = null;
@@ -213,7 +213,7 @@ test('exhaust reuses geometry, samples deterministically and releases resources'
       dispose() { disposedMaterials++; }
     },
   });
-  for (const file of ['resources.js', 'particles.js']) {
+  for (const file of ['resources.mjs', 'particles.mjs']) {
     const source = fs.readFileSync(path.join(__dirname, '../static/assets/Animations/engine', file), 'utf8');
     vm.runInContext(source.replace(/^import .*;\r?\n/gm, '').replace(/^export /gm, ''), context);
   }

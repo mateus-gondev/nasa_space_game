@@ -7,7 +7,7 @@ const { pathToFileURL } = require('node:url');
 
 const root = path.join(__dirname, '..');
 const read = file => fs.readFileSync(path.join(root, file), 'utf8');
-const controllerSource = read('static/assets/Animations/CameraPOV_arquivos/CameraPOVController.js');
+const controllerSource = read('static/assets/Animations/CameraPOV_arquivos/CameraPOVController.mjs');
 const dataModule = source => 'data:text/javascript;base64,' + Buffer.from(source).toString('base64');
 
 test('POV controller smooths look/zoom, clamps limits, resets heading and removes its listeners', () => {
@@ -65,11 +65,11 @@ test('enhanced 3D scene uses the training map, preserves photographic targets an
   t.after(() => { global.document = originalDocument; });
   const threeURL = pathToFileURL(require.resolve('three').replace(/three\.cjs$/, 'three.module.js')).href;
   const THREE = await import(threeURL);
-  const source = read('static/lab_training/js/camera-view.js')
+  const source = read('static/lab_training/js/camera-view.mjs')
     .replace('/vendor/three/three.module.js', threeURL)
-    .replace('/assets/Animations/CameraPOV_arquivos/CameraPOVController.js', dataModule(controllerSource))
-    .replace(/\/assets\/Animations\/Opportunity_Engine_3D_Enhanced\/engine\/(environment|quality)\.js/g,
-      (_, name) => pathToFileURL(path.join(root, 'static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine', name + '.js')).href);
+    .replace('/assets/Animations/CameraPOV_arquivos/CameraPOVController.mjs', dataModule(controllerSource))
+    .replace(/\/assets\/Animations\/Opportunity_Engine_3D_Enhanced\/engine\/(environment|quality)\.mjs/g,
+      (_, name) => pathToFileURL(path.join(root, 'static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine', name + '.mjs')).href);
   const { createLabScene, LabCameraView } = await import(dataModule(source));
   const context = vm.createContext({ window: {} });
   for (const file of [
@@ -126,7 +126,7 @@ test('enhanced 3D scene uses the training map, preserves photographic targets an
   assert(lowScene.children.every(object => !object.isDirectionalLight || !object.castShadow));
   lowScene.userData.disposeEnvironment();
 
-  const { configureQualityRenderer, getRenderProfile } = await import(pathToFileURL(path.join(root, 'static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.js')).href);
+  const { configureQualityRenderer, getRenderProfile } = await import(pathToFileURL(path.join(root, 'static/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.mjs')).href);
   const renderer = { shadowMap: {} };
   configureQualityRenderer('high')(renderer);
   assert.equal(renderer.shadowMap.enabled, true);

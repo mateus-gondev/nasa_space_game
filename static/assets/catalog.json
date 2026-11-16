@@ -3503,10 +3503,10 @@
       "kind": "image"
     },
     {
-      "path": "/assets/Animations/animação capacete atualizada/config.js",
-      "file": "assets/Animations/animação capacete atualizada/config.js",
+      "path": "/assets/Animations/animação capacete atualizada/config.mjs",
+      "file": "assets/Animations/animação capacete atualizada/config.mjs",
       "group": "Animations",
-      "name": "config.js",
+      "name": "config.mjs",
       "kind": "source"
     },
     {
@@ -3517,24 +3517,24 @@
       "kind": "scene"
     },
     {
-      "path": "/assets/Animations/animação capacete atualizada/index.js",
-      "file": "assets/Animations/animação capacete atualizada/index.js",
+      "path": "/assets/Animations/animação capacete atualizada/index.mjs",
+      "file": "assets/Animations/animação capacete atualizada/index.mjs",
       "group": "Animations",
-      "name": "index.js",
+      "name": "index.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/animação capacete atualizada/scene.js",
-      "file": "assets/Animations/animação capacete atualizada/scene.js",
+      "path": "/assets/Animations/animação capacete atualizada/scene.mjs",
+      "file": "assets/Animations/animação capacete atualizada/scene.mjs",
       "group": "Animations",
-      "name": "scene.js",
+      "name": "scene.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/animação capacete atualizada/timeline.js",
-      "file": "assets/Animations/animação capacete atualizada/timeline.js",
+      "path": "/assets/Animations/animação capacete atualizada/timeline.mjs",
+      "file": "assets/Animations/animação capacete atualizada/timeline.mjs",
       "group": "Animations",
-      "name": "timeline.js",
+      "name": "timeline.mjs",
       "kind": "source"
     },
     {
@@ -3552,10 +3552,10 @@
       "kind": "scene"
     },
     {
-      "path": "/assets/Animations/CameraPOV_arquivos/CameraPOVController.js",
-      "file": "assets/Animations/CameraPOV_arquivos/CameraPOVController.js",
+      "path": "/assets/Animations/CameraPOV_arquivos/CameraPOVController.mjs",
+      "file": "assets/Animations/CameraPOV_arquivos/CameraPOVController.mjs",
       "group": "Animations",
-      "name": "CameraPOVController.js",
+      "name": "CameraPOVController.mjs",
       "kind": "source"
     },
     {
@@ -3580,38 +3580,38 @@
       "kind": "scene"
     },
     {
-      "path": "/assets/Animations/engine/audio.js",
-      "file": "assets/Animations/engine/audio.js",
+      "path": "/assets/Animations/engine/audio.mjs",
+      "file": "assets/Animations/engine/audio.mjs",
       "group": "Animations",
-      "name": "audio.js",
+      "name": "audio.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/engine/controls.js",
-      "file": "assets/Animations/engine/controls.js",
+      "path": "/assets/Animations/engine/controls.mjs",
+      "file": "assets/Animations/engine/controls.mjs",
       "group": "Animations",
-      "name": "controls.js",
+      "name": "controls.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/engine/hud.js",
-      "file": "assets/Animations/engine/hud.js",
+      "path": "/assets/Animations/engine/hud.mjs",
+      "file": "assets/Animations/engine/hud.mjs",
       "group": "Animations",
-      "name": "hud.js",
+      "name": "hud.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/engine/index.js",
-      "file": "assets/Animations/engine/index.js",
+      "path": "/assets/Animations/engine/index.mjs",
+      "file": "assets/Animations/engine/index.mjs",
       "group": "Animations",
-      "name": "index.js",
+      "name": "index.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/engine/particles.js",
-      "file": "assets/Animations/engine/particles.js",
+      "path": "/assets/Animations/engine/particles.mjs",
+      "file": "assets/Animations/engine/particles.mjs",
       "group": "Animations",
-      "name": "particles.js",
+      "name": "particles.mjs",
       "kind": "source"
     },
     {
@@ -3622,52 +3622,52 @@
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/engine/resources.js",
-      "file": "assets/Animations/engine/resources.js",
+      "path": "/assets/Animations/engine/resources.mjs",
+      "file": "assets/Animations/engine/resources.mjs",
       "group": "Animations",
-      "name": "resources.js",
+      "name": "resources.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/engine/scene.js",
-      "file": "assets/Animations/engine/scene.js",
+      "path": "/assets/Animations/engine/scene.mjs",
+      "file": "assets/Animations/engine/scene.mjs",
       "group": "Animations",
-      "name": "scene.js",
+      "name": "scene.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/mars01-rocket/index.js",
-      "file": "assets/Animations/mars01-rocket/index.js",
+      "path": "/assets/Animations/mars01-rocket/index.mjs",
+      "file": "assets/Animations/mars01-rocket/index.mjs",
       "group": "Animations",
-      "name": "index.js",
+      "name": "index.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/mars01-rocket/scene.js",
-      "file": "assets/Animations/mars01-rocket/scene.js",
+      "path": "/assets/Animations/mars01-rocket/scene.mjs",
+      "file": "assets/Animations/mars01-rocket/scene.mjs",
       "group": "Animations",
-      "name": "scene.js",
+      "name": "scene.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/audio.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/audio.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/audio.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/audio.mjs",
       "group": "Animations",
-      "name": "audio.js",
+      "name": "audio.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/controls.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/controls.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/controls.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/controls.mjs",
       "group": "Animations",
-      "name": "controls.js",
+      "name": "controls.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/app.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/app.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/app.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/app.mjs",
       "group": "Animations",
-      "name": "app.js",
+      "name": "app.mjs",
       "kind": "source"
     },
     {
@@ -3685,45 +3685,45 @@
       "kind": "scene"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/models.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/models.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/models.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/models.mjs",
       "group": "Animations",
-      "name": "models.js",
+      "name": "models.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/sample-map.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/sample-map.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/sample-map.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/sample-map.mjs",
       "group": "Animations",
-      "name": "sample-map.js",
+      "name": "sample-map.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.mjs",
       "group": "Animations",
-      "name": "environment.js",
+      "name": "environment.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/hud.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/hud.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/hud.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/hud.mjs",
       "group": "Animations",
-      "name": "hud.js",
+      "name": "hud.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/index.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/index.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/index.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/index.mjs",
       "group": "Animations",
-      "name": "index.js",
+      "name": "index.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/materials.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/materials.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/materials.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/materials.mjs",
       "group": "Animations",
-      "name": "materials.js",
+      "name": "materials.mjs",
       "kind": "source"
     },
     {
@@ -3734,24 +3734,24 @@
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/particles.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/particles.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/particles.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/particles.mjs",
       "group": "Animations",
-      "name": "particles.js",
+      "name": "particles.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/props.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/props.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/props.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/props.mjs",
       "group": "Animations",
-      "name": "props.js",
+      "name": "props.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.mjs",
       "group": "Animations",
-      "name": "quality.js",
+      "name": "quality.mjs",
       "kind": "source"
     },
     {
@@ -3769,17 +3769,17 @@
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/resources.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/resources.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/resources.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/resources.mjs",
       "group": "Animations",
-      "name": "resources.js",
+      "name": "resources.mjs",
       "kind": "source"
     },
     {
-      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/scene.js",
-      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/scene.js",
+      "path": "/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/scene.mjs",
+      "file": "assets/Animations/Opportunity_Engine_3D_Enhanced/engine/scene.mjs",
       "group": "Animations",
-      "name": "scene.js",
+      "name": "scene.mjs",
       "kind": "source"
     },
     {

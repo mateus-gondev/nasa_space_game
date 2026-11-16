@@ -2,7 +2,7 @@
 
 Este pacote **não inclui o foguete, o cenário anterior, objetivos, captura de imagens ou minigames**.
 
-- `CameraPOVController.js`: controlador autônomo, para importar em qualquer projeto Three.js.
+- `CameraPOVController.mjs`: controlador autônomo, para importar em qualquer projeto Three.js.
 - `index.html`: demonstração mínima com grade e marcadores geométricos de referência.
 
 ## Rodar
@@ -18,7 +18,7 @@ Acesse http://localhost:8000/. A demo carrega Three.js por CDN e necessita de co
 ## Incorporar ao seu jogo
 
 ```js
-import { CameraPOVController } from './CameraPOVController.js';
+import { CameraPOVController } from './CameraPOVController.mjs';
 
 const controller = new CameraPOVController({
   camera: minhaPerspectiveCamera,

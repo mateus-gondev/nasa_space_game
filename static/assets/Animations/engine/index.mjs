@@ -1,7 +1,6 @@
 import { WebGLRenderer } from 'three';
-import { createAudio } from './audio.js';
-import { createHud, injectStyle } from './hud.js';
-import { configureQualityRenderer, getRenderProfile } from './quality.js';
+import { createAudio } from './audio.mjs';
+import { createHud, injectStyle } from './hud.mjs';
 
 /** A scene factory returns { scene, camera, update(seconds), dispose() }. */
 export function createAnimation({
@@ -11,25 +10,17 @@ export function createAnimation({
   hud = [], captions = [], beeps = [], showHud = true, fontFamily,
   pixelated = true, responsive = false, maxPixelRatio = 1.6,
   rendererOptions = {}, configureRenderer, animateWhenPaused = false,
-  renderQuality = null,
   onComplete, onUpdate,
 } = {}) {
   for (const [name, value] of Object.entries({ duration, width, height, fps, maxPixelRatio })) {
     if (!Number.isFinite(value) || value <= 0) throw new RangeError(`${name} must be positive and finite`);
   }
   if (typeof createScene !== 'function') throw new TypeError('createScene must be a function');
-  if (renderQuality !== null && !['low','balanced','high'].includes(renderQuality)) {
-    throw new RangeError('renderQuality must be low, balanced, high, or null');
-  }
-  const smoothCanvas = !pixelated || renderQuality !== null;
-  const effectivePixelRatio = () => smoothCanvas
-    ? Math.min(window.devicePixelRatio || 1, maxPixelRatio, renderQuality ? getRenderProfile(renderQuality).maxPixelRatio : Infinity)
-    : 1;
 
   injectStyle();
   const root = document.createElement('div');
   root.className = 'animation-root';
-  root.classList.toggle('animation-smooth', smoothCanvas);
+  root.classList.toggle('animation-smooth', !pixelated);
   root.classList.toggle('animation-responsive', responsive);
   root.style.aspectRatio = `${width} / ${height}`;
   root.style.width = `min(100%, ${100 * width / height}vh)`;
@@ -142,7 +133,7 @@ export function createAnimation({
     if (disposed) return;
     const w = Math.max(1, container.clientWidth || width);
     const h = Math.max(1, container.clientHeight || height);
-    renderer.setPixelRatio(effectivePixelRatio());
+    renderer.setPixelRatio(pixelated ? 1 : Math.min(window.devicePixelRatio || 1, maxPixelRatio));
     renderer.setSize(w, h, false);
     world.camera.aspect = w / h;
     world.camera.updateProjectionMatrix();
@@ -151,10 +142,9 @@ export function createAnimation({
   };
 
   try {
-    renderer = new WebGLRenderer({ antialias: smoothCanvas, alpha: smoothCanvas, stencil: false, powerPreference: smoothCanvas ? 'high-performance' : 'low-power', ...rendererOptions, canvas });
-    if (renderQuality) configureQualityRenderer(renderQuality)(renderer);
+    renderer = new WebGLRenderer({ antialias: !pixelated, alpha: !pixelated, stencil: false, powerPreference: pixelated ? 'low-power' : 'high-performance', ...rendererOptions, canvas });
     configureRenderer?.(renderer);
-    renderer.setPixelRatio(effectivePixelRatio());
+    renderer.setPixelRatio(pixelated ? 1 : Math.min(window.devicePixelRatio || 1, maxPixelRatio));
     renderer.setSize(width, height, false);
     world = createScene({ width, height, element: root });
     hudUi = createHud(root, { hud, captions, enabled: showHud });

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { addMesh } from '../engine/scene.js';
-import { createDragRotation } from '../engine/controls.js';
-import { createExhaustParticles } from '../engine/particles.js';
-import { disposeScene } from '../engine/resources.js';
+import { addMesh } from '../engine/scene.mjs';
+import { createDragRotation } from '../engine/controls.mjs';
+import { createExhaustParticles } from '../engine/particles.mjs';
+import { disposeScene } from '../engine/resources.mjs';
 
 export function createRocketScene({ width, height, element }) {
     const scene=new THREE.Scene();

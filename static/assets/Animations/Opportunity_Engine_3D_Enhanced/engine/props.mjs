@@ -3,7 +3,7 @@ import {
   IcosahedronGeometry, PlaneGeometry, LatheGeometry, ExtrudeGeometry, Shape,
   Vector2, Vector3, InstancedMesh,
 } from 'three';
-import { createSignMaterial, createPanelMaterial } from './materials.js';
+import { createSignMaterial, createPanelMaterial } from './materials.mjs';
 
 const TAU = Math.PI * 2, Y = new Vector3(0, 1, 0);
 const group = (parent, name, position = [0, 0, 0]) => {

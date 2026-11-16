@@ -1,4 +1,4 @@
-import { $, S, g, W, H, mx, PAL } from './state.js';
+import { $, S, g, W, H, mx, PAL } from './state.mjs';
 
 const canvas = $('#cu');
 const ctx = canvas.getContext('2d');

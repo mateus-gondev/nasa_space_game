@@ -2,13 +2,13 @@
 
 ## Modelos fiéis aos desenhos do mapa
 
-`props.js` contém modelos específicos para os 31 tipos reais da planta, com dimensões sem o antigo limite de 3 tiles e cores derivadas de `drawProp`/`drawExtra`. Foram incluídos rover com seis rodas e suspensão, Pancam binocular, refletor parabólico, microscópio, espectrômetros, braço articulado, móveis, vitrines, mesa holográfica e equipamentos de energia. O alvo fotográfico continua sendo uma bandeja de terreno para preservar a etapa do tutorial.
+`props.mjs` contém modelos específicos para os 31 tipos reais da planta, com dimensões sem o antigo limite de 3 tiles e cores derivadas de `drawProp`/`drawExtra`. Foram incluídos rover com seis rodas e suspensão, Pancam binocular, refletor parabólico, microscópio, espectrômetros, braço articulado, móveis, vitrines, mesa holográfica e equipamentos de energia. O alvo fotográfico continua sendo uma bandeja de terreno para preservar a etapa do tutorial.
 
 Compare o desenho 2D original e o modelo em `/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/demo/models.html`. A galeria usa os dados e o renderer reais do mapa, oferece órbita, zoom, vista superior e seleção de qualidade. Texturas de gráficos, quadros, células solares e globo marciano são geradas localmente e compartilhadas; peças repetidas são agrupadas com instâncias. A suíte `npm test` verifica todos os modelos nos três perfis.
 
 ## O que havia no arquivo original
 
-O `engine.rar` recebido contém **apenas o motor de animações** (`engine/`), não o projeto `nasa_space_game` descrito em `Engine_3D_Threejs.docx`. Por isso, este pacote **preserva todos os arquivos originais** e adiciona módulos reutilizáveis. Ele não substitui diretamente `static/lab_training/js/camera-view.js`, que não veio no RAR.
+O `engine.rar` recebido contém **apenas o motor de animações** (`engine/`), não o projeto `nasa_space_game` descrito em `Engine_3D_Threejs.docx`. Por isso, este pacote **preserva todos os arquivos originais** e adiciona módulos reutilizáveis. Ele não substitui diretamente `static/lab_training/js/camera-view.mjs`, que não veio no RAR.
 
 A documentação do laboratório menciona Three.js **0.180.0**, enquanto o README do motor enviado menciona **0.170.0**. O demo utiliza 0.170.0, compatível com o motor enviado; os módulos utilizam recursos estáveis nas duas versões. Ao integrar ao projeto completo, utilize a mesma versão do Three.js em todos os imports.
 
@@ -16,10 +16,10 @@ A documentação do laboratório menciona Three.js **0.180.0**, enquanto o READM
 
 | Arquivo | Propósito |
 |---|---|
-| `environment.js` | Constrói cenário de `MAP_DATA` com piso/parede instanciados, teto, portas, props, luzes e atmosfera |
-| `props.js` | Modelos procedurais detalhados para armário, rack, tanque, bancada, painel solar, equipamento científico, planta, mastros, caixas e amostras |
-| `materials.js` | PBR com `MeshStandardMaterial`, texturas procedurais de piso, metal, grade e solo marciano, rótulos Canvas |
-| `quality.js` | Perfis `low`, `balanced`, `high`, com tone mapping ACES e sombras suaves opcionais |
+| `environment.mjs` | Constrói cenário de `MAP_DATA` com piso/parede instanciados, teto, portas, props, luzes e atmosfera |
+| `props.mjs` | Modelos procedurais detalhados para armário, rack, tanque, bancada, painel solar, equipamento científico, planta, mastros, caixas e amostras |
+| `materials.mjs` | PBR com `MeshStandardMaterial`, texturas procedurais de piso, metal, grade e solo marciano, rótulos Canvas |
+| `quality.mjs` | Perfis `low`, `balanced`, `high`, com tone mapping ACES e sombras suaves opcionais |
 | `demo/` | Cena de teste independente usando somente HTML, CSS, JavaScript e Three.js |
 
 ## Testar a demonstração
@@ -32,10 +32,10 @@ A documentação do laboratório menciona Three.js **0.180.0**, enquanto o READM
 
 ## Integração com a câmera científica existente
 
-No **projeto completo**, mantenha `CameraPOVController`, `LabCameraView`, validação de fotografia e regras do tutorial. **Substitua somente a função que constrói a `THREE.Scene`** dentro de `camera-view.js`:
+No **projeto completo**, mantenha `CameraPOVController`, `LabCameraView`, validação de fotografia e regras do tutorial. **Substitua somente a função que constrói a `THREE.Scene`** dentro de `camera-view.mjs`:
 
 ```js
-import { createEnhancedLabScene } from '/assets/Animations/engine/environment.js';
+import { createEnhancedLabScene } from '/assets/Animations/engine/environment.mjs';
 
 // Dentro do seu construtor de cena, usando o mesmo map/config/mood já existentes:
 const scene = createEnhancedLabScene(map, config, mood, {
@@ -45,14 +45,14 @@ const scene = createEnhancedLabScene(map, config, mood, {
 });
 ```
 
-**Atenção:** não é possível aplicar automaticamente esse patch sem o arquivo original de `camera-view.js` e sem os dados reais de `MAP_DATA`. O código foi construído em torno do contrato documentado, mas as variações exatas de nomes/estruturas não puderam ser verificadas.
+**Atenção:** não é possível aplicar automaticamente esse patch sem o arquivo original de `camera-view.mjs` e sem os dados reais de `MAP_DATA`. O código foi construído em torno do contrato documentado, mas as variações exatas de nomes/estruturas não puderam ser verificadas.
 
 ### Renderizador
 
 Se o renderer da câmera já existir, configure-o após criá-lo e antes do primeiro frame:
 
 ```js
-import { configureQualityRenderer, getRenderProfile } from '/assets/Animations/engine/quality.js';
+import { configureQualityRenderer, getRenderProfile } from '/assets/Animations/engine/quality.mjs';
 configureQualityRenderer('balanced')(renderer);
 renderer.setPixelRatio(Math.min(devicePixelRatio || 1, getRenderProfile('balanced').maxPixelRatio));
 ```
@@ -60,8 +60,8 @@ renderer.setPixelRatio(Math.min(devicePixelRatio || 1, getRenderProfile('balance
 Se usar o `createAnimation` já existente no RAR:
 
 ```js
-import {createAnimation} from './engine/index.js';
-import {configureQualityRenderer,getRenderProfile} from './engine/quality.js';
+import {createAnimation} from './engine/index.mjs';
+import {configureQualityRenderer,getRenderProfile} from './engine/quality.mjs';
 const quality='balanced';
 const animation=createAnimation({
   createScene, duration:10, pixelated:false, responsive:true,

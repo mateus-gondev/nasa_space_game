@@ -118,7 +118,7 @@
     const resetButton = document.getElementById('reset');
     const statusText = document.getElementById('status');
     try {
-      const { createRocketIntro } = await import('./mars01-rocket/index.js');
+      const { createRocketIntro } = await import('./mars01-rocket/index.mjs');
       const intro = createRocketIntro({
         container: document.getElementById('stage'),
         onUpdate({ data }) {

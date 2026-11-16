@@ -1,5 +1,5 @@
 // Funções puras: dado o tempo t (s), devolvem a pose. Sem alocação por frame.
-import { T } from './config.js';
+import { T } from './config.mjs';
 
 export const T_FLASH = T.seat; // instante em que o capacete assenta na cabeça (flash branco)
 export const FLASH_LEN = 0.15;

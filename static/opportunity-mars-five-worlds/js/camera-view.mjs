@@ -1,10 +1,10 @@
 import * as THREE from '/vendor/three/three.module.js';
-import {LabCameraView} from '/lab-training/js/camera-view.js';
-import {createEnhancedLabScene} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.js';
-import {createEnvironmentMaterials} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/materials.js';
-import {createPropKit,createEnvironmentProp} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/props.js';
-import {disposeScene} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/resources.js';
-import {getRenderProfile} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.js';
+import {LabCameraView} from '/lab-training/js/camera-view.mjs';
+import {createEnhancedLabScene} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/environment.mjs';
+import {createEnvironmentMaterials} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/materials.mjs';
+import {createPropKit,createEnvironmentProp} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/props.mjs';
+import {disposeScene} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/resources.mjs';
+import {getRenderProfile} from '/assets/Animations/Opportunity_Engine_3D_Enhanced/engine/quality.mjs';
 
 const TAU=Math.PI*2;
 function random(seed){let state=seed>>>0;return ()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};}

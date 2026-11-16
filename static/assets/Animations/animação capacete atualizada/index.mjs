@@ -1,6 +1,6 @@
-import { createAnimation } from '../engine/index.js';
-import { createScene } from './scene.js';
-import { DURATION, FPS, CAPTIONS, HUD, BEEPS } from './config.js';
+import { createAnimation } from '../engine/index.mjs';
+import { createScene } from './scene.mjs';
+import { DURATION, FPS, CAPTIONS, HUD, BEEPS } from './config.mjs';
 
 /** Capacete POV: cena e coreografia próprias, reprodução pela engine comum. */
 export function createHelmetIntro({ hud = true, onComplete, ...options } = {}) {

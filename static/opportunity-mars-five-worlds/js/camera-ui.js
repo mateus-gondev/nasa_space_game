@@ -1,5 +1,5 @@
 /* A câmera observa o setor atual; o mapa e o relógio ficam suspensos. */
-window.MarsCameraUI={mount({engine,updateInterface,loadView=()=>import('./camera-view.js')}){
+window.MarsCameraUI={mount({engine,updateInterface,loadView=()=>import('./camera-view.mjs')}){
   const $=selector=>document.querySelector(selector),dialog=$('#marsCamera');
   let view=null,wasPaused=false,request=0;
   const controls=[$('#cameraReset'),$('#cameraZoom'),$('#cameraCapture')];

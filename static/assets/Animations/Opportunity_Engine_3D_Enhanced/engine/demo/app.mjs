@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import {createSampleMap} from './sample-map.js';
-import {createEnhancedLabScene} from '../environment.js';
-import {configureQualityRenderer,getRenderProfile} from '../quality.js';
+import {createSampleMap} from './sample-map.mjs';
+import {createEnhancedLabScene} from '../environment.mjs';
+import {configureQualityRenderer,getRenderProfile} from '../quality.mjs';
 
 const viewport=document.getElementById('view');
 const label=document.getElementById('targetName');
