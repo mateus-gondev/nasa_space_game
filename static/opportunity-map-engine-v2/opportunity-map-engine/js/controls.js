@@ -182,7 +182,10 @@ window.MapControls = class MapControls {
     this.keys.add(key);
   }
 
-  onKeyUp(event) { this.keys.delete(event.key.toLowerCase()); }
+  onKeyUp(event) {
+    if (typeof event?.key !== "string") return;
+    this.keys.delete(event.key.toLowerCase());
+  }
 
   getMovement() {
     if (!this.movementEnabled) return { x: 0, y: 0 };

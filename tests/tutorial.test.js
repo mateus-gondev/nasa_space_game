@@ -28,6 +28,11 @@ test('tool shortcuts stay available while the research selector blocks movement'
   controls.enabled = false;
   controls.onKeyDown(event('4'));
   assert.deepEqual(selected, [3, 2]);
+  controls.keys.add('w');
+  assert.doesNotThrow(() => controls.onKeyUp({}));
+  assert.equal(controls.keys.has('w'), true);
+  controls.onKeyUp(event('w'));
+  assert.equal(controls.keys.has('w'), false);
 });
 
 test('interaction source reaches the app callback without changing keyboard defaults', () => {
