@@ -2,14 +2,8 @@
 (() => {
   const $ = selector => document.querySelector(selector);
 
-  function showMenuPage(page) {
-    $("#mainMenuHome").hidden = page !== "home";
-    document.querySelectorAll(".menu-subpage").forEach(section => {
-      section.hidden = section.id !== `${page}Page`;
-    });
-    const target = page === "home" ? $("#playButton") : $(`#${page}Page .menu-back`);
-    target?.focus({ preventScroll: true });
-  }
+  const infoButton = $("#infoButton");
+  const infoDialog = $("#infoDialog");
 
   $("#playButton").addEventListener("click", () => {
     window.location.href = "/lab-training/";
@@ -23,15 +17,15 @@
       resume.addEventListener('click', () => { window.location.href = '/mars-test/'; });
     }
   } catch { /* Menu continua disponível com armazenamento inválido. */ }
-  $("#infoButton").addEventListener("click", () => showMenuPage("info"));
-  document.querySelectorAll("[data-menu-home]").forEach(button => {
-    button.addEventListener("click", () => showMenuPage("home"));
-  });
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape" && $(".menu-subpage:not([hidden])")) {
-      event.preventDefault();
-      showMenuPage("home");
+  infoButton.addEventListener("click", () => infoDialog.showModal());
+  $("#closeInfo").addEventListener("click", () => infoDialog.close());
+  infoDialog.addEventListener("close", () => infoButton.focus({ preventScroll: true }));
+  infoDialog.addEventListener("click", event => {
+    if (event.target !== infoDialog) return;
+    const { left, right, top, bottom } = infoDialog.getBoundingClientRect();
+    if (event.clientX < left || event.clientX > right || event.clientY < top || event.clientY > bottom) {
+      infoDialog.close();
     }
   });
-  showMenuPage("home");
+  $("#playButton").focus({ preventScroll: true });
 })();

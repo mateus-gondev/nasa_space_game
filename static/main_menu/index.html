@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -10,39 +10,21 @@
 </head>
 <body>
   <div class="main-menu" id="mainMenuOverlay">
-    <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
+    <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Main menu" data-i18n-aria-label="Menu principal">
       <img class="menu-horizon" src="assets/mars-horizon.png" alt="" width="256" height="144">
       <div class="menu-home-content">
         <header>
           <h1 class="menu-title">Surviving<br>in <span>Mars</span></h1>
-          <p class="menu-description" data-i18n="Aprenda jogando. Venha para Marte e descubra uma nova aventura!">Aprenda jogando. Venha para Marte e descubra uma nova aventura!</p>
-          <p class="menu-rotate-hint" data-i18n="Vire o celular de lado para jogar com mais conforto.">Vire o celular de lado para jogar com mais conforto.</p>
+          <p class="menu-description" data-i18n="Aprenda jogando. Venha para Marte e descubra uma nova aventura!">Learn by playing. Come to Mars and discover a new adventure!</p>
+          <p class="menu-rotate-hint" data-i18n="Vire o celular de lado para jogar com mais conforto.">Turn your phone sideways for a better gameplay experience.</p>
         </header>
-        <nav class="menu-actions" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
-          <button class="menu-option menu-option-primary" id="playButton" type="button" data-i18n="Iniciar">Iniciar</button>
-          <button class="menu-option" id="continueCampaign" type="button" data-i18n="Continuar expedição" hidden>Continuar expedição</button>
-          <button class="menu-option" id="openSettings" type="button" data-i18n="Configurações" aria-haspopup="dialog">Configurações</button>
-          <button class="menu-option" id="infoButton" type="button" data-i18n="Info" aria-haspopup="dialog" aria-controls="infoPage">Info</button>
+        <nav class="menu-actions" aria-label="Main menu" data-i18n-aria-label="Menu principal">
+          <button class="menu-option menu-option-primary" id="playButton" type="button" data-i18n="Iniciar">Start</button>
+          <button class="menu-option" id="continueCampaign" type="button" data-i18n="Continuar expedição" hidden>Continue expedition</button>
+          <button class="menu-option" id="openSettings" type="button" data-i18n="Configurações" aria-haspopup="dialog" aria-controls="settingsDialog">Settings</button>
+          <button class="menu-option" id="infoButton" type="button" data-i18n="Info" aria-haspopup="dialog" aria-controls="infoDialog">Info</button>
         </nav>
       </div>
-    </section>
-
-    <section class="menu-subpage" id="infoPage" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>
-      <button class="menu-back" type="button" data-menu-home data-i18n="← Voltar">← Voltar</button>
-      <p class="menu-eyebrow" data-i18n="OPPORTUNITY · MARTE">OPPORTUNITY · MARTE</p>
-      <h2 id="infoTitle" data-i18n="Info">Info</h2>
-      <p data-i18n="Explore a instalação e treine os instrumentos antes da missão em Marte.">Explore a instalação e treine os instrumentos antes da missão em Marte.</p>
-      <ul class="menu-info-list">
-        <li><kbd>W A S D</kbd> <span data-i18n="mover">mover</span></li>
-        <li><kbd>E</kbd> <span data-i18n="interagir">interagir</span></li>
-        <li><kbd>1–4</kbd> <span data-i18n="ferramentas">ferramentas</span></li>
-        <li><kbd>M</kbd> <span data-i18n="mapa">mapa</span> <kbd>Tab</kbd> <span data-i18n="mochila">mochila</span></li>
-      </ul>
-      <section class="menu-science" aria-labelledby="scienceInfoTitle">
-        <h3 id="scienceInfoTitle" data-i18n="Ciência no jogo">Ciência no jogo</h3>
-        <p data-i18n="Usamos dados da NASA para criar as regras de água, ar, comida e energia. Nossa principal referência foi o BVAD, sobre suporte à vida no espaço. Os valores e tempos foram adaptados para aprender brincando.">Usamos dados da NASA para criar as regras de água, ar, comida e energia. Nossa principal referência foi o BVAD, sobre suporte à vida no espaço. Os valores e tempos foram adaptados para aprender brincando.</p>
-        <a class="menu-source-link" href="https://ntrs.nasa.gov/api/citations/20210024855/downloads/BVAD_2.15.22-final.pdf" target="_blank" rel="noopener noreferrer" data-i18n="Ler documento da NASA (PDF em inglês, abre em nova aba)">Ler documento da NASA (PDF em inglês, abre em nova aba)</a>
-      </section>
     </section>
 
     <section class="menu-subpage" id="creditsPage" role="dialog" aria-modal="true" aria-labelledby="creditsTitle" hidden>
@@ -56,54 +38,76 @@
     </section>
   </div>
 
-  <dialog class="settings-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
-    <header class="settings-heading">
-      <h2 id="settingsTitle" data-i18n="Configurações">Configurações</h2>
-      <button class="settings-close" id="closeSettings" type="button" aria-label="Fechar configurações" data-i18n-aria-label="Fechar configurações" title="Fechar configurações" data-i18n-title="Fechar configurações">×</button>
+  <dialog class="menu-dialog info-dialog" id="infoDialog" aria-labelledby="infoTitle">
+    <header class="menu-dialog-heading">
+      <h2 id="infoTitle" data-i18n="Info">Info</h2>
+      <button class="menu-dialog-close" id="closeInfo" type="button" autofocus aria-label="Close" data-i18n-aria-label="Fechar" title="Close" data-i18n-title="Fechar">×</button>
+    </header>
+    <div class="info-content">
+      <p class="menu-eyebrow" data-i18n="OPPORTUNITY · MARTE">OPPORTUNITY · MARS</p>
+      <p data-i18n="Explore a instalação e treine os instrumentos antes da missão em Marte.">Explore the facility and train with the instruments before your mission to Mars.</p>
+      <ul class="menu-info-list">
+        <li><kbd>W A S D</kbd> <span data-i18n="mover">move</span></li>
+        <li><kbd>E</kbd> <span data-i18n="interagir">interact</span></li>
+        <li><kbd>1–4</kbd> <span data-i18n="ferramentas">tools</span></li>
+        <li><kbd>M</kbd> <span data-i18n="mapa">map</span> <kbd>Tab</kbd> <span data-i18n="mochila">inventory</span></li>
+      </ul>
+      <section class="menu-science" aria-labelledby="scienceInfoTitle">
+        <h3 id="scienceInfoTitle" data-i18n="Ciência no jogo">Science in the game</h3>
+        <p data-i18n="Usamos dados da NASA para criar as regras de água, ar, comida e energia. Nossa principal referência foi o BVAD, sobre suporte à vida no espaço. Os valores e tempos foram adaptados para aprender brincando.">We used NASA data to create the rules for water, air, food and energy. Our main reference was the BVAD, about life support in space. Values and timing were adapted for learning through play.</p>
+        <a class="menu-source-link" href="https://ntrs.nasa.gov/api/citations/20210024855/downloads/BVAD_2.15.22-final.pdf" target="_blank" rel="noopener noreferrer" data-i18n="Ler documento da NASA (PDF em inglês, abre em nova aba)">Read the NASA document (PDF in English, opens in a new tab)</a>
+      </section>
+    </div>
+  </dialog>
+
+  <dialog class="menu-dialog" id="settingsDialog" aria-labelledby="settingsTitle">
+    <header class="menu-dialog-heading">
+      <h2 id="settingsTitle" data-i18n="Configurações">Settings</h2>
+      <button class="menu-dialog-close" id="closeSettings" type="button" aria-label="Close settings" data-i18n-aria-label="Fechar configurações" title="Close settings" data-i18n-title="Fechar configurações">×</button>
     </header>
     <div class="settings-layout">
       <section class="settings-panel" id="audioSettings" role="tabpanel" aria-labelledby="audioSettingsTab">
-        <h3 data-i18n="Som">Som</h3>
+        <h3 data-i18n="Som">Sound</h3>
         <div class="volume-setting">
-          <label for="musicVolume" data-i18n="Volume da música">Volume da música</label>
+          <label for="musicVolume" data-i18n="Volume da música">Music Volume</label>
           <div class="volume-control"><input id="musicVolume" type="range" min="0" max="100" step="1" value="50"><output for="musicVolume" id="musicVolumeValue">50%</output></div>
         </div>
         <div class="volume-setting">
-          <label for="gameVolume" data-i18n="Volume do jogo">Volume do jogo</label>
+          <label for="gameVolume" data-i18n="Volume do jogo">Game Volume</label>
           <div class="volume-control"><input id="gameVolume" type="range" min="0" max="100" step="1" value="100"><output for="gameVolume" id="gameVolumeValue">100%</output></div>
         </div>
       </section>
       <section class="settings-panel" id="languageSettings" role="tabpanel" aria-labelledby="languageSettingsTab" hidden>
-        <h3 data-i18n="Legendas">Legendas</h3>
+        <h3 data-i18n="Legendas">Subtitles</h3>
         <label class="subtitle-setting" for="subtitlesEnabled">
-          <span data-i18n="Ligadas / desligadas">Ligadas / desligadas</span>
+          <span data-i18n="Ligadas / desligadas">On / Off</span>
           <input class="settings-switch" id="subtitlesEnabled" type="checkbox" role="switch" checked>
         </label>
         <div class="language-setting">
-          <label id="gameLanguageLabel" for="gameLanguage" data-i18n="Idioma">Idioma</label>
-          <select id="gameLanguage"><option value="pt-BR" lang="pt-BR">Português</option><option value="en" lang="en">English</option></select>
+          <label id="gameLanguageLabel" for="gameLanguage" data-i18n="Idioma">Language</label>
+          <select id="gameLanguage"><option value="pt-BR" lang="pt-BR">Português</option><option value="en" lang="en" selected>English</option></select>
           <div class="language-picker" id="languagePicker" hidden>
             <button class="language-picker-button" id="gameLanguageButton" type="button" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="gameLanguageOptions" aria-labelledby="gameLanguageLabel gameLanguageText">
-              <img class="language-flag" id="gameLanguageFlag" src="/main-menu/assets/flags/br.webp" alt="">
-              <span id="gameLanguageText" lang="pt-BR">Português</span>
+              <img class="language-flag" id="gameLanguageFlag" src="/main-menu/assets/flags/us.webp" alt="">
+              <span id="gameLanguageText" lang="en">English</span>
               <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>
             </button>
             <ul class="language-options" id="gameLanguageOptions" role="listbox" aria-labelledby="gameLanguageLabel" hidden>
-              <li class="language-option" id="languagePortuguese" role="option" aria-selected="true" data-language="pt-BR">
+              <li class="language-option" id="languagePortuguese" role="option" aria-selected="false" data-language="pt-BR">
                 <img class="language-flag" src="/main-menu/assets/flags/br.webp" alt=""><span lang="pt-BR">Português</span>
               </li>
-              <li class="language-option" id="languageEnglish" role="option" aria-selected="false" data-language="en">
+              <li class="language-option" id="languageEnglish" role="option" aria-selected="true" data-language="en">
                 <img class="language-flag" src="/main-menu/assets/flags/us.webp" alt=""><span lang="en">English</span>
               </li>
             </ul>
           </div>
         </div>
       </section>
-      <nav class="settings-tabs" role="tablist" aria-label="Categorias de configurações" data-i18n-aria-label="Categorias de configurações" aria-orientation="vertical">
-        <button class="settings-tab" id="audioSettingsTab" type="button" role="tab" aria-selected="true" aria-controls="audioSettings" aria-label="Som" data-i18n-aria-label="Som" title="Som" data-i18n-title="Som">
+      <nav class="settings-tabs" role="tablist" aria-label="Settings categories" data-i18n-aria-label="Categorias de configurações" aria-orientation="vertical">
+        <button class="settings-tab" id="audioSettingsTab" type="button" role="tab" aria-selected="true" aria-controls="audioSettings" aria-label="Sound" data-i18n-aria-label="Som" title="Sound" data-i18n-title="Som">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l12-2v13M9 9l12-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="18" cy="16" rx="3" ry="2"/></svg>
         </button>
-        <button class="settings-tab" id="languageSettingsTab" type="button" role="tab" aria-selected="false" aria-controls="languageSettings" aria-label="Legendas e idioma" data-i18n-aria-label="Legendas e idioma" title="Legendas e idioma" data-i18n-title="Legendas e idioma" tabindex="-1">
+        <button class="settings-tab" id="languageSettingsTab" type="button" role="tab" aria-selected="false" aria-controls="languageSettings" aria-label="Subtitles and language" data-i18n-aria-label="Legendas e idioma" title="Subtitles and language" data-i18n-title="Legendas e idioma" tabindex="-1">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M6 11h4m3 0h5M6 15h7m3 0h2"/></svg>
         </button>
       </nav>

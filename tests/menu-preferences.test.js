@@ -4,8 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-function loadPreferences({ menu = false, saved = {} } = {}) {
-  const storage = new Map([['opportunity.labTraining.settings', JSON.stringify(saved)]]);
+function loadPreferences({ menu = false, saved } = {}) {
+  const storage = new Map();
+  if (saved !== undefined) storage.set('opportunity.labTraining.settings', JSON.stringify(saved));
   const nodes = new Map();
   function element() {
     return {
@@ -34,7 +35,7 @@ function loadPreferences({ menu = false, saved = {} } = {}) {
       querySelector: selector => nodes.get(selector) || null,
       querySelectorAll: () => [], addEventListener() {},
     },
-    localStorage: { getItem: key => storage.get(key), setItem: (key, value) => storage.set(key, value) },
+    localStorage: { getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) },
     MutationObserver: class { observe() {} },
     CustomEvent: class {}, console,
   });
@@ -43,6 +44,22 @@ function loadPreferences({ menu = false, saved = {} } = {}) {
   }
   return { context, nodes, storage };
 }
+
+test('English is selected on first launch and a saved Portuguese choice takes precedence', () => {
+  const { context, nodes, storage } = loadPreferences({ menu: true });
+  const input = nodes.get('#gameLanguage');
+  assert.equal(input.value, 'en');
+  assert.equal(context.document.documentElement.lang, 'en');
+
+  input.value = 'pt-BR';
+  input.listeners.get('change')({ target: input });
+  assert.equal(context.document.documentElement.lang, 'pt-BR');
+
+  const saved = JSON.parse(storage.get('opportunity.labTraining.settings'));
+  const reloaded = loadPreferences({ menu: true, saved });
+  assert.equal(reloaded.nodes.get('#gameLanguage').value, 'pt-BR');
+  assert.equal(reloaded.context.document.documentElement.lang, 'pt-BR');
+});
 
 test('training loads shared preferences without requiring the menu DOM or restarting menu music', () => {
   const { context } = loadPreferences({ saved: { language: 'en', subtitles: false, musicVolume: 35, gameVolume: 0 } });
@@ -55,6 +72,7 @@ test('training loads shared preferences without requiring the menu DOM or restar
 
 test('independent menu restores settings and saves volume changes for the next training document', () => {
   const { context, nodes, storage } = loadPreferences({ menu: true, saved: { musicVolume: 35, gameVolume: 80 } });
+  assert.equal(nodes.get('#gameLanguage').value, 'en');
   const music = nodes.get('#menuMusic');
   assert.equal(music.volume, .35);
   const input = nodes.get('#musicVolume');

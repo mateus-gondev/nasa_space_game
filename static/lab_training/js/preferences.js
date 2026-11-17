@@ -1,7 +1,7 @@
 /* Preferências persistentes, modal e canais independentes de música e efeitos. */
 (() => {
   const storageKey = "opportunity.labTraining.settings";
-  const defaults = { musicVolume: 50, gameVolume: 100, subtitles: true, language: "pt-BR" };
+  const defaults = { musicVolume: 50, gameVolume: 100, subtitles: true, language: "en" };
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem(storageKey)) || {}; }
   catch (error) { console.warn("Não foi possível ler as configurações:", error); }
@@ -11,7 +11,7 @@
     musicVolume: volume(saved.musicVolume, defaults.musicVolume),
     gameVolume: volume(saved.gameVolume, defaults.gameVolume),
     subtitles: typeof saved.subtitles === "boolean" ? saved.subtitles : defaults.subtitles,
-    language: saved.language === "en" ? "en" : defaults.language
+    language: ["en", "pt-BR"].includes(saved.language) ? saved.language : defaults.language
   };
   const dialog = document.querySelector("#settingsDialog");
   const trigger = document.querySelector("#openSettings");
