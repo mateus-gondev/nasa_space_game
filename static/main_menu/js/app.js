@@ -8,7 +8,7 @@
       section.hidden = section.id !== `${page}Page`;
     });
     const target = page === "home" ? $("#playButton") : $(`#${page}Page .menu-back`);
-    target?.focus();
+    target?.focus({ preventScroll: true });
   }
 
   $("#playButton").addEventListener("click", () => {
@@ -23,9 +23,7 @@
       resume.addEventListener('click', () => { window.location.href = '/mars-test/'; });
     }
   } catch { /* Menu continua disponível com armazenamento inválido. */ }
-  for (const page of ["info", "credits"]) {
-    $(`#${page}Button`).addEventListener("click", () => showMenuPage(page));
-  }
+  $("#infoButton").addEventListener("click", () => showMenuPage("info"));
   document.querySelectorAll("[data-menu-home]").forEach(button => {
     button.addEventListener("click", () => showMenuPage("home"));
   });
