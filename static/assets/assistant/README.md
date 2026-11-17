@@ -6,4 +6,4 @@ O componente `nova.js` é compartilhado pelo treinamento e por Marte. Exibe uma 
 
 A animação troca três imagens lentamente e para, respeitando a preferência de reduzir movimento. Repetir a mesma dica não reinicia a animação nem atualiza o anúncio acessível. No mapa, é possível recolher o balão e tocar no assistente para reler a dica.
 
-O fundo escuro das imagens é integrado ao painel azul usando CSS, sem apagar ou gerar pixels. A origem e os direitos das imagens permanecem os do material fornecido.
+O filtro de transparência do retrato remove o cinza escuro durante a exibição, preservando os PNGs originais. A origem e os direitos das imagens permanecem os do material fornecido.

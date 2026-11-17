@@ -11,18 +11,20 @@
 <body>
   <div class="main-menu" id="mainMenuOverlay">
     <section class="menu-home" id="mainMenuHome" role="dialog" aria-modal="true" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
-      <img class="menu-logo" src="assets/title.png" alt="Surviving in Mars">
-      <nav class="menu-frame" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
-        <span class="menu-corner menu-corner-tl" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-tr" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-bl" aria-hidden="true"></span>
-        <span class="menu-corner menu-corner-br" aria-hidden="true"></span>
-        <button class="menu-option selected" id="playButton" type="button" data-i18n="Iniciar">Iniciar</button>
-        <button class="menu-option" id="continueCampaign" type="button" data-i18n="Continuar expedição" hidden>Continuar expedição</button>
-        <button class="menu-option" id="openSettings" type="button" data-i18n="Configurações" aria-haspopup="dialog">Configurações</button>
-        <button class="menu-option" id="infoButton" type="button" data-i18n="Info">Info</button>
-      </nav>
-      <button class="credits-button" id="creditsButton" type="button" data-i18n="Créditos">Créditos</button>
+      <img class="menu-horizon" src="assets/mars-horizon.png" alt="" width="256" height="144">
+      <div class="menu-home-content">
+        <header>
+          <h1 class="menu-title">Surviving<br>in <span>Mars</span></h1>
+          <p class="menu-description" data-i18n="Aprenda jogando. Venha para Marte e descubra uma nova aventura!">Aprenda jogando. Venha para Marte e descubra uma nova aventura!</p>
+          <p class="menu-rotate-hint" data-i18n="Vire o celular de lado para jogar com mais conforto.">Vire o celular de lado para jogar com mais conforto.</p>
+        </header>
+        <nav class="menu-actions" aria-label="Menu principal" data-i18n-aria-label="Menu principal">
+          <button class="menu-option menu-option-primary" id="playButton" type="button" data-i18n="Iniciar">Iniciar</button>
+          <button class="menu-option" id="continueCampaign" type="button" data-i18n="Continuar expedição" hidden>Continuar expedição</button>
+          <button class="menu-option" id="openSettings" type="button" data-i18n="Configurações" aria-haspopup="dialog">Configurações</button>
+          <button class="menu-option" id="infoButton" type="button" data-i18n="Info" aria-haspopup="dialog" aria-controls="infoPage">Info</button>
+        </nav>
+      </div>
     </section>
 
     <section class="menu-subpage" id="infoPage" role="dialog" aria-modal="true" aria-labelledby="infoTitle" hidden>

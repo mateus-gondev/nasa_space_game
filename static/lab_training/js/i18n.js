@@ -11,6 +11,8 @@
     "Lá vamos nós! Acompanhe a decolagem.": "Here we go! Watch the lift-off.",
     "O foguete 3D não abriu. Aperte Esc para voltar e tentar de novo.": "The 3D rocket did not open. Press Esc to go back and try again.",
     "Continuar expedição": "Continue expedition",
+    "Aprenda jogando. Venha para Marte e descubra uma nova aventura!": "Learn by playing. Come to Mars and discover a new adventure!",
+    "Vire o celular de lado para jogar com mais conforto.": "Turn your phone sideways for a better gameplay experience.",
     "RELATÓRIO · COMUNICAÇÃO": "REPORT · COMMUNICATIONS",
     "Envie o relatório de treinamento": "Send the training report",
     "Siga a trilha até o terminal de comunicação e pressione E. NOVA reunirá os quatro registros e enviará seu briefing: sustentar a base e recuperar arquivos históricos do Opportunity em uma expedição fictícia.": "Follow the trail to the communications terminal and press E. NOVA will combine the four records and send your briefing: sustain the base and recover historical Opportunity archives in a fictional expedition.",
